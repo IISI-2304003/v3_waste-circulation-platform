@@ -1,0 +1,50 @@
+[
+    {
+        "id": "B-0101",
+        "code": "B-0101",
+        "categoryId": "B",
+        "name": "毒性有害廢棄物 - 含汞廢棄物",
+        "description": "含有汞或汞化合物的有毒廢棄物",
+        "acceptanceCriteria": {
+            "physicalState": ["固態", "半固態"],
+            "chemicalProps": ["汞含量需檢測", "需密封保存"],
+            "restrictions": ["不得破損", "不得與其他廢棄物混合"],
+            "requirements": ["需提供汞含量檢測報告", "需使用專用容器"]
+        },
+        "standards": [
+            {
+                "parameter": "汞含量",
+                "operator": "大於(>)",
+                "value": 5,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["毒性", "汞", "重金屬"]
+    },
+    {
+        "id": "B-0102",
+        "code": "B-0102",
+        "categoryId": "B",
+        "name": "毒性有害廢棄物 - 含鉛廢棄物",
+        "description": "含有鉛或鉛化合物的有毒廢棄物",
+        "acceptanceCriteria": {
+            "physicalState": ["固態"],
+            "chemicalProps": ["鉛含量 > 100 mg/kg"],
+            "restrictions": ["不得粉塵化", "需防滲漏包裝"],
+            "requirements": ["需提供鉛含量檢測", "需清楚標示"]
+        },
+        "standards": [
+            {
+                "parameter": "鉛含量",
+                "operator": "大於(>)",
+                "value": 100,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["毒性", "鉛", "重金屬"]
+    }
+]

@@ -1,0 +1,126 @@
+[
+    {
+        "id": "A-0101",
+        "code": "A-0101",
+        "categoryId": "A",
+        "name": "製程有害廢棄物 - 電鍍污泥",
+        "description": "電鍍製程產生的含重金屬污泥",
+        "acceptanceCriteria": {
+            "physicalState": ["半固態", "固態"],
+            "chemicalProps": ["重金屬含量需符合標準", "含水率 < 50%", "pH 值 5-10"],
+            "restrictions": ["不得含有氰化物", "不得混入其他類別廢棄物"],
+            "requirements": ["需提供製程說明", "需提供重金屬檢測報告", "需清楚標示來源工廠"]
+        },
+        "standards": [
+            {
+                "parameter": "鉻含量",
+                "operator": "小於(<)",
+                "value": 500,
+                "unit": "mg/kg",
+                "condition": "需"
+            },
+            {
+                "parameter": "鎳含量",
+                "operator": "小於(<)",
+                "value": 300,
+                "unit": "mg/kg",
+                "condition": "需"
+            },
+            {
+                "parameter": "含水率",
+                "operator": "小於(<)",
+                "value": 50,
+                "unit": "%",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction", "cycle-internal"],
+        "tags": ["電鍍", "重金屬", "污泥"]
+    },
+    {
+        "id": "A-0102",
+        "code": "A-0102",
+        "categoryId": "A",
+        "name": "製程有害廢棄物 - 廢溶劑",
+        "description": "製程中使用後的廢有機溶劑",
+        "acceptanceCriteria": {
+            "physicalState": ["液態"],
+            "chemicalProps": ["有機物含量 > 70%", "不含水相", "閃點明確"],
+            "restrictions": ["不得含有鹵素", "不得混入重金屬", "需避光密封"],
+            "requirements": ["需提供溶劑成分分析", "需提供閃點資料", "需使用防爆容器運輸"]
+        },
+        "standards": [
+            {
+                "parameter": "有機物含量",
+                "operator": "大於(>)",
+                "value": 70,
+                "unit": "%",
+                "condition": "需"
+            },
+            {
+                "parameter": "含水率",
+                "operator": "小於(<)",
+                "value": 5,
+                "unit": "%",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-energy", "cycle-extraction"],
+        "tags": ["有機溶劑", "液態", "易燃"]
+    },
+    {
+        "id": "A-0103",
+        "code": "A-0103",
+        "categoryId": "A",
+        "name": "製程有害廢棄物 - 廢酸液",
+        "description": "製程產生的廢酸性溶液",
+        "acceptanceCriteria": {
+            "physicalState": ["液態"],
+            "chemicalProps": ["pH < 2", "酸度需明確標示", "不含懸浮物"],
+            "restrictions": ["不得混入鹼液", "不得含有氰化物", "需使用耐酸容器"],
+            "requirements": ["需提供 pH 值檢測", "需提供酸種類說明", "需有安全包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "pH 值",
+                "operator": "小於(<)",
+                "value": 2,
+                "unit": "",
+                "condition": "需"
+            },
+            {
+                "parameter": "懸浮物",
+                "operator": "小於(<)",
+                "value": 1,
+                "unit": "%",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["廢酸", "液態", "腐蝕性"]
+    },
+    {
+        "id": "A-0104",
+        "code": "A-0104",
+        "categoryId": "A",
+        "name": "製程有害廢棄物 - 廢鹼液",
+        "description": "製程產生的廢鹼性溶液",
+        "acceptanceCriteria": {
+            "physicalState": ["液態"],
+            "chemicalProps": ["pH > 12.5", "鹼度需明確標示", "不含懸浮物"],
+            "restrictions": ["不得混入酸液", "不得含有重金屬", "需使用耐鹼容器"],
+            "requirements": ["需提供 pH 值檢測", "需提供鹼種類說明", "需有安全包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "pH 值",
+                "operator": "大於(>)",
+                "value": 12.5,
+                "unit": "",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["廢鹼", "液態", "腐蝕性"]
+    }
+]

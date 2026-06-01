@@ -1,0 +1,42 @@
+[
+    {
+        "id": "D-0101",
+        "code": "D-0101",
+        "categoryId": "D",
+        "name": "一般事業廢棄物 - 廢紙類",
+        "description": "一般事業產生的廢紙類廢棄物",
+        "acceptanceCriteria": {
+            "physicalState": ["固態"],
+            "chemicalProps": ["乾燥無污染", "不含油污"],
+            "restrictions": ["不得混入塑膠", "不得受潮發霉"],
+            "requirements": ["需分類打包", "需保持乾燥"]
+        },
+        "standards": [
+            {
+                "parameter": "含水率",
+                "operator": "小於(<)",
+                "value": 15,
+                "unit": "%",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-internal", "cycle-cross-industry"],
+        "tags": ["一般廢棄物", "紙類", "可回收"]
+    },
+    {
+        "id": "D-0201",
+        "code": "D-0201",
+        "categoryId": "D",
+        "name": "一般事業廢棄物 - 廢塑膠容器",
+        "description": "一般事業產生的廢塑膠容器",
+        "acceptanceCriteria": {
+            "physicalState": ["固態"],
+            "chemicalProps": ["清潔無殘留", "材質單一"],
+            "restrictions": ["不得含有化學品殘留", "需清洗乾淨"],
+            "requirements": ["需標示塑膠類型", "需壓縮打包"]
+        },
+        "standards": [],
+        "circulationModes": ["cycle-extraction", "cycle-cross-industry"],
+        "tags": ["一般廢棄物", "塑膠", "可回收"]
+    }
+]

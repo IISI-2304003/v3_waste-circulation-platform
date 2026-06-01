@@ -1,0 +1,166 @@
+// ==================== 色彩變數 ====================
+
+// 主色調 - 清新綠
+$primary-green: #4caf50;
+$primary-green-light: #66bb6a;
+$primary-green-dark: #388e3c;
+
+// 輔助色 - 藍綠
+$secondary-teal: #26a69a;
+$secondary-cyan: #00bcd4;
+
+// 強調色 - 橘褐
+$accent-brown: #a0522d;
+$accent-orange: #ff9800;
+
+// 背景色 - 強調留白
+$bg-primary: #ffffff;
+$bg-gradient: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 50%, #ffffff 100%);
+$bg-card: #ffffff;
+$bg-section: #f9fafb;
+
+// 中性色
+$text-primary: #2c3e50;
+$text-secondary: #607d8b;
+$text-tertiary: #90a4ae;
+$border-color: #e0e0e0;
+$border-light: #f0f0f0;
+
+// ==================== 間距變數 ====================
+
+// 區塊間距
+$spacing-section-desktop: 120px;
+$spacing-section-tablet: 80px;
+$spacing-section-mobile: 60px;
+
+// 卡片內距
+$spacing-card-large: 32px;
+$spacing-card-medium: 24px;
+$spacing-card-small: 16px;
+
+// 一般間距
+$spacing-xl: 48px;
+$spacing-lg: 32px;
+$spacing-md: 24px;
+$spacing-sm: 16px;
+$spacing-xs: 8px;
+
+// ==================== 字體變數 ====================
+
+$font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif;
+$font-family-code: 'Courier New', Courier, monospace;
+
+// 字體大小
+$font-size-hero: 48px;
+$font-size-h1: 36px;
+$font-size-h2: 28px;
+$font-size-h3: 24px;
+$font-size-h4: 20px;
+$font-size-body: 16px;
+$font-size-small: 14px;
+$font-size-xs: 12px;
+
+// 行距
+$line-height-tight: 1.4;
+$line-height-base: 1.6;
+$line-height-loose: 1.8;
+
+// ==================== 陰影變數 ====================
+
+$shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 12px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.12);
+$shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+// 懸停陰影
+$shadow-hover: 0 6px 24px rgba(76, 175, 80, 0.2);
+
+// ==================== 圓角變數 ====================
+
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-full: 9999px;
+
+// ==================== 轉場時間 ====================
+
+$transition-fast: 0.15s;
+$transition-base: 0.3s;
+$transition-slow: 0.5s;
+
+// ==================== 斷點變數 ====================
+
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 1024px;
+$breakpoint-desktop: 1200px;
+$breakpoint-wide: 1440px;
+
+// ==================== Z-index 層級 ====================
+
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;
+
+// ==================== Mixin ====================
+
+// 響應式斷點
+@mixin mobile {
+    @media (max-width: #{$breakpoint-mobile - 1px}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: $breakpoint-mobile) and (max-width: #{$breakpoint-tablet - 1px}) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: $breakpoint-desktop) {
+        @content;
+    }
+}
+
+// 文字省略
+@mixin text-ellipsis($lines: 1) {
+    @if $lines == 1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    } @else {
+        display: -webkit-box;
+        -webkit-line-clamp: $lines;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}
+
+// 清除浮動
+@mixin clearfix {
+    &::after {
+        content: '';
+        display: table;
+        clear: both;
+    }
+}
+
+// 絕對置中
+@mixin absolute-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+// Flexbox 置中
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

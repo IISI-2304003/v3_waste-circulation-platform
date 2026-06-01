@@ -1,0 +1,112 @@
+[
+    {
+        "id": 1,
+        "name": "廠內模式1",
+        "icon": "cycle-internal",
+        "color": "#4CAF50",
+        "description": "物料製程內未排出，逕自循環使用",
+        "flowchartUrl": "/flowcharts/01-internal-cycle.png",
+        "flowchartAlt": "場內自體循環流程圖",
+        "notices": ["建議廢清書中敘明該資源循環方式，如於「附件一、製程資料-質量平衡流程圖」中，加入循環資源利用之流向箭頭，並輔以文字備註說明。"],
+        "relatedCategories": [1, 5, 12, 18]
+    },
+    {
+        "id": 2,
+        "name": "廠內模式2",
+        "icon": "cycle-cross-process",
+        "color": "#66BB6A",
+        "description": "同一工廠內不同製程間的廢棄物相互利用，例如製程A產生的廢料經處理後供製程B使用。此模式促進廠內資源整合，提升整體資源使用效率，降低廢棄物產生量。適用於具有多元製程的綜合性工廠。",
+        "flowchartUrl": "/flowcharts/mode-02-cross-process.svg",
+        "flowchartAlt": "場內跨製程循環流程圖",
+        "notices": ["需建立跨製程物料移轉機制", "確保不同製程間廢料相容性", "記錄各製程間的物質流向", "定期評估跨製程利用效益", "廢清書應載明各製程產出與使用情形"],
+        "relatedCategories": [2, 8, 15, 22]
+    },
+    {
+        "id": 3,
+        "name": "廠內模式3",
+        "icon": "cycle-park",
+        "color": "#26A69A",
+        "description": "同一產業園區內不同工廠間的資源共享與循環利用，透過園區管理單位建立媒合機制，促進廠商間的廢料交換。此模式可發揮產業聚落效應，建立區域性循環經濟網絡，降低運輸成本與環境衝擊。",
+        "flowchartUrl": "/flowcharts/mode-03-industrial-park.svg",
+        "flowchartAlt": "產業園區內循環流程圖",
+        "notices": ["需配合園區管理機構調度機制", "建立廠商間物料交換協議", "注意跨廠運輸的安全管理", "定期更新可供交換物料清單", "廢清書需載明園區內流向資訊"],
+        "relatedCategories": [3, 9, 16, 25]
+    },
+    {
+        "id": 4,
+        "name": "廠外模式1",
+        "icon": "cycle-supply-chain",
+        "color": "#00BCD4",
+        "description": "產業鏈上游廠商的廢料或副產物，經處理後成為下游廠商的原料或材料，形成縱向整合的循環利用網絡。此模式可強化產業鏈韌性，降低原料供應風險，創造供應鏈整體效益。",
+        "flowchartUrl": "/flowcharts/mode-04-supply-chain.svg",
+        "flowchartAlt": "產業鏈上下游循環流程圖",
+        "notices": ["需建立上下游廠商長期合作關係", "確保物料品質符合下游需求", "建立穩定的供應與接收機制", "定期檢討供需平衡狀況", "廢清書應載明產業鏈流向關係"],
+        "relatedCategories": [4, 11, 19, 28]
+    },
+    {
+        "id": 5,
+        "name": "廠外模式2",
+        "icon": "cycle-cross-industry",
+        "color": "#388E3C",
+        "description": "不同產業別之間的廢棄物交換與再利用，例如食品業廢料供應給農業或生技業。此模式可突破產業藩籬，創造跨領域合作機會，發掘廢棄物的多元利用價值，實現真正的循環經濟。",
+        "flowchartUrl": "/flowcharts/mode-05-cross-industry.svg",
+        "flowchartAlt": "跨產業循環流程圖",
+        "notices": ["需透過媒合平台尋找合作對象", "確認跨產業利用的法規適用性", "建立跨產業物料品質標準", "評估跨產業合作的經濟效益", "廢清書需詳載跨產業利用方式"],
+        "relatedCategories": [6, 13, 21, 30]
+    },
+    {
+        "id": 6,
+        "name": "廠外模式3",
+        "icon": "cycle-energy",
+        "color": "#FF9800",
+        "description": "廢棄物透過焚化、氣化或其他熱處理技術轉化為熱能、電能或燃料，供應工廠或社區使用。此模式可將難以物質循環的廢棄物轉為能源，實現資源的能源化利用，降低化石燃料依賴。",
+        "flowchartUrl": "/flowcharts/mode-06-energy-recovery.svg",
+        "flowchartAlt": "能源回收循環流程圖",
+        "notices": ["需符合空氣污染防制法規要求", "定期監測排放氣體與灰渣成分", "評估能源回收效率與經濟性", "建立能源產出與利用記錄", "廢清書應載明能源回收方式與產出量"],
+        "relatedCategories": [7, 14, 23, 31]
+    },
+    {
+        "id": 7,
+        "name": "廠外模式4",
+        "icon": "cycle-extraction",
+        "color": "#A0522D",
+        "description": "從廢棄物中透過化學、物理或生物技術提煉有價金屬、化學品或稀有元素，經精煉後重新進入原料市場。此模式可回收高價值資源，減少對天然礦產的開採，實現都市礦山的開發。",
+        "flowchartUrl": "/flowcharts/mode-07-extraction.svg",
+        "flowchartAlt": "原料萃取循環流程圖",
+        "notices": ["需具備專業萃取技術與設備", "確保萃取過程的環境安全", "定期檢測萃取物質純度", "建立萃取效率與成本評估機制", "廢清書需載明萃取方法與回收率"],
+        "relatedCategories": [10, 17, 26, 33]
+    },
+    {
+        "id": 8,
+        "name": "廠外模式5",
+        "icon": "cycle-construction",
+        "color": "#607D8B",
+        "description": "廢棄物經破碎、混合、成型等處理後製成建築材料或土木工程材料，如再生粒料、環保磚、鋪面材料等。此模式可消納大量營建廢棄物與產業副產物，降低天然砂石開採，促進綠色營建發展。",
+        "flowchartUrl": "/flowcharts/mode-08-construction.svg",
+        "flowchartAlt": "建材再製循環流程圖",
+        "notices": ["需符合建材相關國家標準", "定期檢測建材物理化學性質", "建立建材產品品質保證制度", "評估建材應用的耐久性與安全性", "廢清書應載明建材產品規格與用途"],
+        "relatedCategories": [20, 24, 27, 35]
+    },
+    {
+        "id": 9,
+        "name": "廠外模式6",
+        "icon": "cycle-compost",
+        "color": "#8BC34A",
+        "description": "有機廢棄物透過堆肥化、發酵等生物處理技術，製成堆肥、有機肥料或栽培介質，應用於農業或園藝。此模式可將有機廢棄物回歸土壤，改善土壤結構，增加土壤有機質，促進農業永續發展。",
+        "flowchartUrl": "/flowcharts/mode-09-compost.svg",
+        "flowchartAlt": "土壤改良循環流程圖",
+        "notices": ["需符合肥料管理法相關規定", "定期檢測堆肥產品品質與重金屬含量", "建立堆肥製程溫度與濕度控制", "評估堆肥產品的農業應用效果", "廢清書需載明堆肥化處理方式與產品用途"],
+        "relatedCategories": [29, 32, 36, 38]
+    },
+    {
+        "id": 10,
+        "name": "廠外模式7",
+        "icon": "cycle-innovation",
+        "color": "#9C27B0",
+        "description": "廢棄物透過先進技術與創新研發，開發為新型功能性材料或高附加價值產品，如奈米材料、複合材料、3D列印材料等。此模式代表循環經濟的最高價值化利用，可創造全新的市場與應用領域。",
+        "flowchartUrl": "/flowcharts/mode-10-innovation.svg",
+        "flowchartAlt": "創新材料循環流程圖",
+        "notices": ["需投入研發資源進行技術開發", "確保創新材料符合安全規範", "建立創新材料性能測試機制", "評估市場應用可行性與經濟效益", "廢清書應載明創新技術與產品特性"],
+        "relatedCategories": [34, 37, 39, 40]
+    }
+]

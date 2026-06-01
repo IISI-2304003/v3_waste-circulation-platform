@@ -1,0 +1,341 @@
+[
+    {
+        "id": "C-0201",
+        "code": "C-0201",
+        "categoryId": "C",
+        "name": "廢液pH值大（等）於12.5",
+        "description": "僅限以廢棄物處理設施處理之有害事業廢棄物",
+        "acceptanceCriteria": {
+            "physicalState": ["固態", "半固態"],
+            "chemicalProps": ["pH 值 6-9", "含水率 < 30%", "重金屬含量需符合標準"],
+            "restrictions": ["不得含有放射性物質", "不得含有爆炸性物質", "不得混入其他類別廢棄物"],
+            "requirements": ["需提供 MSDS（物質安全資料表）", "需提供檢測報告", "需清楚標示廢棄物來源"]
+        },
+        "standards": [
+            {
+                "parameter": "重金屬含量",
+                "operator": "小於(<)",
+                "value": 100,
+                "unit": "mg/kg",
+                "condition": "需"
+            },
+            {
+                "parameter": "含水率",
+                "operator": "小於(<)",
+                "value": 30,
+                "unit": "%",
+                "condition": "需"
+            },
+            {
+                "parameter": "pH 值",
+                "operator": "範圍",
+                "valueMin": 6,
+                "valueMax": 9,
+                "unit": "",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-internal", "cycle-extraction"],
+        "tags": ["有害特性", "重金屬", "固態"]
+    },
+    {
+        "id": "C-0202",
+        "code": "C-0202",
+        "categoryId": "C",
+        "name": "廢液pH值小（等）於2.0",
+        "description": "僅限以廢棄物處理設施處理之有害事業廢棄物",
+        "acceptanceCriteria": {
+            "physicalState": ["液態", "半固態"],
+            "chemicalProps": ["硫酸含量 < 5%", "氯離子含量需在規定範圍", "水分 < 45%"],
+            "restrictions": ["不得含有劇毒物質", "不得有強烈腐蝕性", "運輸時需特殊包裝"],
+            "requirements": ["需提供詳細成分分析報告", "需提供來源證明", "需符合環保署規定的包裝方式"]
+        },
+        "standards": [
+            {
+                "parameter": "硫酸含量",
+                "operator": "小於(<)",
+                "value": 5,
+                "unit": "%",
+                "condition": "需"
+            },
+            {
+                "parameter": "水分",
+                "operator": "等於",
+                "value": 45,
+                "unit": "%",
+                "condition": "需"
+            },
+            {
+                "parameter": "氯離子",
+                "operator": "範圍",
+                "valueMin": 1,
+                "valueMax": 6,
+                "unit": "%",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction", "cycle-energy"],
+        "tags": ["有害特性", "化學物質", "液態"]
+    },
+    {
+        "id": "C-0203",
+        "code": "C-0203",
+        "categoryId": "C",
+        "name": "廢液在55°C時封銅(S20C)之腐蝕速率每超過6.35毫米/年者",
+        "description": "來源：不銹鋼酸化、電子業蝕刻",
+        "acceptanceCriteria": {
+            "physicalState": ["液態"],
+            "chemicalProps": ["有機物含量 > 50%", "閃點 > 60°C", "不含鹵素"],
+            "restrictions": ["不得混入水相物質", "不得含有重金屬", "需避光保存"],
+            "requirements": ["需提供有機物成分分析", "需提供閃點測試報告", "需使用防爆容器"]
+        },
+        "standards": [
+            {
+                "parameter": "有機物含量",
+                "operator": "大於(>)",
+                "value": 50,
+                "unit": "%",
+                "condition": "需"
+            },
+            {
+                "parameter": "閃點",
+                "operator": "大於(>)",
+                "value": 60,
+                "unit": "°C",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-energy"],
+        "tags": ["有機溶劑", "液態", "易燃"]
+    },
+    {
+        "id": "C-0204",
+        "code": "C-0204",
+        "categoryId": "C",
+        "name": "廢漆渣 (Waste Paint Sludge)",
+        "description": "來源：噴漆房水簾系統沉淀物",
+        "acceptanceCriteria": {
+            "physicalState": ["液態"],
+            "chemicalProps": ["pH < 2 或 pH > 12.5", "酸鹼濃度需明確標示"],
+            "restrictions": ["不得混合酸鹼", "不得含有氧化劑", "需使用耐酸鹼容器"],
+            "requirements": ["需提供 pH 值檢測報告", "需提供濃度分析", "需有專業包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "pH 值",
+                "operator": "小於(<)",
+                "value": 2,
+                "unit": "",
+                "condition": "或"
+            },
+            {
+                "parameter": "pH 值",
+                "operator": "大於(>)",
+                "value": 12.5,
+                "unit": "",
+                "condition": "或"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["酸鹼", "液態", "腐蝕性"]
+    },
+    {
+        "id": "C-0205",
+        "code": "C-0205",
+        "categoryId": "C",
+        "name": "含銅污泥 (Copper Sludge)",
+        "description": "來源：PCB板製作、廢水處理設施產出",
+        "acceptanceCriteria": {
+            "physicalState": ["半固態", "固態"],
+            "chemicalProps": ["重金屬總量 > 1000 mg/kg", "含水率 < 60%"],
+            "restrictions": ["不得有自由液", "不得混入放射性物質"],
+            "requirements": ["需提供重金屬檢測報告", "需提供含水率測試", "需使用防滲漏包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "重金屬總量",
+                "operator": "大於(>)",
+                "value": 1000,
+                "unit": "mg/kg",
+                "condition": "需"
+            },
+            {
+                "parameter": "含水率",
+                "operator": "小於(<)",
+                "value": 60,
+                "unit": "%",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["重金屬", "泥餅", "半固態"]
+    },
+    {
+        "id": "C-0206",
+        "code": "C-0206",
+        "categoryId": "C",
+        "name": "重金屬污泥類",
+        "description": "來源：表面處理、電鏀、化學製程廢水處理產出",
+        "acceptanceCriteria": {
+            "physicalState": ["固態", "液態"],
+            "chemicalProps": ["氰化物含量需標示", "pH 值需控制在安全範圍"],
+            "restrictions": ["不得與酸類混合", "不得含有強氧化劑"],
+            "requirements": ["需提供氰化物濃度檢測", "需特殊密封包裝", "需專業運輸"]
+        },
+        "standards": [
+            {
+                "parameter": "氰化物含量",
+                "operator": "小於(<)",
+                "value": 50,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["氰化物", "劇毒", "固態"]
+    },
+    {
+        "id": "C-0207",
+        "code": "C-0207",
+        "categoryId": "C",
+        "name": "有機溶劑類",
+        "description": "來源：印刷業、塗裝業、化學製程清洗劑",
+        "acceptanceCriteria": {
+            "physicalState": ["固態", "半固態"],
+            "chemicalProps": ["鉻含量 > 100 mg/kg", "含水率 < 40%"],
+            "restrictions": ["需區分六價鉻與三價鉻", "不得含有其他重金屬"],
+            "requirements": ["需提供鉻價數分析", "需提供總鉻檢測報告"]
+        },
+        "standards": [
+            {
+                "parameter": "鉻含量",
+                "operator": "大於(>)",
+                "value": 100,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["鉻", "重金屬", "固態"]
+    },
+    {
+        "id": "C-0208",
+        "code": "C-0208",
+        "categoryId": "C",
+        "name": "廢酸類",
+        "description": "來源：化學製程、表面處理、金屬配解製程",
+        "acceptanceCriteria": {
+            "physicalState": ["固態"],
+            "chemicalProps": ["鎳含量 > 200 mg/kg", "不含氰化物"],
+            "restrictions": ["不得混入其他重金屬污泥"],
+            "requirements": ["需提供鎳含量檢測", "需防塵包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "鎳含量",
+                "operator": "大於(>)",
+                "value": 200,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["鎳", "重金屬", "固態"]
+    },
+    {
+        "id": "C-0209",
+        "code": "C-0209",
+        "categoryId": "C",
+        "name": "廢鹼類",
+        "description": "來源：化學製程、表面處理、電鏀業鹼性清洗",
+        "acceptanceCriteria": {
+            "physicalState": ["液態"],
+            "chemicalProps": ["閃點 > 40°C", "不含鹵素 > 1000 ppm"],
+            "restrictions": ["不得混入切削液", "不得含有重金屬"],
+            "requirements": ["需提供油品成分分析", "需使用油桶包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "閃點",
+                "operator": "大於(>)",
+                "value": 40,
+                "unit": "°C",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-energy", "cycle-extraction"],
+        "tags": ["廢油", "液態", "可燃"]
+    },
+    {
+        "id": "C-0210",
+        "code": "C-0210",
+        "categoryId": "C",
+        "name": "廢油類",
+        "description": "來源：機械加工業、車輛維修業、金屬製品製造業",
+        "acceptanceCriteria": {
+            "physicalState": ["固態", "半固態"],
+            "chemicalProps": ["鉛含量 > 500 mg/kg", "含水率 < 50%"],
+            "restrictions": ["不得粉塵化", "需防止鉛外洩"],
+            "requirements": ["需提供鉛含量檢測", "需密封防塵包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "鉛含量",
+                "operator": "大於(>)",
+                "value": 500,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["鉛", "重金屬", "固態"]
+    },
+    {
+        "id": "C-0211",
+        "code": "C-0211",
+        "categoryId": "C",
+        "name": "含銅、鉛、鎳、鈘等污泥",
+        "description": "來源：電鏀業、表面處理業廢水處理產出",
+        "acceptanceCriteria": {
+            "physicalState": ["固態", "液態"],
+            "chemicalProps": ["汞含量需明確標示", "需避免揮發"],
+            "restrictions": ["需低溫保存", "不得破損容器"],
+            "requirements": ["需提供汞含量檢測", "需使用特殊密封容器", "需冷藏運輸"]
+        },
+        "standards": [
+            {
+                "parameter": "汞含量",
+                "operator": "大於(>)",
+                "value": 5,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["汞", "劇毒", "重金屬"]
+    },
+    {
+        "id": "C-0212",
+        "code": "C-0212",
+        "categoryId": "C",
+        "name": "含氰化物廢污泥",
+        "description": "來源：電鏀業、金屬表面處理廢水處理產出",
+        "acceptanceCriteria": {
+            "physicalState": ["固態"],
+            "chemicalProps": ["砷含量 > 50 mg/kg", "含水率 < 30%"],
+            "restrictions": ["不得粉塵化", "需防滲漏"],
+            "requirements": ["需提供砷含量檢測", "需多層防護包裝"]
+        },
+        "standards": [
+            {
+                "parameter": "砷含量",
+                "operator": "大於(>)",
+                "value": 50,
+                "unit": "mg/kg",
+                "condition": "需"
+            }
+        ],
+        "circulationModes": ["cycle-extraction"],
+        "tags": ["砷", "劇毒", "固態"]
+    }
+]
