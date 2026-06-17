@@ -1,5 +1,5 @@
 <template>
-  <div class="home-page">
+  <div class="home-page ">
     <section class="hero-section">
       <ParticleBackground />
       <div class="container hero-content">
@@ -8,7 +8,7 @@
             <img src="../assets/logo.png" alt="環境部資源循環署" class="hero-logo" />
           </div>
 
-          <h1 class="hero-title">產業廢棄物循環利用<br>智慧媒合平台</h1>
+          <h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">智慧媒合平台</span></h1>
           <p class="hero-description">連結資源循環供需，推動產業共生，實現永續循環經濟</p>
 
           <div class="hero-actions">
@@ -35,67 +35,99 @@
             直接在此頁面切換六大類、搜尋子項代碼，並即時預覽主要允收資訊。
           </p>
         </div>
+        <el-row :gutter="20" class="tabsLabel">
+          <el-col class="colGap" :span="4" id="wasteSpeciesRef">
+            <el-button plain :class="['tab-btn', { 'tab-btn--active': activeTab === 'wasteSpeciesRef' }]" @click="activeTab = 'wasteSpeciesRef'">
+              <el-icon style="vertical-align: middle">
+                <Search />
+              </el-icon>
+              <span>廢棄物物種搜尋</span>
+            </el-button>
+          </el-col>
+          <el-col :span="18" id="wasteCodeRef">
+            <el-row :gutter="10">
+              <el-col :span="5">
+                <el-button plain :class="['tab-btn', { 'tab-btn--active': activeTab === 'wasteCodeRef' }]" @click="activeTab = 'wasteCodeRef'">
+                  <el-icon style="vertical-align: middle">
+                    <Management />
+                  </el-icon>
+                  <span>廢棄物代碼搜尋</span>
+                </el-button>
+              </el-col>
+              <el-col :span="6">
+                <el-select v-model="selectedCategory" placeholder="請選擇廢棄物類別" :class="{ 'select-control': activeTab === 'wasteCodeRef' }">
+                  <el-option v-for="item in wasteCategories" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+              </el-col>
+              <el-col :span="13">
+                <el-input v-model="searchKeyword" clearable placeholder="關鍵字搜尋" :class="{ 'select-control': activeTab === 'wasteCodeRef' }" />
+              </el-col>
+            </el-row>
+          </el-col>
+        </el-row>
+        <el-divider />
+        <el-row>
+          <el-col v-if="activeTab === 'wasteSpeciesRef'" :span="24">
+            <div class="species-panel">
+              <div class="species-panel-header">
+                <h3 class="list-title">廢棄物物種</h3>
+                <!-- <el-input v-model="speciesSearchKeyword" clearable placeholder="搜尋物種名稱或代表項目" class="species-search-input" /> -->
+              </div>
 
-        <div class="search-shell">
-          <div class="search-box">
-            <div class="search-label-row">
-              <span class="search-label">目前類別</span>
-              <span class="search-current">{{ currentCategory.code }} {{ getCategoryShortName(currentCategory) }}</span>
-            </div>
-            <el-select v-model="selectedCode" filterable clearable placeholder="請輸入代碼或名稱搜尋，例如 C-0202" size="large" class="waste-selector" @change="handleCodeSelect">
-              <el-option-group v-for="category in wasteCategories" :key="category.id" :label="`${category.code} ${getCategoryShortName(category)}`">
-                <el-option v-for="code in category.codes" :key="code.id" :label="`${code.code}｜${code.name}`" :value="code.code">
-                  <div class="option-content">
-                    <span class="code-dot" :style="{ background: category.color }"></span>
-                    <span class="code-badge">{{ code.code }}</span>
-                    <span class="code-name">{{ code.name }}</span>
+              <div v-if="speciesDisplayCards.length > 0" class="species-grid">
+                <button v-for="species in speciesCurrentPageCards" :key="species.id" type="button" class="species-card" @click="handleSpeciesClick(species)">
+                  <div class="species-card-top">
+                    <span class="species-no">{{ species.id }}</span>
                   </div>
-                </el-option>
-              </el-option-group>
-            </el-select>
-          </div>
+                  <h4 class="species-title">{{ species.name }}</h4>
+                  <div class="species-image" role="img" :aria-label="species.imageLabel">
+                    <img :src="species.image" :alt="species.imageLabel" loading="lazy" @error="handleSpeciesImageError" />
+                  </div>
+                  <p class="species-items">{{ species.representativeItems.join('、') }}</p>
+                </button>
+              </div>
 
-          <div class="category-buttons">
-            <button v-for="category in wasteCategories" :key="category.id" type="button" :class="['category-btn', { active: selectedCategory === category.id }]" @click="selectCategory(category.id)">
-              <span class="category-icon-shell" :style="getCategoryShellStyle(category, selectedCategory === category.id)">
-                <span class="category-icon-mark" role="img" :aria-label="`${category.code} icon`">{{ getCategoryIcon(category) }}</span>
-              </span>
-              <span class="category-title">{{ getCategoryShortName(category) }}</span>
-              <span class="category-code">({{ category.code }})</span>
-            </button>
-          </div>
+              <div v-else class="empty-state">
+                <el-empty description="查無符合的物種類別" />
+              </div>
 
-          <div v-if="currentCategoryCodes.length > 0" class="codes-panel">
-            <div class="codes-panel-header">
-              <h3 class="list-title">{{ getCategoryShortName(currentCategory) }}</h3>
-              <span class="list-count">共 {{ currentCategoryCodes.length }} 項</span>
+              <div v-if="speciesDisplayCards.length > speciesPageSize" class="pagination-wrapper">
+                <el-pagination v-model:current-page="speciesCurrentPage" :page-size="speciesPageSize" :total="speciesDisplayCards.length" layout="prev, pager, next" background />
+              </div>
             </div>
+          </el-col>
 
-            <div v-if="currentPageCodes.length > 0" class="codes-grid">
-              <button v-for="code in currentPageCodes" :key="code.id" type="button" class="code-card" @click="handleCardClick(code.code)">
-                <div class="code-card-top">
-                  <span class="code-chip" :style="{ background: currentCategoryColor }">{{ code.code }}</span>
-                </div>
-                <h4 class="code-card-title">{{ code.name }}</h4>
-                <p class="code-card-description">{{ code.description }}</p>
-              </button>
+          <el-col v-else-if="activeTab === 'wasteCodeRef'" :span="24">
+            <div v-if="displayCodes.length > 0" class="codes-panel">
+              <div class="codes-panel-header">
+                <h3 class="list-title">{{ getCategoryShortName(currentCategory) }}</h3>
+                <span class="list-count">共 {{ displayCodes.length }} 項</span>
+              </div>
+
+              <div v-if="currentPageCodes.length > 0" class="codes-grid">
+                <button v-for="code in currentPageCodes" :key="code.id" type="button" class="code-card" @click="handleCardClick(code.code)">
+                  <div class="code-card-top">
+                    <span class="code-chip" :style="{ background: getCodeColor(code) }">{{ code.code }}</span>
+                  </div>
+                  <h4 class="code-card-title">{{ code.name }}</h4>
+                  <p class="code-card-description">{{ code.description }}</p>
+                </button>
+              </div>
+
+              <div v-else class="empty-state">
+                <el-empty description="目前此類別暫無資料" />
+              </div>
+
+              <div v-if="displayCodes.length > pageSize" class="pagination-wrapper">
+                <el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="displayCodes.length" layout="prev, pager, next" background />
+              </div>
             </div>
-
-            <div v-else class="empty-state">
-              <el-empty description="目前此類別暫無資料" />
+            <div v-else class="empty-state-main">
+              <el-empty description="請選擇類別以查看廢棄物代碼" />
             </div>
+          </el-col>
+        </el-row>
 
-            <div v-if="currentCategoryCodes.length > pageSize" class="pagination-wrapper">
-              <el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="currentCategoryCodes.length" layout="prev, pager, next" background />
-            </div>
-          </div>
-
-          <div v-else class="empty-state-main">
-            <el-empty description="請選擇類別以查看廢棄物代碼" />
-          </div>
-
-
-        </div>
       </div>
     </section>
 
@@ -104,14 +136,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Search, ArrowRight } from '@element-plus/icons-vue'
+import { Search, Management } from '@element-plus/icons-vue'
 import { useCirculationModes } from '../composables/useCirculationModes'
 import ParticleBackground from '../components/ParticleBackground.vue'
 import CirculationModesGrid from '../components/CirculationModesGrid.vue'
 import CirculationModal from '../components/CirculationModal.vue'
 import { wasteCategories, getCategoryById, getCategoryByCode, getAllWasteCodes } from '@/data/wasteCategories'
+import { getWasteSpeciesCardsLocal, buildSpeciesFallbackImage } from '@/data/wasteSpecies'
 
 const router = useRouter()
 const route = useRoute()
@@ -128,22 +161,83 @@ const defaultCodeMap = {
 
 const selectedCategory = ref('C')
 const selectedCode = ref('C-0202')
+const searchKeyword = ref('')
 const dialogVisible = ref(false)
 const selectedMode = ref(null)
 const currentPage = ref(1)
 const pageSize = ref(9)
+const activeTab = ref('wasteSpeciesRef')
+const speciesSearchKeyword = ref('')
+const speciesCurrentPage = ref(1)
+const speciesPageSize = 10
+
+const wasteSpeciesCards = getWasteSpeciesCardsLocal()
+const fallbackSpeciesImage = buildSpeciesFallbackImage()
+
+const handleSpeciesImageError = (event) => {
+  const target = event?.target
+  if (!target || target.dataset.fallbackApplied === 'true') return
+  target.dataset.fallbackApplied = 'true'
+  target.src = fallbackSpeciesImage
+}
+
+const handleSpeciesClick = (species) => {
+  router.push({
+    path: `/waste-species/${species.id}`,
+    query: {
+      from: 'home',
+      tab: 'wasteSpeciesRef'
+    }
+  })
+}
 
 const currentCategory = computed(() => getCategoryById(selectedCategory.value) || wasteCategories[0])
-const currentCategoryCodes = computed(() => currentCategory.value?.codes || [])
+const currentCategoryCodes = computed(() => {
+  if (selectedCategory.value === 'ALL') {
+    return getAllWasteCodes()
+  }
+  return currentCategory.value?.codes || []
+})
 const currentCategoryColor = computed(() => currentCategory.value?.color || '#7bbf8a')
 const allWasteCodes = computed(() => getAllWasteCodes())
+const filteredCategoryCodes = computed(() => {
+  const keyword = searchKeyword.value.trim().toLowerCase()
+  if (!keyword) return currentCategoryCodes.value
+
+  return currentCategoryCodes.value.filter((code) => {
+    const targetText = `${code.code} ${code.name} ${code.description || ''}`.toLowerCase()
+    return targetText.includes(keyword)
+  })
+})
+const displayCodes = computed(() => (activeTab.value === 'wasteCodeRef' ? filteredCategoryCodes.value : currentCategoryCodes.value))
 const currentPageCodes = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
-  return currentCategoryCodes.value.slice(start, end)
+  return displayCodes.value.slice(start, end)
+})
+const speciesDisplayCards = computed(() => {
+  const keyword = speciesSearchKeyword.value.trim().toLowerCase()
+  if (!keyword) return wasteSpeciesCards
+
+  return wasteSpeciesCards.filter((species) => {
+    const targetText = `${species.id} ${species.name} ${species.representativeItems.join(' ')}`.toLowerCase()
+    return targetText.includes(keyword)
+  })
+})
+const speciesCurrentPageCards = computed(() => {
+  const start = (speciesCurrentPage.value - 1) * speciesPageSize
+  const end = start + speciesPageSize
+  return speciesDisplayCards.value.slice(start, end)
 })
 
 const getCategoryShortName = (category) => category?.name?.split(' - ')[1] || category?.name || ''
+
+const getCodeColor = (code) => {
+  if (selectedCategory.value === 'ALL') {
+    return getCategoryById(code.categoryId)?.color || currentCategoryColor.value
+  }
+  return currentCategoryColor.value
+}
 
 const categoryIconMap = {
   A: '⚗️',
@@ -199,6 +293,14 @@ const handleCodeSelect = (code) => {
   selectedCode.value = code
 }
 
+watch([activeTab, selectedCategory, searchKeyword], () => {
+  currentPage.value = 1
+})
+
+watch([activeTab, speciesSearchKeyword], () => {
+  speciesCurrentPage.value = 1
+})
+
 const showModeDetail = (mode) => {
   selectedMode.value = mode
   dialogVisible.value = true
@@ -216,6 +318,9 @@ const scrollToSearch = () => {
 }
 
 onMounted(() => {
+  if (route.query.tab) {
+    activeTab.value = route.query.tab
+  }
   if (route.query.category) {
     selectedCategory.value = route.query.category
   }
@@ -226,9 +331,15 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .home-page {
-  min-height: 80vh;
-  background: #ffffff;
+  min-height: 100vh;
+  width: 100%;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(143, 178, 224, 0.1), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.3), transparent 40%),
+    radial-gradient(circle at 10% 100%, rgba(143, 178, 224, 0.3), transparent 50%);
 }
 
 .container {
@@ -244,24 +355,15 @@ onMounted(() => {
 .hero-section {
   position: relative;
   background:
-    linear-gradient(135deg, rgba(232, 245, 233, 0.45) 0%, rgba(241, 248, 244, 0.7) 50%, rgba(255, 255, 255, 0.45) 100%),
     url('../assets/Bg.png');
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;
   padding: 24px 40px;
   overflow: hidden;
-  min-height: auto;
+  min-height: 100vh;
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 30% 50%, rgba(76, 175, 80, 0.08), transparent 50%),
-      radial-gradient(circle at 70% 50%, rgba(33, 150, 243, 0.05), transparent 50%);
-    pointer-events: none;
-  }
+
 }
 
 .hero-content {
@@ -337,23 +439,76 @@ onMounted(() => {
 }
 
 .search-section {
-  position: relative;
-  background:
-    linear-gradient(180deg, rgba(235, 246, 239, 0.88) 0%, rgba(245, 250, 248, 0.96) 35%, #ffffff 100%);
-  padding: 24px 0;
-  overflow: hidden;
+  padding: 50px 60px;
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 12% 18%, rgba(76, 175, 80, 0.14), transparent 20%),
-      radial-gradient(circle at 88% 10%, rgba(33, 150, 243, 0.12), transparent 18%),
-      linear-gradient(120deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0));
-    pointer-events: none;
+  .container {
+    background: #ffffff8e;
+    border-radius: 32px;
+    padding: 50px 24px;
+    box-shadow: 0 24px 80px rgba(53, 92, 72, 0.12);
+    min-height: 600px;
+
+    .search-header {
+      text-align: center;
+      margin-bottom: 36px;
+
+      .section-title {
+        font-size: 40px;
+        font-weight: 700;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      .section-description {
+        font-size: 16px;
+        color: #607d8b;
+        text-align: center;
+        max-width: 720px;
+        margin: 0 auto;
+        line-height: 1.85;
+      }
+    }
+
+    .tabsLabel {
+      --el-tabs-header-height: 50px;
+
+      /* 維持原本高度不變 */
+      .tab-btn {
+        background-color: #ffffff;
+        color: $primary-green;
+        border-color: $primary-green-light;
+        width: 100%;
+      }
+
+      .tab-btn--active {
+        background-color: $primary-green;
+        color: #ffffff;
+        border-color: $primary-green;
+      }
+
+      .colGap {
+        border-right: #ccc solid 1.5px;
+        height: 30px;
+        padding-left: 30px;
+      }
+
+      #wasteCodeRef {
+        .select-control {
+          /* 1. 預設狀態下的邊框顏色 */
+          --el-border-color: #{$primary-green};
+
+        }
+      }
+
+
+
+    }
+
+
   }
 }
+
 
 .search-header,
 .search-shell {
@@ -361,10 +516,7 @@ onMounted(() => {
   z-index: 1;
 }
 
-.search-header {
-  text-align: center;
-  margin-bottom: 36px;
-}
+
 
 .search-eyebrow {
   margin: 0 0 10px;
@@ -375,32 +527,14 @@ onMounted(() => {
   font-weight: 700;
 }
 
-.section-title {
-  font-size: 40px;
-  font-weight: 700;
-  color: #2c3e50;
-  text-align: center;
-  margin-bottom: 16px;
-}
 
-.section-description {
-  font-size: 16px;
-  color: #607d8b;
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto;
-  line-height: 1.85;
-}
+
+
 
 .search-shell {
   max-width: 1100px;
   margin: 0 auto;
   padding: 28px;
-  // border-radius: 32px;
-  // background: rgba(255, 255, 255, 0.72);
-  // border: 1px solid rgba(255, 255, 255, 0.78);
-  // box-shadow: 0 24px 80px rgba(53, 92, 72, 0.12);
-  // backdrop-filter: blur(14px);
 }
 
 .search-box {
@@ -531,13 +665,7 @@ onMounted(() => {
   color: #ffffff;
 }
 
-.codes-panel {
-  border-radius: 28px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(245, 250, 248, 0.94));
-  border: 1px solid rgba(113, 155, 132, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 18px 40px rgba(82, 116, 98, 0.1);
-  padding: 26px;
-}
+
 
 .codes-panel-header {
   display: flex;
@@ -570,6 +698,100 @@ onMounted(() => {
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 20px;
+}
+
+.species-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.species-search-input {
+  max-width: 360px;
+}
+
+.species-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.species-card {
+  border: 1px solid rgba(110, 155, 130, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 22px;
+  padding: 16px;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 10px 24px rgba(88, 120, 103, 0.08);
+  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+}
+
+.species-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(88, 120, 103, 0.14);
+  border-color: rgba(55, 138, 101, 0.28);
+}
+
+.species-card-top {
+  display: flex;
+}
+
+.species-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ecf5ef;
+  color: #2e6e4f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.species-title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #2e4754;
+  min-height: 44px;
+}
+
+.species-image {
+  height: 90px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(231, 243, 236, 0.92), rgba(245, 250, 248, 0.96));
+  border: 1px solid rgba(101, 143, 120, 0.2);
+  overflow: hidden;
+}
+
+.species-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.species-items {
+  margin: 0;
+  font-size: 13px;
+  color: #667f8d;
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+  overflow: hidden;
 }
 
 .code-card {
@@ -687,9 +909,25 @@ onMounted(() => {
   .codes-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .species-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 @media (max-width: 968px) {
+
+  .search-section .container :deep(.tabsLabel .el-tabs__nav),
+  .search-section .container .tab-label-right,
+  .search-section .container .query-controls {
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+  }
+
+  .search-section .container .tab-label-left {
+    justify-content: flex-start;
+  }
+
   .hero-content {
     flex-direction: column;
     gap: 40px;
@@ -722,6 +960,20 @@ onMounted(() => {
   .codes-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .species-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .species-search-input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .species-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 576px) {
@@ -738,6 +990,16 @@ onMounted(() => {
   }
 
   .codes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .species-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .species-grid {
     grid-template-columns: 1fr;
   }
 }

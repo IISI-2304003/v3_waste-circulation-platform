@@ -3,10 +3,10 @@
 		<div class="circle-container">
 			<!-- 中央地球循環圖 -->
 			<div class="center-earth">
-				<div class="earth-glow"></div>
-				<div class="recycle-icon">
+				<!-- <div class="earth-glow"></div> -->
+				<!-- <div class="recycle-icon">
 
-				</div>
+				</div> -->
 			</div>
 
 			<!-- 連接線動畫 -->
@@ -18,13 +18,12 @@
 						<stop offset="100%" stop-color="rgba(76, 175, 80, 0)" />
 					</radialGradient>
 				</defs>
-				<circle class="pulse-circle" cx="250" cy="250" r="180" fill="none" stroke="rgba(76, 175, 80, 0.3)" stroke-width="2" stroke-dasharray="10,5" />
+				<circle class="pulse-circle" cx="250" cy="250" r="180" fill="none" stroke="#FFF" stroke-width="2" stroke-dasharray="10,5" />
 				<!-- 外層光暈 -->
 				<circle class="pulse-circle-2-glow" cx="250" cy="250" r="120" fill="none" stroke="rgba(76, 175, 80, 0.4)" stroke-width="8" />
-				<!-- 內層線條 -->
-				<circle class="pulse-circle-2" cx="250" cy="250" r="120" fill="none" stroke="rgba(76, 175, 80, 0.6)" stroke-width="1" />
-				<circle cx="250" cy="250" r="90" fill="url(#glowGradient)" opacity="0.5" class="glow-circle" />
+
 			</svg>
+			<img class="earth-image" src="../assets/earth.png" alt="Earth" />
 
 			<!-- 環繞的循環模式圖標 -->
 			<div class="modes-circle">
@@ -44,11 +43,22 @@
 					</span>
 				</div>
 			</div>
+
+			<!-- 點選後顯示的卡片區塊內容 -->
+			<div v-if="selectedMode" class="mode-detail-card">
+				<h3>{{ selectedMode.name }}</h3>
+				<p>{{ selectedMode.description || '尚未提供模式說明。' }}</p>
+				<el-button type="primary" round class="explore-btn" @click="handleExploreMode">
+					探索此模式
+				</el-button>
+			</div>
+
 		</div>
 	</div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import {
 	Operation,
 	Connection,
@@ -70,6 +80,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['mode-click'])
+const selectedMode = ref(null)
 
 // 圖標映射
 const iconMap = {
@@ -125,7 +136,12 @@ const getModePosition = (index) => {
 }
 
 const handleModeClick = (mode) => {
-	emit('mode-click', mode)
+	selectedMode.value = mode
+}
+
+const handleExploreMode = () => {
+	if (!selectedMode.value) return
+	emit('mode-click', selectedMode.value)
 }
 </script>
 
@@ -147,30 +163,39 @@ const handleModeClick = (mode) => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
+	/* 中央地球循環圖 */
+	.center-earth {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 120px;
+		height: 120px;
+		z-index: 5;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.earth-glow {
+		position: absolute;
+		width: 180px;
+		height: 180px;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, rgba(76, 175, 80, 0.1) 40%, transparent 70%);
+		animation: pulse-glow 3s ease-in-out infinite;
+	}
+
+	.earth-image {
+		position: relative;
+		top: -3%;
+		left: -35%;
+		width: 100%;
+		opacity: 0.7;
+	}
 }
 
-/* 中央地球循環圖 */
-.center-earth {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 120px;
-	height: 120px;
-	z-index: 5;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.earth-glow {
-	position: absolute;
-	width: 180px;
-	height: 180px;
-	border-radius: 50%;
-	background: radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, rgba(76, 175, 80, 0.1) 40%, transparent 70%);
-	animation: pulse-glow 3s ease-in-out infinite;
-}
 
 .recycle-icon {
 	position: relative;
@@ -199,10 +224,10 @@ const handleModeClick = (mode) => {
 /* 連接線 */
 .connection-lines {
 	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+	top: -9%;
+	left: -37%;
+	width: 105%;
+	height: 105%;
 	z-index: 1;
 	pointer-events: none;
 }
@@ -214,75 +239,77 @@ const handleModeClick = (mode) => {
 /* 環繞的模式圖標 */
 .modes-circle {
 	position: absolute;
-	top: -7%;
-	left: -7%;
+	top: -15%;
+	left: -40%;
 	width: 100%;
 	height: 100%;
-	z-index: 3;
-}
+	z-index: 20;
 
-.mode-item {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	cursor: pointer;
-	animation: fadeInScale 0.6s ease-out backwards;
-	transition: all 0.3s ease;
-
-	&:hover {
-		transform: translate(var(--x), var(--y)) scale(1.15) !important;
-		z-index: 10;
-
-		.mode-circle {
-			box-shadow: 0 0 25px var(--glow-color), 0 0 40px rgba(76, 175, 80, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2);
-			transform: scale(1.1);
-			border-color: var(--glow-color);
-		}
-
-		.icon-glow {
-			opacity: 0.3;
-			transform: scale(1.5);
-		}
-
-		.mode-name {
-			color: #4CAF50;
-			font-weight: 600;
-			box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
-		}
-	}
-}
-
-.mode-circle {
-	position: relative;
-	width: 65px;
-	height: 65px;
-	border-radius: 50%;
-	background: linear-gradient(145deg, #ffffff, #f0fff5);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border: 3px solid #E0E0E0;
-	transition: all 0.4s ease;
-	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 1px 3px rgba(255, 255, 255, 0.8);
-	animation: floating 3s ease-in-out infinite;
-	overflow: hidden;
-
-	&::before {
-		content: '';
+	.mode-item {
 		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent);
+		top: 50%;
+		left: 50%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		cursor: pointer;
+		animation: fadeInScale 0.6s ease-out backwards;
+		transition: all 0.3s ease;
+		z-index: 21;
+
+		&:hover {
+			transform: translate(var(--x), var(--y)) scale(1.15) !important;
+			z-index: 10;
+
+			.mode-circle {
+				box-shadow: 0 0 25px var(--glow-color), 0 0 40px rgba(76, 175, 80, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2);
+				transform: scale(1.1);
+				border-color: var(--glow-color);
+			}
+
+			.icon-glow {
+				opacity: 0.3;
+				transform: scale(1.5);
+			}
+
+			.mode-name {
+				color: #4CAF50;
+				font-weight: 600;
+				box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+			}
+		}
+	}
+
+	.mode-circle {
+		position: relative;
+		width: 65px;
+		height: 65px;
 		border-radius: 50%;
-		pointer-events: none;
+		background: linear-gradient(145deg, #ffffff, #f0fff5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 3px solid #E0E0E0;
+		transition: all 0.4s ease;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 1px 3px rgba(255, 255, 255, 0.8);
+		animation: floating 3s ease-in-out infinite;
+		overflow: hidden;
+
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent);
+			border-radius: 50%;
+			pointer-events: none;
+		}
 	}
 }
+
 
 .icon-glow {
 	position: absolute;
@@ -315,6 +342,7 @@ const handleModeClick = (mode) => {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	animation: fadeInUp 0.6s ease-out backwards;
 	border: 1px solid rgba(76, 175, 80, 0.1);
+	pointer-events: none;
 }
 
 .pulse-circle {
@@ -328,6 +356,40 @@ const handleModeClick = (mode) => {
 
 .pulse-circle-2 {
 	animation: pulse-ring 3s ease-in-out infinite 0.5s;
+}
+
+/* 卡片區塊內容 */
+.mode-detail-card {
+	position: absolute;
+	right: -40px;
+	top: 10%;
+	width: 200px;
+	min-height: 250px;
+	background: #fffff990;
+	border-radius: 16px;
+	padding: 20px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+	z-index: 5;
+	animation: fadeInUp 0.5s ease-out;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+
+	h3 {
+		margin: 0;
+		color: #4CAF50;
+	}
+
+	p {
+		margin: 0;
+		color: #333;
+		line-height: 1.6;
+		flex: 1;
+	}
+
+	.explore-btn {
+		width: 100%;
+	}
 }
 
 /* 動畫 */

@@ -26,6 +26,11 @@ const routes = [
         name: 'WasteCodeDetail',
         component: () => import('../views/WasteCodeDetail.vue'),
     },
+    {
+        path: '/waste-species/:id',
+        name: 'WasteSpeciesDetail',
+        component: () => import('../views/WasteSpeciesDetail.vue'),
+    },
 ];
 
 const router = createRouter({

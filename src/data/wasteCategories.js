@@ -70,6 +70,16 @@ export const wasteCategories = [
         pattern: /^R-\d{4}$/,
         codes: rClassCodes,
     },
+    {
+        id: 'ALL',
+        code: '全部',
+        name: '全部類別',
+        description: '顯示所有廢棄物類別',
+        icon: 'grid',
+        color: '#3D5467',
+        pattern: null,
+        codes: [],
+    },
 ];
 
 export function getCategoryById(categoryId) {
@@ -77,7 +87,7 @@ export function getCategoryById(categoryId) {
 }
 
 export function getCategoryByCode(code) {
-    return wasteCategories.find((cat) => cat.pattern.test(code));
+    return wasteCategories.find((cat) => cat.pattern && cat.pattern.test(code));
 }
 
 export function getAllWasteCodes() {
