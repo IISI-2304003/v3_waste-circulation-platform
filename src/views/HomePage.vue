@@ -8,7 +8,7 @@
             <img src="../assets/logo.png" alt="環境部資源循環署" class="hero-logo" />
           </div>
 
-          <h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">智慧媒合平台</span></h1>
+          <h1 class="hero-title">產業廢棄物循環利用<br><span class="highlight-text">智慧媒合平台</span></h1>
           <p class="hero-description">連結資源循環供需，推動產業共生，實現永續循環經濟</p>
 
           <div class="hero-actions">
@@ -356,8 +356,8 @@ onMounted(() => {
 
 .hero-section {
   position: relative;
-  background:
-    url('../assets/Bg.png');
+  // background:
+  //   linear-gradient(135deg, rgba(77, 182, 152, 0.35) 0%, rgba(20, 184, 166, 0.25) 50%, rgba(34, 197, 94, 0.3) 100%);
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;
@@ -366,6 +366,20 @@ onMounted(() => {
   min-height: clamp(640px, 82vh, 900px);
   isolation: isolate;
 
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(45, 138, 111, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
   &::after {
     content: '';
     position: absolute;
@@ -373,9 +387,9 @@ onMounted(() => {
     right: 0;
     bottom: -1px;
     height: 120px;
-    // background:
-    //   radial-gradient(circle at 0% 100%, rgba(232, 244, 255, 0.95) 0%, rgba(232, 244, 255, 0.35) 36%, transparent 72%),
-    //   linear-gradient(180deg, rgba(232, 244, 255, 0) 0%, rgba(232, 244, 255, 0.78) 82%, rgba(232, 244, 255, 1) 100%);
+    background:
+      radial-gradient(circle at 0% 100%, rgba(240, 253, 244, 0.95) 0%, rgba(240, 253, 244, 0.35) 36%, transparent 72%),
+      linear-gradient(180deg, rgba(240, 253, 244, 0) 0%, rgba(240, 253, 244, 0.8) 82%, rgba(240, 253, 244, 1) 100%);
     z-index: 0;
     pointer-events: none;
   }
@@ -419,16 +433,25 @@ onMounted(() => {
 
 .hero-title {
   font-size: clamp(48px, 3.2vw, 68px);
-  font-weight: 700;
-  color: #2c3e50;
+  font-weight: 800;
+  color: #ffffff;
   margin-bottom: 16px;
   line-height: 1.3;
   animation: fadeInUp 0.8s ease-out 0.1s backwards;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.highlight-text {
+  background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
 }
 
 .hero-description {
   font-size: clamp(17px, 1.1vw, 24px);
-  color: #607d8b;
+  color: #e0f2fe;
   margin-bottom: 28px;
   line-height: 1.8;
   animation: fadeInUp 0.8s ease-out 0.3s backwards;
@@ -460,11 +483,12 @@ onMounted(() => {
   padding: 0 60px 50px;
 
   .container {
-    background: #8cbfd37c;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 50%, #fef3c7 100%);
     border-radius: 32px;
     padding: 50px 24px;
-    box-shadow: 0 24px 80px rgba(53, 92, 72, 0.12);
+    box-shadow: 0 24px 80px rgba(45, 138, 111, 0.2), 0 0 60px rgba(132, 204, 22, 0.1);
     min-height: 600px;
+    border: 1px solid rgba(20, 184, 166, 0.2);
 
     .search-header {
       text-align: center;
@@ -473,14 +497,17 @@ onMounted(() => {
       .section-title {
         font-size: 40px;
         font-weight: 700;
-        color: #2c3e50;
+        background: linear-gradient(135deg, #2d8a6f 0%, #14b8a6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         text-align: center;
         margin-bottom: 16px;
       }
 
       .section-description {
         font-size: 16px;
-        color: #607d8b;
+        color: #475569;
         text-align: center;
         max-width: 720px;
         margin: 0 auto;
@@ -495,18 +522,26 @@ onMounted(() => {
       .tab-btn {
         background-color: #ffffff;
         color: $primary-green;
-        border-color: $primary-green-light;
+        border-color: $primary-green;
         width: 100%;
+        border: 2px solid;
+        transition: all 0.3s ease;
+      }
+
+      .tab-btn:hover {
+        background-color: rgba($primary-green, 0.05);
+        box-shadow: 0 4px 12px rgba($primary-green, 0.15);
       }
 
       .tab-btn--active {
-        background-color: $primary-green;
+        background: linear-gradient(135deg, $primary-green 0%, $secondary-teal 100%);
         color: #ffffff;
         border-color: $primary-green;
+        box-shadow: 0 6px 20px rgba($primary-green, 0.25);
       }
 
       .colGap {
-        border-right: #ccc solid 1.5px;
+        border-right: rgba($primary-green, 0.3) solid 1.5px;
         height: 30px;
         padding-left: 30px;
       }
@@ -697,7 +732,10 @@ onMounted(() => {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #28414f;
+  background: linear-gradient(135deg, #2d8a6f 0%, #14b8a6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .list-count {
@@ -705,10 +743,11 @@ onMounted(() => {
   align-items: center;
   padding: 8px 14px;
   border-radius: 999px;
-  background: rgba(76, 175, 80, 0.08);
-  color: #4b7f64;
+  background: linear-gradient(135deg, rgba(45, 138, 111, 0.1) 0%, rgba(20, 184, 166, 0.08) 100%);
+  color: #2d8a6f;
   font-size: 13px;
   font-weight: 700;
+  border: 1px solid rgba(45, 138, 111, 0.2);
 }
 
 .codes-grid {
@@ -738,26 +777,44 @@ onMounted(() => {
 }
 
 .species-card {
-  border: 1px solid rgba(110, 155, 130, 0.12);
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(20, 184, 166, 0.25);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 244, 0.96) 100%);
   border-radius: 22px;
   padding: 16px;
   min-height: 240px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 0 10px 24px rgba(88, 120, 103, 0.08);
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  box-shadow: 0 10px 24px rgba(45, 138, 111, 0.12), 0 0 30px rgba(132, 204, 22, 0.08);
+  transition: all 0.24s ease;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
   width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.species-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.1), transparent);
+  transition: left 0.5s ease;
+  pointer-events: none;
 }
 
 .species-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 34px rgba(88, 120, 103, 0.14);
-  border-color: rgba(55, 138, 101, 0.28);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(45, 138, 111, 0.18), 0 0 40px rgba(132, 204, 22, 0.12);
+  border-color: rgba(20, 184, 166, 0.4);
+}
+
+.species-card:hover::before {
+  left: 100%;
 }
 
 .species-card-top {
@@ -771,8 +828,8 @@ onMounted(() => {
   min-width: 50px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: #ecf5ef;
-  color: #2e6e4f;
+  background: linear-gradient(135deg, #2d8a6f 0%, #14b8a6 100%);
+  color: #ffffff;
   font-size: 13px;
   font-weight: 700;
 }
@@ -781,15 +838,16 @@ onMounted(() => {
   margin: 0;
   font-size: 16px;
   line-height: 1.4;
-  color: #2e4754;
+  color: #0f172a;
   min-height: 44px;
+  font-weight: 700;
 }
 
 .species-image {
   height: 90px;
   border-radius: 18px;
-  background: linear-gradient(160deg, rgba(231, 243, 236, 0.92), rgba(245, 250, 248, 0.96));
-  border: 1px solid rgba(101, 143, 120, 0.2);
+  background: linear-gradient(135deg, rgba(45, 138, 111, 0.1) 0%, rgba(20, 184, 166, 0.08) 50%, rgba(132, 204, 22, 0.08) 100%);
+  border: 1px solid rgba(20, 184, 166, 0.3);
   overflow: hidden;
 }
 
@@ -814,20 +872,38 @@ onMounted(() => {
 
 .code-card {
   text-align: left;
-  border: 1px solid rgba(110, 155, 130, 0.12);
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(20, 184, 166, 0.25);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 244, 0.96) 100%);
   border-radius: 22px;
   padding: 18px;
   min-height: 160px;
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease, background 0.24s ease;
-  box-shadow: 0 10px 24px rgba(88, 120, 103, 0.08);
+  transition: all 0.24s ease;
+  box-shadow: 0 10px 24px rgba(45, 138, 111, 0.12), 0 0 30px rgba(132, 204, 22, 0.08);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.code-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.1), transparent);
+  transition: right 0.5s ease;
+  pointer-events: none;
 }
 
 .code-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 34px rgba(88, 120, 103, 0.14);
-  border-color: rgba(55, 138, 101, 0.28);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(45, 138, 111, 0.18), 0 0 40px rgba(132, 204, 22, 0.12);
+  border-color: rgba(20, 184, 166, 0.4);
+}
+
+.code-card:hover::before {
+  right: 100%;
 }
 
 .code-card-top {
@@ -844,14 +920,16 @@ onMounted(() => {
   color: #ffffff;
   font-size: 13px;
   font-weight: 700;
+  background: linear-gradient(135deg, #2d8a6f 0%, #14b8a6 100%);
+  box-shadow: 0 4px 12px rgba(45, 138, 111, 0.2);
 }
 
 .code-card-title {
   margin: 0 0 10px;
   font-size: 15px;
-  color: #2e4754;
+  color: #0f172a;
   line-height: 1.5;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .code-card-description {

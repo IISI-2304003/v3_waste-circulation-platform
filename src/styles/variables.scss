@@ -1,30 +1,37 @@
 // ==================== 色彩變數 ====================
 
-// 主色調 - 清新綠
-$primary-green: #4caf50;
-$primary-green-light: #66bb6a;
-$primary-green-dark: #388e3c;
+// 主色調 - 深翠綠（強烈版本）
+$primary-green: #2d8a6f;
+$primary-green-light: #3da87f;
+$primary-green-dark: #1a5147;
+$primary-green-bright: #22c55e;
 
-// 輔助色 - 藍綠
-$secondary-teal: #26a69a;
-$secondary-cyan: #00bcd4;
+// 輔助色 - 藍綠與湖藍
+$secondary-teal: #14b8a6;
+$secondary-cyan: #06b6d4;
+$secondary-blue: #3b82f6;
 
-// 強調色 - 橘褐
-$accent-brown: #a0522d;
-$accent-orange: #ff9800;
+// 強調色 - 檸檬綠與珊瑚紅
+$accent-lime: #84cc16;
+$accent-orange: #f97316;
+$accent-coral: #ff6b6b;
 
-// 背景色 - 強調留白
+// 背景色 - 動感漸變
 $bg-primary: #ffffff;
-$bg-gradient: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 50%, #ffffff 100%);
+$bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 25%, #f0f9ff 50%, #fef3c7 100%);
 $bg-card: #ffffff;
-$bg-section: #f9fafb;
+$bg-section: #f8fafc;
+
+// 深色背景（用於高對比區域）
+$bg-dark-section: #0f172a;
+$bg-gradient-dark: linear-gradient(135deg, #2d8a6f 0%, #14b8a6 50%, #22c55e 100%);
 
 // 中性色
-$text-primary: #2c3e50;
-$text-secondary: #607d8b;
-$text-tertiary: #90a4ae;
-$border-color: #e0e0e0;
-$border-light: #f0f0f0;
+$text-primary: #0f172a;
+$text-secondary: #475569;
+$text-tertiary: #64748b;
+$border-color: #cbd5e1;
+$border-light: #e2e8f0;
 
 // ==================== 間距變數 ====================
 
