@@ -181,7 +181,7 @@ const handleNextStep = () => {
 }
 
 .detail-header-nav {
-	max-width: 1280px;
+	max-width: min(92vw, 1640px);
 	margin: 0 auto;
 	padding: 0 24px 24px;
 
@@ -198,7 +198,7 @@ const handleNextStep = () => {
 }
 
 .detail-container {
-	max-width: 1280px;
+	max-width: min(92vw, 1640px);
 	margin: 0 auto;
 	padding: 0 24px;
 }
@@ -570,6 +570,29 @@ const handleNextStep = () => {
 		height: 44px;
 		font-size: 14px;
 		gap: 6px;
+	}
+}
+
+@media (min-width: 1600px) {
+
+	.detail-header-nav,
+	.detail-container {
+		max-width: min(92vw, 1780px);
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	.detail-wrapper {
+		padding: 56px;
+	}
+
+	.species-title {
+		font-size: clamp(46px, 2.1vw, 58px);
+	}
+
+	.classification-content p,
+	.item-text {
+		font-size: clamp(16px, 1vw, 19px);
 	}
 }
 </style>

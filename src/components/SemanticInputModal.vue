@@ -6,13 +6,13 @@
 				<el-alert title="使用說明" type="info" :closable="false" show-icon>
 					<p>輸入廢棄物特性參數後，系統會自動解析為查詢條件。</p>
 					<p class="example-text">
-						例如：水分 45%、硫酸 < 5%、氯離子 1-6%、pH 6-9 </p>
+						請以頓號（、）分隔條件，例如：硫酸含量 < 5%、重金屬含量 < 100 mg/kg、pH值 < 2</p>
 				</el-alert>
 			</div>
 
 			<!-- 輸入區域 -->
 			<div class="input-area">
-				<el-input v-model="inputText" type="textarea" :rows="8" placeholder="請輸入廢棄物特性參數，每行一個條件&#10;例如：&#10;水分 45%&#10;硫酸含量 < 5%&#10;重金屬含量 < 100 mg/kg&#10;pH 值 6-9&#10;氯離子 1-6%" class="semantic-input" />
+				<el-input v-model="inputText" type="textarea" :rows="3" placeholder="請輸入廢棄物特性參數，以頓號（、）分隔&#10;例如：水分 45%、硫酸含量 < 5%、重金屬含量 < 100 mg/kg、pH值 6~9" class="semantic-input" />
 
 				<div class="char-count">
 					{{ inputText.length }} 字元
@@ -26,45 +26,12 @@
 					{{ example.label }}
 				</el-button>
 			</div>
-
-			<!-- 預覽解析結果 -->
-			<div v-if="parsedPreview.length > 0" class="preview-section">
-				<h4>解析預覽</h4>
-				<el-table :data="parsedPreview" border size="small">
-					<el-table-column prop="parameter" label="參數" width="150" />
-					<el-table-column prop="operator" label="操作符" width="100" />
-					<el-table-column label="數值" width="150">
-						<template #default="{ row }">
-							<span v-if="row.operator === '範圍'">
-								{{ row.valueMin }} ~ {{ row.valueMax }}
-							</span>
-							<span v-else>
-								{{ row.value }}
-							</span>
-						</template>
-					</el-table-column>
-					<el-table-column prop="unit" label="單位" width="80" />
-					<el-table-column label="狀態" width="100">
-						<template #default="{ row }">
-							<el-tag v-if="row.isText" type="warning" size="small">
-								未識別
-							</el-tag>
-							<el-tag v-else type="success" size="small">
-								已識別
-							</el-tag>
-						</template>
-					</el-table-column>
-				</el-table>
-			</div>
 		</div>
 
 		<template #footer>
 			<span class="dialog-footer">
 				<el-button @click="handleClose">取消</el-button>
-				<el-button type="info" @click="handlePreview" :loading="parsing">
-					預覽解析
-				</el-button>
-				<el-button type="primary" @click="handleConfirm" :disabled="!inputText.trim() || parsedPreview.length === 0">
+				<el-button type="primary" @click="handleConfirm" :disabled="!inputText.trim()" :loading="parsing">
 					確認填入
 				</el-button>
 			</span>
@@ -73,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { parseSemanticInput } from '@/api/wasteCode'
 
@@ -95,40 +62,31 @@ const visible = computed({
 })
 
 const inputText = ref('')
-const parsedPreview = ref([])
 const parsing = ref(false)
 
 // 範例資料
 const examples = [
 	{
 		label: '化學品類',
-		text: '水分45%\n硫酸含量<5%\n氯離子1-6%\npH 值 6-9'
+		text: '水分45%、硫酸含量<5%、氯離子1-6%、pH值 6~9'
 	},
 	{
 		label: '重金屬類',
-		text: '重金屬含量<100 mg/kg\n鉻含量<500 mg/kg\n含水率<50%'
+		text: '重金屬含量<100 mg/kg、鉻含量<500 mg/kg、含水率<50%'
 	},
 	{
 		label: '有機物類',
-		text: '有機物含量>70%\n含水率<5%\n閃點>60°C'
+		text: '有機物含量>70%、含水率<5%、閃點>60°C'
 	}
 ]
-
-// 監聽輸入變化
-watch(inputText, () => {
-	// 清空預覽
-	parsedPreview.value = []
-})
 
 // 帶入範例
 const fillExample = (text) => {
 	inputText.value = text
-	// 自動解析
-	handlePreview()
 }
 
-// 預覽解析結果
-const handlePreview = () => {
+// 確認填入
+const handleConfirm = () => {
 	if (!inputText.value.trim()) {
 		ElMessage.warning('請先輸入內容')
 		return
@@ -136,47 +94,47 @@ const handlePreview = () => {
 
 	parsing.value = true
 
+	let parsedResult = []
 	try {
-		const result = parseSemanticInput(inputText.value)
-		parsedPreview.value = result
+		const normalizedText = inputText.value
+			.replace(/，/g, '、')
+			.split('、')
+			.map(item => item.trim())
+			.filter(Boolean)
+			.join('\n')
 
-		const unrecognizedCount = result.filter(r => r.isText).length
-		if (unrecognizedCount > 0) {
-			ElMessage.warning(`已解析 ${result.length} 筆，其中 ${unrecognizedCount} 筆尚未識別`)
-		} else {
-			ElMessage.success(`成功解析 ${result.length} 筆參數`)
-		}
+		parsedResult = parseSemanticInput(normalizedText)
 	} catch (error) {
 		console.error('解析失敗：', error)
 		ElMessage.error('解析失敗')
-	} finally {
 		parsing.value = false
-	}
-}
-
-// 確認填入
-const handleConfirm = () => {
-	if (parsedPreview.value.length === 0) {
-		ElMessage.warning('請先預覽解析結果')
 		return
 	}
 
 	// 過濾未識別的項目
-	const validItems = parsedPreview.value.filter(item => !item.isText)
+	const validItems = parsedResult.filter(item => !item.isText)
 
 	if (validItems.length === 0) {
 		ElMessage.error('沒有可用的參數條件')
+		parsing.value = false
 		return
 	}
 
+	const unrecognizedCount = parsedResult.length - validItems.length
+	if (unrecognizedCount > 0) {
+		ElMessage.warning(`已填入 ${validItems.length} 筆，略過 ${unrecognizedCount} 筆未識別內容`)
+	} else {
+		ElMessage.success(`成功填入 ${validItems.length} 筆參數`)
+	}
+
 	emit('confirm', validItems)
+	parsing.value = false
 	handleClose()
 }
 
 // 關閉彈窗
 const handleClose = () => {
 	inputText.value = ''
-	parsedPreview.value = []
 	visible.value = false
 }
 </script>
@@ -233,19 +191,6 @@ const handleClose = () => {
 		margin: 0;
 		color: #606266;
 		font-size: 14px;
-	}
-}
-
-.preview-section {
-	padding: 16px;
-	background: linear-gradient(135deg, rgba(236, 246, 239, 0.82), rgba(245, 250, 248, 0.92));
-	border-radius: 8px;
-
-	h4 {
-		font-size: 16px;
-		font-weight: 600;
-		color: #2C3E50;
-		margin: 0 0 12px 0;
 	}
 }
 

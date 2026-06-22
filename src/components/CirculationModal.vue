@@ -23,13 +23,9 @@
               </el-icon>
               廢清書填報注意事項
             </h3>
-            <el-collapse v-model="activeNotices" accordion>
-              <el-collapse-item v-for="(notice, index) in mode.notices" :key="index" :title="`注意事項 ${index + 1}`" :name="index">
-                <div class="notice-content">
-                  {{ notice }}
-                </div>
-              </el-collapse-item>
-            </el-collapse>
+            <div class="mode-description" style="white-space: pre-line">
+              {{ mode.notices }}
+            </div>
           </div>
         </el-col>
 
@@ -45,11 +41,9 @@
             <div class="flowchart-container">
               <!-- 流程圖占位符 -->
               <div class="flowchart-placeholder">
-                
-
                 <!-- 簡易流程示意 -->
                 <div class="simple-flow">
-                  <img :src="mode.flowchartUrl" :alt="mode.flowchartAlt" style="width: 100%; height: auto; max-width: 400px;" />
+                  <img :src="mode.flowchartUrl" :alt="mode.flowchartAlt" style="width: 100%; height: auto; " />
                 </div>
               </div>
             </div>
@@ -151,6 +145,7 @@ const handleSearch = () => {
 
 .section-block {
   margin-bottom: 32px;
+  
 
   &:last-child {
     margin-bottom: 0;
@@ -178,6 +173,7 @@ const handleSearch = () => {
   background: #F9FAFB;
   border-radius: 8px;
   border-left: 4px solid #4CAF50;
+  // min-height: 230px;
 }
 
 .notice-content {
@@ -198,8 +194,9 @@ const handleSearch = () => {
 .flowchart-container {
   background: #F9FAFB;
   border-radius: 12px;
+  height: 100%;
   padding: 24px;
-  min-height: 500px;
+  min-height: 200px;
 }
 
 .flowchart-placeholder {
@@ -208,7 +205,7 @@ const handleSearch = () => {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  padding: 40px 20px;
+  // padding: 40px 20px;
   text-align: center;
 }
 
@@ -235,12 +232,13 @@ const handleSearch = () => {
 
 /* 簡易流程示意 */
 .simple-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 24px;
-  padding: 24px;
+  // display: flex;
+  // align-items: center;
+  // justify-content: center;
+  // gap: 20px;
+  // margin-top: 24px;
+  // padding: 24px;
+  width: 90%;
   background: #FFFFFF;
   border-radius: 8px;
   border: 2px dashed #E0E0E0;

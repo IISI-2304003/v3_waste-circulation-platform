@@ -29,7 +29,7 @@
 		<!-- 詳情內容 -->
 		<div v-else-if="wasteCode" class="detail-content" :data-print-time="currentDateTime">
 			<!-- 帶數字的步驟進度條 -->
-			<div class="step-progress no-print">
+			<div v-if="currentStep !== 1" class="step-progress no-print">
 				<div class="step-item" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
 					<div class="step-circle">1</div>
 					<div class="step-label">允收標準查詢</div>
@@ -85,30 +85,11 @@
 			<div v-if="currentStep === 1" class="step-content">
 				<div class="section-title-bar">
 					<div class="step-number">1</div>
-					<h2>允收標準查詢</h2>
-					<span class="subtitle">（輸入條件可查詢符合之廢棄物處理廠）</span>
+					<h2>條件設定</h2>
+					<span class="subtitle">（輸入條件後進行 AI 媒合分析）</span>
 				</div>
 
-				<div class="standards-section">
-					<div class="section-header">
-						<el-button type="primary" @click="openSemanticModal" :icon="Search">
-							語意化搜尋
-						</el-button>
-					</div>
-
-					<AcceptanceStandardForm ref="standardFormRef" :initial-standards="wasteCode.standards" />
-				</div>
-
-
-				<!-- 步驟導航按鈕 -->
-				<div class="step-navigation">
-					<el-button type="primary" size="large" @click="nextStep">
-						下一步：適用循環模式
-						<el-icon class="el-icon--right">
-							<ArrowRight />
-						</el-icon>
-					</el-button>
-				</div>
+				<ConditionSetupWorkspace ref="standardFormRef" :initial-standards="wasteCode.standards" :embedded-mode="true" @next="nextStep" />
 			</div>
 
 			<!-- 步驟 2: 適用循環模式 -->
@@ -232,9 +213,6 @@
 			</el-result>
 		</div>
 
-		<!-- 語意化搜尋彈窗 -->
-		<SemanticInputModal v-model="showSemanticModal" @confirm="handleSemanticConfirm" />
-
 		<!-- 溶出試驗標準彈窗 -->
 		<el-dialog v-model="showLeachingDialog" title="溶出試驗標準" width="760px" class="leaching-dialog">
 			<div class="standards-table">
@@ -294,12 +272,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, ArrowRight, Loading, Document, Edit, Connection, Search, Printer, Download, Check } from '@element-plus/icons-vue'
+import { ArrowLeft, ArrowRight, Loading, Document, Printer, Download, Check } from '@element-plus/icons-vue'
 import { getWasteCodeDetail } from '@/api/wasteCode'
 import { getCategoryById } from '@/data/wasteCategories'
 import circulationModes from '@/data/circulationModes.json'
-import AcceptanceStandardForm from '@/components/AcceptanceStandardForm.vue'
-import SemanticInputModal from '@/components/SemanticInputModal.vue'
+import ConditionSetupWorkspace from '@/components/condition-setup/ConditionSetupWorkspace.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -307,7 +284,6 @@ const router = useRouter()
 // 狀態
 const wasteCode = ref(null)
 const loading = ref(true)
-const showSemanticModal = ref(false)
 const showLeachingDialog = ref(false)
 const standardFormRef = ref(null)
 const currentStep = ref(1) // 當前步驟：1=允收條件, 2=允收標準查詢, 3=適用循環模式
@@ -403,22 +379,9 @@ const goBack = () => {
 	}
 }
 
-// 開啟語意化搜尋彈窗
-const openSemanticModal = () => {
-	showSemanticModal.value = true
-}
-
 // 開啟溶出試驗標準彈窗
 const openLeachingDialog = () => {
 	showLeachingDialog.value = true
-}
-
-// 處理語意化搜尋確認
-const handleSemanticConfirm = (parsedData) => {
-	if (standardFormRef.value) {
-		standardFormRef.value.setStandards(parsedData)
-		ElMessage.success('已將搜尋條件填入表單')
-	}
 }
 
 // 列印功能
@@ -436,7 +399,7 @@ const handleExport = () => {
 
 <style scoped lang="scss">
 .waste-code-detail {
-	max-width: 1200px;
+	max-width: min(92vw, 1640px);
 	margin: 0 auto;
 	padding: 24px;
 	min-height: 80vh;
@@ -720,10 +683,7 @@ const handleExport = () => {
 
 /* 卡片式布局 */
 .criteria-cards-grid {
-	// display: grid;
-	// grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-	// gap: 5px;
-	// margin-bottom: 24px;
+	margin-bottom: 24px;
 }
 
 .criteria-card {
@@ -1311,6 +1271,27 @@ const handleExport = () => {
 		margin-top: 30px;
 		padding-top: 10px;
 		border-top: 1px solid #ddd;
+	}
+}
+
+@media (min-width: 1600px) {
+	.waste-code-detail {
+		max-width: min(92vw, 1780px);
+		padding: 28px 20px;
+	}
+
+	.header-left {
+		.code-title {
+			font-size: clamp(32px, 2vw, 44px);
+		}
+
+		.code-description {
+			font-size: clamp(16px, 1vw, 20px);
+		}
+	}
+
+	.section-title-bar h2 {
+		font-size: clamp(24px, 1.3vw, 30px);
 	}
 }
 </style>

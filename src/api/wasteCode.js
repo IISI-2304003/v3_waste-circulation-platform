@@ -102,60 +102,80 @@ export function parseSemanticInput(text) {
     const lines = text.split('\n').filter((line) => line.trim());
     const results = [];
 
+    const normalizeUnit = (unit = '') => unit.replace(/\s+/g, '').toLowerCase();
+
+    const unitMap = {
+        '%': '%',
+        'mg/kg': 'mg/kg',
+        mgkg: 'mg/kg',
+        ppm: 'ppm',
+        '°c': '°C',
+        c: '°C',
+        'g/l': 'g/L',
+        gl: 'g/L',
+    };
+
+    const normalizeOperator = (op = '') => {
+        const source = op.replace(/\s+/g, '');
+        if (source === '<' || source === '＜') return '小於(<)';
+        if (source === '>' || source === '＞') return '大於(>)';
+        if (source === '<=' || source === '≤' || source === '≦' || source === '≶' || source === '=<') return '小於等於(<=)';
+        if (source === '>=' || source === '≥' || source === '≧' || source === '=>') return '大於等於(>=)';
+        if (source === '=' || source === '＝') return '等於';
+        return '';
+    };
+
+    const normalizeUnitOutput = (unit = '') => {
+        if (!unit) return '';
+        const normalized = normalizeUnit(unit);
+        return unitMap[normalized] || unit;
+    };
+
     for (const line of lines) {
         const trimmedLine = line.trim();
+        const normalizedLine = trimmedLine.replace(/～/g, '~').replace(/−/g, '-').replace(/\s+/g, ' ').trim();
 
-        // 解析「水分45%」格式
-        const pattern1 = /^(.+?)(\d+\.?\d*)(%|mg\/kg|ppm|°C)?$/;
-        const match1 = trimmedLine.match(pattern1);
-
-        if (match1) {
-            const [, parameter, value, unit = ''] = match1;
-            results.push({
-                parameter: parameter.trim(),
-                operator: '等於',
-                value: parseFloat(value),
-                unit: unit,
-                condition: '需',
-            });
-            continue;
-        }
-
-        // 解析「硫酸<5%」格式
-        const pattern2 = /^(.+?)([<>=])(\d+\.?\d*)(%|mg\/kg|ppm|°C)?$/;
-        const match2 = trimmedLine.match(pattern2);
-
-        if (match2) {
-            const [, parameter, operator, value, unit = ''] = match2;
-            const operatorMap = {
-                '<': '小於(<)',
-                '>': '大於(>)',
-                '=': '等於',
-            };
+        const rangeMatch = normalizedLine.match(/^(.+?)\s*([<>]=?|[＜＞]=?|[≤≥≦≧＝=])?\s*(-?\d+(?:\.\d+)?)\s*~\s*(-?\d+(?:\.\d+)?)\s*([%a-zA-Z°/]+)?$/u);
+        if (rangeMatch) {
+            const [, parameterRaw, , valueMinRaw, valueMaxRaw, unitRaw = ''] = rangeMatch;
+            const valueMin = parseFloat(valueMinRaw);
+            const valueMax = parseFloat(valueMaxRaw);
 
             results.push({
-                parameter: parameter.trim(),
-                operator: operatorMap[operator] || operator,
-                value: parseFloat(value),
-                unit: unit,
-                condition: '需',
-            });
-            continue;
-        }
-
-        // 解析「氯離子1-6」或「pH 6-9」的範圍格式
-        const pattern3 = /^(.+?)([<>=])?(\d+\.?\d*)-(\d+\.?\d*)(%|mg\/kg|ppm|°C)?$/;
-        const match3 = trimmedLine.match(pattern3);
-
-        if (match3) {
-            const [, parameter, operator = '', valueMin, valueMax, unit = ''] = match3;
-
-            results.push({
-                parameter: parameter.trim(),
+                parameter: parameterRaw.trim(),
                 operator: '範圍',
-                valueMin: parseFloat(valueMin),
-                valueMax: parseFloat(valueMax),
-                unit: unit,
+                valueMin,
+                valueMax,
+                unit: normalizeUnitOutput(unitRaw),
+                condition: '需',
+            });
+            continue;
+        }
+
+        const compareMatch = normalizedLine.match(/^(.+?)\s*(<=|>=|<|>|=|＜|＞|＝|≤|≥|≦|≧)\s*(-?\d+(?:\.\d+)?)\s*([%a-zA-Z°/]+)?$/u);
+        if (compareMatch) {
+            const [, parameterRaw, operatorRaw, valueRaw, unitRaw = ''] = compareMatch;
+            const operator = normalizeOperator(operatorRaw);
+
+            results.push({
+                parameter: parameterRaw.trim(),
+                operator: operator || '等於',
+                value: parseFloat(valueRaw),
+                unit: normalizeUnitOutput(unitRaw),
+                condition: '需',
+            });
+            continue;
+        }
+
+        const equalMatch = normalizedLine.match(/^(.+?)\s*(-?\d+(?:\.\d+)?)\s*([%a-zA-Z°/]+)?$/u);
+        if (equalMatch) {
+            const [, parameterRaw, valueRaw, unitRaw = ''] = equalMatch;
+
+            results.push({
+                parameter: parameterRaw.trim(),
+                operator: '等於',
+                value: parseFloat(valueRaw),
+                unit: normalizeUnitOutput(unitRaw),
                 condition: '需',
             });
             continue;
@@ -192,7 +212,7 @@ export function getOperatorOptions() {
         { value: '大於(>)', label: '大於 (>)' },
         { value: '小於等於(<=)', label: '小於等於 (<=)' },
         { value: '大於等於(>=)', label: '大於等於 (>=)' },
-        { value: '範圍', label: '範圍 (min-max)' },
+        { value: '範圍', label: '範圍 (~)' },
     ];
 }
 

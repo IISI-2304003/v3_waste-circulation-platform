@@ -1,0 +1,661 @@
+<template>
+	<div class="condition-setup-shell" :class="{ embedded: embeddedMode }">
+		<FlowStepProgress v-if="showProgress" :active-step="1" class="progress-top" />
+		<div class="layout-grid">
+			<VerticalConditionNav :active-section="store.activeSection" @select="handleSectionSelect" />
+
+			<div class="content-panel glass-panel">
+				<div class="business-info-form">
+					<el-form label-position="top" class="business-form-grid">
+						<el-form-item>
+							<template #label>
+								<div class="label-with-icon">
+									<el-icon>
+										<House />
+									</el-icon>
+									<span>事業名稱</span>
+								</div>
+							</template>
+							<el-input v-model="businessName" placeholder="輸入事業名稱" />
+						</el-form-item>
+						<el-form-item>
+							<template #label>
+								<div class="label-with-icon">
+									<el-icon>
+										<Location />
+									</el-icon>
+									<span>事業地址</span>
+								</div>
+							</template>
+							<div class="address-input-row">
+								<el-input v-model="businessAddress" placeholder="輸入地址或點擊按鈕自動定位" />
+								<el-button :icon="Location" @click="getGeolocation" :loading="geoLoading">定位</el-button>
+							</div>
+						</el-form-item>
+					</el-form>
+				</div>
+				<ConditionAccordionSection id="physical" ref="physicalRef" title="物化特性" theme="green" :expanded="expandedMap.physical" @toggle="toggleSection">
+					<div class="section-subtitle-row">
+						<div class="section-subtitle">
+							依據檢測數據設定允收條件，支援自由新增條件組合。
+						</div>
+						<el-button class="semantic-button" type="primary" plain :icon="Search" @click="openSemanticModal">
+							語意化搜尋
+						</el-button>
+					</div>
+
+					<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="initialStandards" @change="handleStandardsChange" />
+
+					<!-- <div class="report-upload">
+						<h4>檢測報告上傳區</h4>
+						<el-upload drag multiple :auto-upload="false" :file-list="uploadFiles" :on-change="onFileChange" :on-remove="onFileRemove">
+							<el-icon class="upload-icon">
+								<UploadFilled />
+							</el-icon>
+							<div class="el-upload__text">拖曳檔案到此或 <em>點擊上傳</em></div>
+							<template #tip>
+								<div class="el-upload__tip">支援 PDF / XLSX / CSV，最多 20 MB</div>
+							</template>
+						</el-upload>
+					</div> -->
+				</ConditionAccordionSection>
+
+				<ConditionAccordionSection id="source" ref="sourceRef" title="來源條件" theme="cyan" :expanded="expandedMap.source" @toggle="toggleSection">
+					<el-form label-position="top" class="form-grid">
+						<el-form-item>
+							<template #label>
+								<span><span class="required-mark">*</span>來源產業</span>
+							</template>
+							<el-select v-model="store.sourceConditions.industry" placeholder="選擇來源產業">
+								<el-option label="電子與半導體" value="semiconductor" />
+								<el-option label="鋼鐵冶金" value="steel" />
+								<el-option label="化工製程" value="chemical" />
+								<el-option label="食品加工" value="food" />
+							</el-select>
+						</el-form-item>
+
+						<el-form-item>
+							<template #label>
+								<span><span class="required-mark">*</span>來源製程</span>
+							</template>
+							<el-select v-model="store.sourceConditions.process" placeholder="選擇來源製程" filterable>
+								<el-option v-for="item in sourceProcessOptions" :key="item.value" :label="item.label" :value="item.value" />
+							</el-select>
+						</el-form-item>
+
+						<el-form-item label="產出量 (公噸/月)">
+							<el-input-number v-model="store.sourceConditions.outputAmount" :min="0" :max="100000" :step="1" controls-position="right" />
+						</el-form-item>
+
+					</el-form>
+				</ConditionAccordionSection>
+
+				<ConditionAccordionSection id="site" ref="siteRef" title="場域條件" theme="violet" :expanded="expandedMap.site" @toggle="toggleSection">
+					<el-form label-position="top" class="form-grid">
+
+
+						<el-form-item label="是否有再利用空間">
+							<el-switch v-model="store.siteConditions.hasReuseSpace" active-text="有" inactive-text="無" inline-prompt />
+						</el-form-item>
+
+						<el-form-item label="是否有產出衍生廢棄物">
+							<el-switch v-model="store.siteConditions.hasSecondaryWaste" active-text="有" inactive-text="無" inline-prompt />
+						</el-form-item>
+					</el-form>
+
+				</ConditionAccordionSection>
+			</div>
+		</div>
+
+		<div class="floating-actions glass-panel">
+			<el-button @click="resetAll">重設條件</el-button>
+			<el-button type="primary" @click="$emit('next')">下一步 : 媒合分析
+				<el-icon class="el-icon--right">
+					<ArrowRight />
+				</el-icon>
+			</el-button>
+		</div>
+
+		<SemanticInputModal v-model="showSemanticModal" @confirm="handleSemanticConfirm" />
+	</div>
+</template>
+
+<script setup>
+import { computed, nextTick, reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { UploadFilled, Search, Location, House } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
+import AcceptanceStandardForm from '@/components/AcceptanceStandardForm.vue'
+import SemanticInputModal from '@/components/SemanticInputModal.vue'
+import { useConditionSetupStore } from '@/stores/conditionSetup'
+import FlowStepProgress from './FlowStepProgress.vue'
+import VerticalConditionNav from './VerticalConditionNav.vue'
+import ConditionAccordionSection from './ConditionAccordionSection.vue'
+
+const props = defineProps({
+	initialStandards: {
+		type: Array,
+		default: () => []
+	},
+	showProgress: {
+		type: Boolean,
+		default: true
+	},
+	embeddedMode: {
+		type: Boolean,
+		default: false
+	}
+})
+
+defineEmits(['next'])
+
+const store = useConditionSetupStore()
+const { uploadedReports } = storeToRefs(store)
+const showSemanticModal = ref(false)
+
+const acceptanceRef = ref(null)
+const physicalRef = ref(null)
+const sourceRef = ref(null)
+const siteRef = ref(null)
+const businessRef = ref(null)
+const businessName = computed({
+	get: () => store.businessConditions.businessName || '',
+	set: (value) => {
+		store.businessConditions.businessName = value
+	}
+})
+const businessAddress = computed({
+	get: () => store.businessConditions.businessAddress || '',
+	set: (value) => {
+		store.businessConditions.businessAddress = value
+	}
+})
+const geoLoading = ref(false)
+
+const expandedMap = reactive({
+	physical: true,
+	source: true,
+	site: true,
+	business: true
+})
+
+const regionOptions = [
+	{
+		value: 'north',
+		label: '北部',
+		children: [
+			{ value: 'taipei', label: '台北市' },
+			{ value: 'new-taipei', label: '新北市' },
+			{ value: 'taoyuan', label: '桃園市' }
+		]
+	},
+	{
+		value: 'center',
+		label: '中部',
+		children: [
+			{ value: 'taichung', label: '台中市' },
+			{ value: 'changhua', label: '彰化縣' },
+			{ value: 'nantou', label: '南投縣' }
+		]
+	},
+	{
+		value: 'south',
+		label: '南部',
+		children: [
+			{ value: 'tainan', label: '台南市' },
+			{ value: 'kaohsiung', label: '高雄市' },
+			{ value: 'pingtung', label: '屏東縣' }
+		]
+	}
+]
+
+const cascaderProps = {
+	expandTrigger: 'hover',
+	checkStrictly: true
+}
+
+const maturityMarks = {
+	1: 'TRL1',
+	5: 'TRL5',
+	9: 'TRL9'
+}
+
+const sourceProcessOptions = [
+	{ value: '260001', label: '260001 積體電路製造程序' },
+	{ value: '260003', label: '260003 記憶體製造程序' },
+	{ value: '260004', label: '260004 二極體製造程序' },
+	{ value: '260005', label: '260005 發光二極體製造程序' },
+	{ value: '260006', label: '260006 電晶體製造程序' },
+	{ value: '260009', label: '260009 其他分離式元件製造程序' },
+	{ value: '260011', label: '260011 晶片製造程序' },
+	{ value: '260012', label: '260012 晶圓製造程序' },
+	{ value: '260013', label: '260013 晶圓包裝程序' }
+]
+
+const uploadFiles = uploadedReports
+
+const sectionRefMap = {
+	physical: physicalRef,
+	source: sourceRef,
+	site: siteRef,
+	business: businessRef
+}
+
+const toggleSection = (sectionId) => {
+	expandedMap[sectionId] = !expandedMap[sectionId]
+}
+
+const handleSectionSelect = async (sectionId) => {
+	store.setActiveSection(sectionId)
+	expandedMap[sectionId] = true
+
+	await nextTick()
+	const sectionEl = sectionRefMap[sectionId]?.value?.$el
+	if (sectionEl) {
+		sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+	}
+}
+
+const onFileChange = (_, files) => {
+	store.setUploadedReports(files)
+}
+
+const onFileRemove = (_, files) => {
+	store.setUploadedReports(files)
+}
+
+const resetAll = () => {
+	store.resetAll()
+}
+
+const openSemanticModal = () => {
+	showSemanticModal.value = true
+}
+
+const handleSemanticConfirm = (parsedData) => {
+	if (acceptanceRef.value) {
+		acceptanceRef.value.setStandards(parsedData)
+		ElMessage.success('已將搜尋條件填入表單')
+	}
+}
+
+const handleStandardsChange = (standards) => {
+	store.setAcceptanceConditions(standards)
+}
+
+const getGeolocation = () => {
+	if (!navigator.geolocation) {
+		ElMessage.error('瀏覽器不支援地理位置定位')
+		return
+	}
+
+	geoLoading.value = true
+	navigator.geolocation.getCurrentPosition(
+		async (position) => {
+			const { latitude, longitude } = position.coords
+			try {
+				const response = await fetch(
+					`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=zh`
+				)
+				const data = await response.json()
+				if (data.address) {
+					const city = data.address.city || data.address.county || data.address.state || ''
+					const district = data.address.city_district || data.address.town || data.address.suburb || data.address.village || ''
+					const road = data.address.road || data.address.pedestrian || ''
+					const houseNumber = data.address.house_number || ''
+					const formattedAddress = `${city}${district}${road}${houseNumber ? `${houseNumber}號` : ''}`
+
+					const detailedAddress = formattedAddress || data.display_name || ''
+					businessAddress.value = detailedAddress
+					ElMessage.success('定位成功')
+				} else {
+					ElMessage.error('無法獲取地址資訊')
+				}
+			} catch (error) {
+				ElMessage.error('獲取地址失敗')
+				console.error(error)
+			} finally {
+				geoLoading.value = false
+			}
+		},
+		(error) => {
+			geoLoading.value = false
+			if (error.code === error.PERMISSION_DENIED) {
+				ElMessage.error('您已拒絕位置訪問權限')
+			} else if (error.code === error.POSITION_UNAVAILABLE) {
+				ElMessage.error('位置資訊不可用')
+			} else {
+				ElMessage.error('獲取位置失敗')
+			}
+		}
+	)
+}
+
+const setStandards = (parsedStandards) => {
+	acceptanceRef.value?.setStandards(parsedStandards)
+}
+
+defineExpose({
+	setStandards
+})
+</script>
+
+<style scoped lang="scss">
+.condition-setup-shell {
+	// position: relative;
+	padding: 24px
+}
+
+.condition-setup-shell.embedded {
+	padding-top: 0;
+	min-height: auto;
+}
+
+
+
+// .condition-setup-shell.embedded .tech-particle-bg {
+// 	border-radius: 24px;
+// }
+
+.progress-top,
+.layout-grid,
+.floating-actions {
+	position: relative;
+	z-index: 1;
+}
+
+.progress-top {
+	width: calc(100% - 36px);
+	margin: 0 auto;
+}
+
+.layout-grid {
+	margin-top: 0;
+	display: grid;
+	grid-template-columns: 260px 1fr;
+	gap: 18px;
+	padding: 18px;
+}
+
+.glass-panel {
+	border: 1px solid rgba(255, 255, 255, 0.82);
+	background: #ffffff62;
+	box-shadow: 0 14px 34px rgba(53, 93, 83, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+	backdrop-filter: blur(16px);
+	border-radius: 20px;
+}
+
+.semantic-button {
+	background: linear-gradient(135deg, rgb(78, 76, 99), rgb(34, 13, 109));
+	color: white;
+
+	&:hover {
+		background: linear-gradient(135deg, rgb(98, 95, 122), rgb(54, 33, 129));
+	}
+}
+
+.content-panel {
+	padding: 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.section-subtitle-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 14px;
+
+	:deep(.el-button) {
+		flex-shrink: 0;
+	}
+}
+
+.section-subtitle {
+	color: #5d7370;
+	font-size: 13px;
+	margin-bottom: 0;
+}
+
+.report-upload {
+	margin-top: 18px;
+	padding: 16px;
+	border-radius: 14px;
+	border: 1px dashed rgba(76, 175, 80, 0.35);
+	background: rgba(238, 253, 244, 0.66);
+
+	h4 {
+		margin: 0 0 12px;
+		font-size: 14px;
+		color: #305a4f;
+	}
+
+	:deep(.el-upload-dragger) {
+		background: rgba(255, 255, 255, 0.84);
+		border-color: rgba(52, 157, 96, 0.38);
+	}
+
+	.upload-icon {
+		color: #26a69a;
+		font-size: 30px;
+	}
+}
+
+.form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 20px 24px;
+
+	:deep(.el-form-item) {
+		width: 100%;
+		margin-bottom: 8px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+
+	:deep(.el-form-item__content) {
+		width: 100%;
+	}
+
+	:deep(.el-form-item__label) {
+		line-height: 1.3;
+		color: #426b64;
+		font-weight: 600;
+	}
+
+	:deep(.el-input),
+	:deep(.el-select),
+	:deep(.el-cascader),
+	:deep(.el-input-number),
+	:deep(.el-textarea) {
+		width: 100%;
+	}
+
+	:deep(.el-slider__runway) {
+		margin: 12px 0;
+	}
+
+	:deep(.el-radio-group) {
+		display: inline-flex;
+		width: auto;
+	}
+}
+
+.frequency-item :deep(.el-form-item__content) {
+	width: auto;
+}
+
+.source-theme :deep(.el-radio-button__inner) {
+	border-color: rgba(38, 166, 154, 0.32);
+}
+
+.map-placeholder {
+	margin-top: 18px;
+	height: 200px;
+	border-radius: 16px;
+	border: 1px solid rgba(155, 109, 255, 0.35);
+	background: linear-gradient(135deg, rgba(248, 243, 255, 0.84), rgba(236, 248, 255, 0.78));
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.map-grid {
+		position: absolute;
+		inset: 0;
+		background-image:
+			linear-gradient(rgba(155, 109, 255, 0.08) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(155, 109, 255, 0.08) 1px, transparent 1px);
+		background-size: 24px 24px;
+	}
+
+	p {
+		position: relative;
+		margin: 0;
+		font-size: 13px;
+		color: #5f4f8a;
+		font-weight: 600;
+	}
+}
+
+.business-info-form {
+	padding: 14px 0 18px;
+	border-bottom: 1px solid rgba(76, 175, 80, 0.15);
+	margin-bottom: 14px;
+}
+
+.business-form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px 32px;
+
+	:deep(.el-form-item) {
+		width: 100%;
+		margin-bottom: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	:deep(.el-form-item__content) {
+		width: 100%;
+	}
+
+	:deep(.el-form-item__label) {
+		line-height: 1.3;
+		color: #426b64;
+		font-weight: 600;
+		font-size: 13px;
+	}
+
+	:deep(.el-input) {
+		width: 100%;
+	}
+}
+
+.label-with-icon {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	color: #426b64;
+	font-weight: 600;
+	font-size: 13px;
+
+	:deep(.el-icon) {
+		font-size: 14px;
+		color: #26a69a;
+	}
+
+	span {
+		line-height: 1.3;
+	}
+}
+
+.address-input-row {
+	display: flex;
+	gap: 8px;
+	width: 100%;
+
+	:deep(.el-input) {
+		flex: 1;
+	}
+
+	:deep(.el-button) {
+		flex-shrink: 0;
+	}
+}
+
+.required-mark {
+	color: #f56c6c;
+	font-weight: 700;
+	margin-right: 4px;
+}
+
+.floating-actions {
+	position: sticky;
+	bottom: 14px;
+	margin: 20px 18px 0;
+	padding: 12px 16px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+@keyframes drift {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
+
+	to {
+		transform: translate3d(12%, 8%, 0);
+	}
+}
+
+@media (max-width: 1200px) {
+	.layout-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 768px) {
+	.condition-setup-shell {
+		padding-bottom: 110px;
+	}
+
+	.layout-grid {
+		padding: 14px;
+	}
+
+	.progress-top {
+		width: calc(100% - 28px);
+		margin: 0 auto;
+	}
+
+	.section-subtitle-row {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.business-form-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.form-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.floating-actions {
+		justify-content: stretch;
+
+		:deep(.el-button) {
+			flex: 1;
+		}
+	}
+}
+</style>

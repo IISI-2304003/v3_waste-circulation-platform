@@ -274,9 +274,11 @@ const selectCategory = (categoryId) => {
 
 const handleCardClick = (code) => {
   router.push({
-    path: `/waste/${code}`,
+    path: '/standard-input',
     query: {
       from: 'home',
+      entry: 'wasteCode',
+      code,
       category: selectedCategory.value,
       page: currentPage.value
     }
@@ -343,12 +345,12 @@ onMounted(() => {
 }
 
 .container {
-  max-width: 1280px;
+  max-width: min(92vw, 1600px);
   margin: 0 auto;
   padding: 0 24px;
 
   @media (min-width: 1400px) {
-    max-width: 1360px;
+    max-width: min(92vw, 1720px);
   }
 }
 
@@ -359,11 +361,24 @@ onMounted(() => {
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;
-  padding: 24px 40px;
+  padding: clamp(20px, 2vw, 36px) clamp(24px, 3vw, 52px);
   overflow: hidden;
-  min-height: 100vh;
+  min-height: clamp(640px, 82vh, 900px);
+  isolation: isolate;
 
-
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 120px;
+    // background:
+    //   radial-gradient(circle at 0% 100%, rgba(232, 244, 255, 0.95) 0%, rgba(232, 244, 255, 0.35) 36%, transparent 72%),
+    //   linear-gradient(180deg, rgba(232, 244, 255, 0) 0%, rgba(232, 244, 255, 0.78) 82%, rgba(232, 244, 255, 1) 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
 }
 
 .hero-content {
@@ -379,7 +394,7 @@ onMounted(() => {
 .hero-left {
   flex: 1;
   text-align: left;
-  max-width: 500px;
+  max-width: 620px;
 }
 
 .hero-right {
@@ -403,7 +418,7 @@ onMounted(() => {
 }
 
 .hero-title {
-  font-size: 48px;
+  font-size: clamp(48px, 3.2vw, 68px);
   font-weight: 700;
   color: #2c3e50;
   margin-bottom: 16px;
@@ -412,7 +427,7 @@ onMounted(() => {
 }
 
 .hero-description {
-  font-size: 17px;
+  font-size: clamp(17px, 1.1vw, 24px);
   color: #607d8b;
   margin-bottom: 28px;
   line-height: 1.8;
@@ -439,10 +454,13 @@ onMounted(() => {
 }
 
 .search-section {
-  padding: 50px 60px;
+  position: relative;
+  z-index: 3;
+  margin-top: -54px;
+  padding: 0 60px 50px;
 
   .container {
-    background: #ffffff8e;
+    background: #8cbfd37c;
     border-radius: 32px;
     padding: 50px 24px;
     box-shadow: 0 24px 80px rgba(53, 92, 72, 0.12);
@@ -917,6 +935,11 @@ onMounted(() => {
 
 @media (max-width: 968px) {
 
+  .search-section {
+    margin-top: -24px;
+    padding-top: 0;
+  }
+
   .search-section .container :deep(.tabsLabel .el-tabs__nav),
   .search-section .container .tab-label-right,
   .search-section .container .query-controls {
@@ -979,6 +1002,12 @@ onMounted(() => {
 @media (max-width: 576px) {
   .hero-section {
     padding: 24px 20px;
+    min-height: auto;
+  }
+
+  .search-section {
+    margin-top: 0;
+    padding: 24px 18px 42px;
   }
 
   .container {
@@ -1001,6 +1030,53 @@ onMounted(() => {
 @media (max-width: 420px) {
   .species-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1600px) {
+  .hero-section {
+    padding: 28px 56px;
+    min-height: clamp(700px, 80vh, 860px);
+  }
+
+  .search-section {
+    margin-top: -72px;
+  }
+
+  .hero-content {
+    gap: 88px;
+  }
+
+  .search-section {
+    padding: 64px 72px;
+  }
+
+  .search-section .container {
+    padding: 60px 36px;
+  }
+
+  .search-section .container .search-header .section-title {
+    font-size: clamp(44px, 2.1vw, 56px);
+  }
+
+  .search-section .container .search-header .section-description {
+    font-size: clamp(18px, 1vw, 22px);
+    max-width: 980px;
+  }
+}
+
+@media (min-width: 2100px) {
+  .hero-section {
+    min-height: clamp(720px, 76vh, 840px);
+  }
+
+  .container {
+    max-width: min(90vw, 1880px);
+    padding: 0 20px;
+  }
+
+  .hero-content {
+    gap: 110px;
   }
 }
 </style>

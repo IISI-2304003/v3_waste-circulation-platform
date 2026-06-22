@@ -44,10 +44,6 @@
 				新增條件
 			</el-button>
 
-			<el-button type="primary" :icon="Search" @click="handleSearch" :loading="searching">
-				搜尋匹配
-			</el-button>
-
 			<el-button @click="resetForm">
 				重設
 			</el-button>
@@ -101,6 +97,8 @@ const props = defineProps({
 		default: () => []
 	}
 })
+
+const emit = defineEmits(['change'])
 
 // 產生唯一 ID
 let idCounter = 0
@@ -164,42 +162,6 @@ const resetForm = () => {
 	hasSearched.value = false
 }
 
-// 搜尋匹配
-const handleSearch = async () => {
-	// 驗證
-	const valid = standards.value.every(std => {
-		if (!std.parameter || !std.operator) return false
-		if (std.operator === '範圍') {
-			return std.valueMin != null && std.valueMax != null
-		}
-		return std.value != null
-	})
-
-	if (!valid) {
-		ElMessage.warning('請完整填寫查詢條件')
-		return
-	}
-
-	try {
-		searching.value = true
-		hasSearched.value = true
-
-		// 呼叫 API 搜尋
-		const results = await searchByStandards(standards.value)
-		searchResults.value = results
-
-		if (results.length === 0) {
-			ElMessage.info('找不到符合條件的廢棄物代碼')
-		} else {
-			ElMessage.success(`找到 ${results.length} 筆匹配結果`)
-		}
-	} catch (error) {
-		console.error('搜尋失敗：', error)
-		ElMessage.error('搜尋失敗，請稍後再試')
-	} finally {
-		searching.value = false
-	}
-}
 
 // 查看詳情
 const viewDetail = (code) => {
@@ -217,6 +179,11 @@ const setStandards = (parsedStandards) => {
 		hasSearched.value = false
 	}
 }
+
+watch(standards, (value) => {
+	const normalized = value.map(({ id, ...rest }) => ({ ...rest }))
+	emit('change', normalized)
+}, { deep: true, immediate: true })
 
 // 對父層暴露方法
 defineExpose({

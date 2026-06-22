@@ -147,13 +147,14 @@ const handleExploreMode = () => {
 
 <style scoped lang="scss">
 .circulation-modes-grid {
+	--grid-scale: clamp(0.76, calc(0.58 + 0.03vw), 1.34);
 	width: 100%;
 	padding: 0;
 	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: 550px;
+	min-height: clamp(430px, 42vw, 760px);
 }
 
 .circle-container {
@@ -163,6 +164,8 @@ const handleExploreMode = () => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	transform: scale(var(--grid-scale));
+	transform-origin: center center;
 
 	/* 中央地球循環圖 */
 	.center-earth {
@@ -283,8 +286,8 @@ const handleExploreMode = () => {
 
 	.mode-circle {
 		position: relative;
-		width: 65px;
-		height: 65px;
+		width: 72px;
+		height: 72px;
 		border-radius: 50%;
 		background: linear-gradient(145deg, #ffffff, #f0fff5);
 		display: flex;
@@ -329,15 +332,15 @@ const handleExploreMode = () => {
 }
 
 .mode-name {
-	font-size: 11px;
+	font-size: clamp(12px, 0.75vw, 16px);
 	color: #2C3E50;
-	font-weight: 500;
+	font-weight: 600;
 	text-align: center;
 	white-space: nowrap;
 	transition: all 0.3s;
 	background: rgba(255, 255, 255, 0.95);
 	backdrop-filter: blur(8px);
-	padding: 5px 10px;
+	padding: 6px 12px;
 	border-radius: 10px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	animation: fadeInUp 0.6s ease-out backwards;
@@ -506,14 +509,14 @@ const handleExploreMode = () => {
 /* 手機版 */
 @media (max-width: 968px) {
 	.circulation-modes-grid {
-		padding: 20px 0;
+		--grid-scale: clamp(0.68, calc(0.62 + 0.05vw), 0.86);
+		padding: 16px 0;
 		min-height: 420px;
 	}
 
 	.circle-container {
 		width: 500px;
 		height: 500px;
-		transform: scale(0.75);
 	}
 
 	.center-earth {
@@ -528,27 +531,21 @@ const handleExploreMode = () => {
 
 
 
-	.mode-circle {
-		width: 55px;
-		height: 55px;
-
-		.el-icon {
-			font-size: 24px !important;
-		}
-	}
-
 	.mode-name {
-		font-size: 10px;
+		font-size: 12px;
 		padding: 4px 8px;
 	}
 }
 
 /* 平板版 */
 @media (min-width: 969px) and (max-width: 1200px) {
+	.circulation-modes-grid {
+		--grid-scale: 0.92;
+	}
+
 	.circle-container {
 		width: 500px;
 		height: 500px;
-		transform: scale(0.88);
 	}
 
 	.center-earth {
@@ -559,6 +556,12 @@ const handleExploreMode = () => {
 	.recycle-icon {
 		width: 90px;
 		height: 90px;
+	}
+}
+
+@media (min-width: 1600px) {
+	.circulation-modes-grid {
+		--grid-scale: clamp(1.15, calc(0.72 + 0.028vw), 1.42);
 	}
 }
 </style>

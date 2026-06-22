@@ -17,6 +17,11 @@ const routes = [
         component: () => import('../views/CompanyMatch.vue'),
     },
     {
+        path: '/technology-match',
+        name: 'TechnologyMatch',
+        component: () => import('../views/TechnologyMatch.vue'),
+    },
+    {
         path: '/waste',
         name: 'WasteSearch',
         component: () => import('../views/WasteSearchPage.vue'),
