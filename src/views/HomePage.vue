@@ -36,15 +36,7 @@
           </p>
         </div>
         <el-row :gutter="20" class="tabsLabel">
-          <el-col class="colGap" :span="4" id="wasteSpeciesRef">
-            <el-button plain :class="['tab-btn', { 'tab-btn--active': activeTab === 'wasteSpeciesRef' }]" @click="activeTab = 'wasteSpeciesRef'">
-              <el-icon style="vertical-align: middle">
-                <Search />
-              </el-icon>
-              <span>廢棄物物種搜尋</span>
-            </el-button>
-          </el-col>
-          <el-col :span="18" id="wasteCodeRef">
+          <el-col :span="24" id="wasteCodeRef">
             <el-row :gutter="10">
               <el-col :span="5">
                 <el-button plain :class="['tab-btn', { 'tab-btn--active': activeTab === 'wasteCodeRef' }]" @click="activeTab = 'wasteCodeRef'">
@@ -67,37 +59,9 @@
         </el-row>
         <el-divider />
         <el-row>
-          <el-col v-if="activeTab === 'wasteSpeciesRef'" :span="24">
-            <div class="species-panel">
-              <div class="species-panel-header">
-                <h3 class="list-title">廢棄物物種</h3>
-                <!-- <el-input v-model="speciesSearchKeyword" clearable placeholder="搜尋物種名稱或代表項目" class="species-search-input" /> -->
-              </div>
 
-              <div v-if="speciesDisplayCards.length > 0" class="species-grid">
-                <button v-for="species in speciesCurrentPageCards" :key="species.id" type="button" class="species-card" @click="handleSpeciesClick(species)">
-                  <div class="species-card-top">
-                    <span class="species-no">{{ species.id }}</span>
-                  </div>
-                  <h4 class="species-title">{{ species.name }}</h4>
-                  <div class="species-image" role="img" :aria-label="species.imageLabel">
-                    <img :src="species.image" :alt="species.imageLabel" loading="lazy" @error="handleSpeciesImageError" />
-                  </div>
-                  <p class="species-items">{{ species.representativeItems.join('、') }}</p>
-                </button>
-              </div>
 
-              <div v-else class="empty-state">
-                <el-empty description="查無符合的物種類別" />
-              </div>
-
-              <div v-if="speciesDisplayCards.length > speciesPageSize" class="pagination-wrapper">
-                <el-pagination v-model:current-page="speciesCurrentPage" :page-size="speciesPageSize" :total="speciesDisplayCards.length" layout="prev, pager, next" background />
-              </div>
-            </div>
-          </el-col>
-
-          <el-col v-else-if="activeTab === 'wasteCodeRef'" :span="24">
+          <el-col :span="24">
             <div v-if="displayCodes.length > 0" class="codes-panel">
               <div class="codes-panel-header">
                 <h3 class="list-title">{{ getCategoryShortName(currentCategory) }}</h3>
@@ -460,7 +424,7 @@ onMounted(() => {
   padding: 0 60px 50px;
 
   .container {
-    background: #8cbfd37c;
+    background: #f9fdff7c;
     border-radius: 32px;
     padding: 50px 24px;
     box-shadow: 0 24px 80px rgba(53, 92, 72, 0.12);
