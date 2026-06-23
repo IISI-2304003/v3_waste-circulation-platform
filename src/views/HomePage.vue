@@ -8,8 +8,45 @@
             <img src="../assets/logo.png" alt="環境部資源循環署" class="hero-logo" />
           </div>
 
-          <h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">智慧媒合平台</span></h1>
+          <h1 class="hero-title">產業資源循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
           <p class="hero-description">連結資源循環供需，推動產業共生，實現永續循環經濟</p>
+
+          <!-- <div class="hero-pillars" aria-label="平台核心價值">
+            <div class="pillar-item">
+              <span class="pillar-icon pillar-icon--green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 0 1 7 7L17 13" />
+                  <path d="M14 11a5 5 0 0 1 0 7L12.5 19.5a5 5 0 1 1-7-7L7 11" />
+                </svg>
+              </span>
+              <div class="pillar-title">智慧媒合</div>
+              <div class="pillar-subtitle">智慧媒合供需</div>
+            </div>
+
+            <div class="pillar-item">
+              <span class="pillar-icon pillar-icon--blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 3v9l6 3" />
+                </svg>
+              </span>
+              <div class="pillar-title">資源共享</div>
+              <div class="pillar-subtitle">擴大再利用價值</div>
+            </div>
+
+            <div class="pillar-item">
+              <span class="pillar-icon pillar-icon--orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 12a8 8 0 0 1 14-5" />
+                  <path d="M20 12a8 8 0 0 1-14 5" />
+                  <path d="M16 4h2.8V6.8" />
+                  <path d="M8 20H5.2v-2.8" />
+                </svg>
+              </span>
+              <div class="pillar-title">永續循環</div>
+              <div class="pillar-subtitle">共創綠色未來</div>
+            </div>
+          </div> -->
 
           <div class="hero-actions">
             <el-button type="primary" size="large" round @click="scrollToSearch">
@@ -27,71 +64,115 @@
       </div>
     </section>
 
+    <section class="home-footer-insights" aria-label="平台效益摘要">
+      <div class="container">
+        <div class="insight-card-board">
+          <article v-for="item in footerHighlights" :key="item.title" class="insight-card">
+            <div class="insight-icon" :style="{ color: item.color, background: `${item.color}15` }">
+              <span v-html="item.icon"></span>
+            </div>
+            <div class="insight-texts">
+              <h4 class="insight-title" :style="{ color: item.color }">{{ item.title }}</h4>
+              <p class="insight-subtitle">{{ item.subtitle }}</p>
+              <p class="insight-desc">{{ item.desc }}</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section id="search-section" class="search-section">
       <div class="container">
         <div class="search-header">
           <h2 class="section-title">廢棄物類別搜尋</h2>
           <p class="section-description">
-            直接在此頁面切換六大類、搜尋子項代碼，並即時預覽主要允收資訊。
+            點選六大廢棄物類別快速瀏覽，或輸入關鍵字精準查詢各項廢棄物資訊。
           </p>
         </div>
-        <el-row :gutter="20" class="tabsLabel">
-          <el-col :span="24" id="wasteCodeRef">
-            <el-row :gutter="10">
-              <el-col :span="5">
-                <el-button plain :class="['tab-btn', { 'tab-btn--active': activeTab === 'wasteCodeRef' }]" @click="activeTab = 'wasteCodeRef'">
-                  <el-icon style="vertical-align: middle">
-                    <Management />
-                  </el-icon>
-                  <span>廢棄物代碼搜尋</span>
-                </el-button>
-              </el-col>
-              <el-col :span="6">
-                <el-select v-model="selectedCategory" placeholder="請選擇廢棄物類別" :class="{ 'select-control': activeTab === 'wasteCodeRef' }">
-                  <el-option v-for="item in wasteCategories" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-              </el-col>
-              <el-col :span="13">
-                <el-input v-model="searchKeyword" clearable placeholder="關鍵字搜尋" :class="{ 'select-control': activeTab === 'wasteCodeRef' }" />
-              </el-col>
-            </el-row>
-          </el-col>
-        </el-row>
-        <el-divider />
-        <el-row>
 
-
-          <el-col :span="24">
-            <div v-if="displayCodes.length > 0" class="codes-panel">
-              <div class="codes-panel-header">
-                <h3 class="list-title">{{ getCategoryShortName(currentCategory) }}</h3>
-                <span class="list-count">共 {{ displayCodes.length }} 項</span>
-              </div>
-
-              <div v-if="currentPageCodes.length > 0" class="codes-grid">
-                <button v-for="code in currentPageCodes" :key="code.id" type="button" class="code-card" @click="handleCardClick(code.code)">
-                  <div class="code-card-top">
-                    <span class="code-chip" :style="{ background: getCodeColor(code) }">{{ code.code }}</span>
-                  </div>
-                  <h4 class="code-card-title">{{ code.name }}</h4>
-                  <p class="code-card-description">{{ code.description }}</p>
-                </button>
-              </div>
-
-              <div v-else class="empty-state">
-                <el-empty description="目前此類別暫無資料" />
-              </div>
-
-              <div v-if="displayCodes.length > pageSize" class="pagination-wrapper">
-                <el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="displayCodes.length" layout="prev, pager, next" background />
-              </div>
+        <!-- 六大類分類卡片 -->
+        <div class="category-card-grid">
+          <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
+            <span v-if="selectedCategory === catInfo.id" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            <div class="category-card-icon-wrap" :style="getCategoryIconWrapStyle(catInfo)">
+              <span v-html="categoryIcons[catInfo.id]" class="category-svg-icon"></span>
             </div>
-            <div v-else class="empty-state-main">
-              <el-empty description="請選擇類別以查看廢棄物代碼" />
-            </div>
-          </el-col>
-        </el-row>
+            <div class="category-card-label" :style="{ color: selectedCategory === catInfo.id ? catInfo.color : catInfo.color }">{{ catInfo.id }}類</div>
+            <div class="category-card-name" :style="{ color: '#1a365d' }">{{ catInfo.displayName }}</div>
+            <div class="category-card-count" :style="getCategoryCountStyle(catInfo)">{{ getCategoryCodeCount(catInfo.id) }} 項</div>
+          </button>
+        </div>
 
+        <!-- 搜尋卡片 -->
+        <div class="search-card">
+          <el-input v-model="searchKeyword" clearable placeholder="請輸入關鍵字（例如：pH值、污泥、廢酸、重金屬）" class="search-input-field" @input="currentPage = 1">
+            <template #prefix>
+              <el-icon>
+                <Search />
+              </el-icon>
+            </template>
+          </el-input>
+        </div>
+
+        <el-divider style="margin: 24px 0" />
+
+        <div class="codes-area">
+          <div v-if="displayCodes.length > 0" class="codes-panel">
+            <div class="codes-panel-header">
+              <h3 class="list-title">
+                <span class="list-title-badge" :style="{ background: getCategoryColor(currentCategory) }">{{ currentCategory?.id }}類</span>
+                {{ getCategoryShortName(currentCategory) }}
+              </h3>
+              <span class="list-count" :style="{ background: getCategoryColor(currentCategory) + '18', color: getCategoryColor(currentCategory) }">共 {{ displayCodes.length }} 項</span>
+            </div>
+
+            <transition-group v-if="currentPageCodes.length > 0" name="card-list" tag="div" class="codes-grid">
+              <button v-for="code in currentPageCodes" :key="`${code.code}-${currentPage}`" type="button" class="code-card" :style="{ '--card-color': getCategoryColor(currentCategory), borderLeftColor: getCategoryColor(currentCategory) }" @click="handleCardClick(code.code)">
+                <div class="code-card-top">
+                  <span class="code-chip" :style="{ background: getCategoryColor(currentCategory) + '15', color: getCategoryColor(currentCategory), border: `1px solid ${getCategoryColor(currentCategory)}30` }">{{ code.code }}</span>
+                  <span class="code-card-arrow">→</span>
+                </div>
+                <h4 class="code-card-title">{{ code.name }}</h4>
+                <p class="code-card-description">{{ code.description }}</p>
+              </button>
+            </transition-group>
+
+            <div v-else class="empty-state">
+              <el-empty description="目前此類別暫無資料" />
+            </div>
+
+            <div v-if="displayCodes.length > pageSize" class="pagination-wrapper">
+              <el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="displayCodes.length" layout="prev, pager, next" background />
+            </div>
+          </div>
+          <div v-else class="empty-state-main">
+            <el-empty description="查無符合條件的廢棄物代碼" />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="home-footer-stats" aria-label="平台成效統計">
+      <div class="insight-stats-bar">
+        <div class="container insight-stats-grid">
+          <article v-for="stat in footerStats" :key="stat.label" class="insight-stat-item">
+            <div class="insight-stat-icon">
+              <span v-html="stat.icon"></span>
+            </div>
+            <div class="insight-stat-copy">
+              <p class="insight-stat-label">{{ stat.label }}</p>
+              <p class="insight-stat-value">
+                <span>{{ stat.value }}</span>
+                <small>{{ stat.unit }}</small>
+              </p>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -135,6 +216,87 @@ const speciesSearchKeyword = ref('')
 const speciesCurrentPage = ref(1)
 const speciesPageSize = 10
 
+// 六大類分類顯示信息
+// Lucide-style SVG icons
+const categoryIcons = {
+  A: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M10 3v8l-5 9a1 1 0 00.9 1.5h12.2a1 1 0 00.9-1.5L14 11V3"/><line x1="7" y1="17" x2="17" y2="17"/></svg>',
+  B: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="currentColor" stroke="none"/></svg>',
+  C: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6z"/><polyline points="9 12 11 14 15 10"/></svg>',
+  D: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><path d="M2 22V9l7-6h6l7 6v13"/><rect x="9" y="15" width="6" height="7"/><line x1="6" y1="12" x2="6" y2="14"/><line x1="18" y1="12" x2="18" y2="14"/></svg>',
+  E: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>',
+  R: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>',
+}
+
+// 六大類分類顯示信息
+const categoriesDisplay = ref([
+  { id: 'A', displayName: '製程有害', color: '#4285F4' },
+  { id: 'B', displayName: '毒性有害', color: '#EF4444' },
+  { id: 'C', displayName: '有害特性認定', color: '#22C55E' },
+  { id: 'D', displayName: '一般事業廢棄物', color: '#F97316' },
+  { id: 'E', displayName: '混合五金廢料', color: '#8B5CF6' },
+  { id: 'R', displayName: '公告應回收', color: '#06B6D4' }
+])
+
+const hotTags = ref(['pH值', '污泥', '廢酸', '廢鹼', 'PCB', '電鍍污泥', '重金屬', '廢油'])
+
+const footerHighlights = [
+  {
+    title: '智慧媒合',
+    subtitle: 'AI 精準匹配供需',
+    desc: '提升媒合效率',
+    color: '#22c55e',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11c0 4.4 3.6 8 8 8"/><path d="M13 3c4.4 0 8 3.6 8 8"/><path d="M8 11l8-8"/><path d="M10 3H3v7"/><path d="M14 21h7v-7"/></svg>'
+  },
+  {
+    title: '數據透明',
+    subtitle: '即時數據分析',
+    desc: '掌握資源流向',
+    color: '#3b82f6',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="9" rx="1"/><rect x="17" y="5" width="3" height="12" rx="1"/></svg>'
+  },
+  {
+    title: '安全可靠',
+    subtitle: '嚴格審查機制',
+    desc: '確保資訊可信',
+    color: '#f59e0b',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5.2-3.4 9.5-8 10-4.6-.5-8-4.8-8-10V6z"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8"/></svg>'
+  },
+  {
+    title: '永續循環',
+    subtitle: '促進資源再生',
+    desc: '實現淨零未來',
+    color: '#22c55e',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>'
+  }
+]
+
+const footerStats = [
+  {
+    label: '媒合成功案例',
+    value: '2,458+',
+    unit: '',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M6 20V8l4-3 4 3v12"/><path d="M10 8l-4-3"/><path d="M10 8l4-3"/></svg>'
+  },
+  {
+    label: '合作廠商數',
+    value: '1,236+',
+    unit: '',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="7" height="10" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/><path d="M6 14h1"/><path d="M6 17h1"/><path d="M17 8h1"/><path d="M17 11h1"/></svg>'
+  },
+  {
+    label: '資源再利用量',
+    value: '3.85',
+    unit: '萬噸',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h4l-1.5-2.5"/><path d="M7 7l2.5 4.5"/><path d="M17 7l-2.5-4.5"/><path d="M17 7h-4"/><path d="M17 17h-4l1.5 2.5"/><path d="M17 17l-2.5-4.5"/><path d="M7 17l2.5 4.5"/><path d="M7 17h4"/></svg>'
+  },
+  {
+    label: '減碳效益',
+    value: '12.6',
+    unit: '萬噸 CO₂e',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.5A4.5 4.5 0 1 1 12 9a4.2 4.2 0 0 1 6.7 3.4A3.6 3.6 0 1 1 18 19H8.8"/><path d="M9 21h6"/><path d="M10 18h4"/></svg>'
+  }
+]
+
 const wasteSpeciesCards = getWasteSpeciesCardsLocal()
 const fallbackSpeciesImage = buildSpeciesFallbackImage()
 
@@ -162,7 +324,6 @@ const currentCategoryCodes = computed(() => {
   }
   return currentCategory.value?.codes || []
 })
-const currentCategoryColor = computed(() => currentCategory.value?.color || '#7bbf8a')
 const allWasteCodes = computed(() => getAllWasteCodes())
 const filteredCategoryCodes = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
@@ -173,7 +334,7 @@ const filteredCategoryCodes = computed(() => {
     return targetText.includes(keyword)
   })
 })
-const displayCodes = computed(() => (activeTab.value === 'wasteCodeRef' ? filteredCategoryCodes.value : currentCategoryCodes.value))
+const displayCodes = computed(() => filteredCategoryCodes.value)
 const currentPageCodes = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
@@ -196,38 +357,38 @@ const speciesCurrentPageCards = computed(() => {
 
 const getCategoryShortName = (category) => category?.name?.split(' - ')[1] || category?.name || ''
 
-const getCodeColor = (code) => {
-  if (selectedCategory.value === 'ALL') {
-    return getCategoryById(code.categoryId)?.color || currentCategoryColor.value
-  }
-  return currentCategoryColor.value
+const getCategoryColor = (category) => {
+  const categoryInfo = categoriesDisplay.value.find(c => c.id === category?.id)
+  return categoryInfo?.color || '#64748B'
 }
 
-const categoryIconMap = {
-  A: '⚗️',
-  B: '☣️',
-  C: '🧪',
-  D: '🏭',
-  E: '🔩',
-  R: '♻️'
-}
+const getCategoryCodeCount = (categoryId) => getCategoryById(categoryId)?.codes?.length || 0
 
-const getCategoryIcon = (category) => categoryIconMap[category?.id] || '🗂️'
-
-const getCategoryShellStyle = (category, isActive) => {
-  if (isActive) {
-    return {
-      background: 'rgba(255, 255, 255, 0.18)',
-      color: '#ffffff',
-      boxShadow: '0 14px 30px rgba(20, 89, 62, 0.22)'
-    }
-  }
-
+const getCategoryCardStyle = (catInfo) => {
+  const isActive = selectedCategory.value === catInfo.id
+  if (!isActive) return {}
   return {
-    background: `${category.color}18`,
-    color: category.color,
-    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.48)'
+    background: `linear-gradient(180deg, #ffffff 0%, ${catInfo.color}10 100%)`,
+    borderColor: catInfo.color,
+    boxShadow: `0 10px 24px ${catInfo.color}2e, 0 0 0 1px ${catInfo.color}30`,
   }
+}
+
+const getCategoryIconWrapStyle = (catInfo) => {
+  const isActive = selectedCategory.value === catInfo.id
+
+  return { background: `${catInfo.color}14`, border: `1px solid ${catInfo.color}28`, color: catInfo.color }
+}
+
+const getCategoryCountStyle = (catInfo) => {
+  const isActive = selectedCategory.value === catInfo.id
+  if (isActive) return { color: catInfo.color, background: `${catInfo.color}18`, border: `1px solid ${catInfo.color}36` }
+  return { color: '#94a3b8', background: '#f1f5f9' }
+}
+
+const applyTag = (tag) => {
+  searchKeyword.value = tag
+  currentPage.value = 1
 }
 
 const selectCategory = (categoryId) => {
@@ -300,16 +461,39 @@ onMounted(() => {
 @use "@/styles/variables.scss" as *;
 
 .home-page {
-  min-height: 100vh;
+  --footer-art-height: clamp(10px, 18vw, 300px);
+  min-height: 170vh;
   width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
   background:
     radial-gradient(circle at 10% 20%, rgba(143, 178, 224, 0.1), transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.3), transparent 40%),
+    radial-gradient(circle at 70% 20%, rgba(33, 150, 243, 0.2), transparent 40%),
     radial-gradient(circle at 10% 100%, rgba(143, 178, 224, 0.3), transparent 50%);
+  background-size: auto, auto, auto;
+}
+
+.home-page::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--footer-art-height) * 2);
+  background: url('../assets/Footer_v3.png') center bottom / cover no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.home-page>* {
+  position: relative;
+  z-index: 1;
 }
 
 .container {
-  max-width: min(92vw, 1600px);
+  max-width: min(92vw, 1500px);
   margin: 0 auto;
   padding: 0 24px;
 
@@ -320,11 +504,10 @@ onMounted(() => {
 
 .hero-section {
   position: relative;
-  background:
-    url('../assets/Bg.png');
-  background-size: cover;
-  background-position: center;
-  background-blend-mode: overlay;
+  background-image: url('../assets/Bg_v3.png');
+  background-size: auto 100%;
+  background-position: right top;
+  background-repeat: no-repeat;
   padding: clamp(20px, 2vw, 36px) clamp(24px, 3vw, 52px);
   overflow: hidden;
   min-height: clamp(640px, 82vh, 900px);
@@ -335,11 +518,9 @@ onMounted(() => {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -1px;
-    height: 120px;
-    // background:
-    //   radial-gradient(circle at 0% 100%, rgba(232, 244, 255, 0.95) 0%, rgba(232, 244, 255, 0.35) 36%, transparent 72%),
-    //   linear-gradient(180deg, rgba(232, 244, 255, 0) 0%, rgba(232, 244, 255, 0.78) 82%, rgba(232, 244, 255, 1) 100%);
+    bottom: 0;
+    height: 100px;
+    background: linear-gradient(180deg, transparent 0%, rgba(248, 250, 252, 0.7) 70%, rgba(248, 250, 252, 1) 100%);
     z-index: 0;
     pointer-events: none;
   }
@@ -383,8 +564,8 @@ onMounted(() => {
 
 .hero-title {
   font-size: clamp(48px, 3.2vw, 68px);
-  font-weight: 700;
-  color: #2c3e50;
+  font-weight: 800;
+  color: #1a365d;
   margin-bottom: 16px;
   line-height: 1.3;
   animation: fadeInUp 0.8s ease-out 0.1s backwards;
@@ -392,10 +573,69 @@ onMounted(() => {
 
 .hero-description {
   font-size: clamp(17px, 1.1vw, 24px);
-  color: #607d8b;
-  margin-bottom: 28px;
+  color: #4a5568;
+  margin-bottom: 20px;
   line-height: 1.8;
   animation: fadeInUp 0.8s ease-out 0.3s backwards;
+}
+
+.hero-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0px;
+  max-width: 420px;
+  margin-bottom: 30px;
+  animation: fadeInUp 0.8s ease-out 0.35s backwards;
+}
+
+.pillar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 06px;
+}
+
+.pillar-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 8px 24px rgba(15, 23, 42, 0.08);
+
+  svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.pillar-icon--green {
+  color: #22c55e;
+}
+
+.pillar-icon--blue {
+  color: #3b82f6;
+}
+
+.pillar-icon--orange {
+  color: #f59e0b;
+}
+
+.pillar-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.pillar-subtitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #64748b;
+  line-height: 1.3;
 }
 
 .hero-actions {
@@ -403,6 +643,170 @@ onMounted(() => {
   gap: 16px;
   justify-content: flex-start;
   animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+.home-footer-insights {
+  position: relative;
+  z-index: 4;
+  margin-top: clamp(-90px, -7vw, -34px);
+  margin-bottom: clamp(18px, 2.4vw, 34px);
+}
+
+.home-footer-stats {
+  position: relative;
+  margin-top: auto;
+  // padding-bottom: calc(var(--footer-art-height) * 0.7);
+  z-index: 2;
+}
+
+.insight-card-board {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  box-shadow: 0 14px 34px rgba(16, 24, 40, 0.12);
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 30px;
+}
+
+.insight-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.insight-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  span {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+  }
+
+  :deep(svg) {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.insight-texts {
+  min-width: 0;
+}
+
+.insight-title {
+  margin: 0 0 2px;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.insight-subtitle {
+  margin: 0 0 2px;
+  font-size: 13px;
+  color: #334155;
+  font-weight: 700;
+}
+
+.insight-desc {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.insight-stats-bar {
+  margin-top: -10px;
+  background: linear-gradient(96deg, #3bb7f3 0%, #2ec8b5 52%, #35d05e 100%);
+  // border-radius: 0 0 22px 22px;
+  box-shadow: 0 16px 34px rgba(15, 118, 110, 0.24);
+  overflow: hidden;
+}
+
+.insight-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+
+.insight-stat-item {
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 26%;
+    width: 1px;
+    height: 48%;
+    background: rgba(255, 255, 255, 0.35);
+  }
+}
+
+.insight-stat-icon {
+  width: 34px;
+  height: 34px;
+  color: #ffffff;
+  opacity: 0.94;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  span {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+  }
+
+  :deep(svg) {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.insight-stat-copy {
+  min-width: 0;
+}
+
+.insight-stat-label {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.insight-stat-value {
+  margin: 2px 0 0;
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+
+  small {
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.95;
+  }
 }
 
 @keyframes fadeInUp {
@@ -417,18 +821,37 @@ onMounted(() => {
   }
 }
 
+// 卡片列表過渡動畫
+.card-list-enter-active,
+.card-list-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-list-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.card-list-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
 .search-section {
   position: relative;
   z-index: 3;
-  margin-top: -54px;
-  padding: 0 60px 50px;
+  margin-top: 0;
+  padding: 0 60px clamp(140px, 14vh, 220px);
+  flex: 1 0 auto;
 
   .container {
-    background: #f9fdff7c;
-    border-radius: 32px;
-    padding: 50px 24px;
-    box-shadow: 0 24px 80px rgba(53, 92, 72, 0.12);
+    background: linear-gradient(180deg, rgba(215, 238, 248, 0.87) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 28px;
+    padding: 50px 36px;
     min-height: 600px;
+    box-shadow: 0 16px 48px rgba(26, 54, 93, 0.08);
 
     .search-header {
       text-align: center;
@@ -436,15 +859,15 @@ onMounted(() => {
 
       .section-title {
         font-size: 40px;
-        font-weight: 700;
-        color: #2c3e50;
+        font-weight: 800;
+        color: #1a365d;
         text-align: center;
         margin-bottom: 16px;
       }
 
       .section-description {
         font-size: 16px;
-        color: #607d8b;
+        color: #4a5568;
         text-align: center;
         max-width: 720px;
         margin: 0 auto;
@@ -452,42 +875,200 @@ onMounted(() => {
       }
     }
 
-    .tabsLabel {
-      --el-tabs-header-height: 50px;
+    .category-card-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
 
-      /* 維持原本高度不變 */
-      .tab-btn {
-        background-color: #ffffff;
-        color: $primary-green;
-        border-color: $primary-green-light;
-        width: 100%;
+    .category-card {
+      position: relative;
+      border: 1.5px solid #e8edf5;
+      border-radius: 20px;
+      padding: 28px 14px 20px;
+      min-height: 165px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.10);
+        border-color: #c7d7f5;
       }
 
-      .tab-btn--active {
-        background-color: $primary-green;
-        color: #ffffff;
-        border-color: $primary-green;
+      &--active {
+        transform: translateY(-4px);
+
+        &:hover {
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+        }
       }
+    }
 
-      .colGap {
-        border-right: #ccc solid 1.5px;
-        height: 30px;
-        padding-left: 30px;
+    .category-card-check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.24);
+
+      svg {
+        width: 14px;
+        height: 14px;
       }
+    }
 
-      #wasteCodeRef {
-        .select-control {
-          /* 1. 預設狀態下的邊框顏色 */
-          --el-border-color: #{$primary-green};
+    .category-card-icon-wrap {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
 
+    .category-svg-icon {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      :deep(svg) {
+        width: 26px;
+        height: 26px;
+        display: block;
+      }
+    }
+
+    .category-card-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      transition: color 0.3s;
+      text-transform: uppercase;
+    }
+
+    .category-card-name {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      transition: color 0.3s;
+    }
+
+    .category-card-count {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+      transition: all 0.3s;
+      margin-top: 2px;
+    }
+
+    .search-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #e8edf5;
+      border-radius: 20px;
+      padding: 22px 24px;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(8px);
+    }
+
+    .search-input-field {
+      :deep(.el-input__wrapper) {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 14px;
+        border: 1.5px solid #e2e8f0;
+        box-shadow: none;
+        transition: all 0.3s ease;
+        padding: 4px 12px;
+
+        &:hover {
+          border-color: #c3d4f5;
+        }
+
+        &.is-focus {
+          border-color: #4285f4;
+          box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.12);
         }
       }
 
+      :deep(.el-input__inner) {
+        font-size: 15px;
+        color: #2c3e50;
+        height: 42px;
 
+        &::placeholder {
+          color: #b0bec5;
+        }
+      }
 
+      :deep(.el-icon) {
+        color: #94a3b8;
+        font-size: 16px;
+      }
     }
 
+    .hot-tags-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
 
+    .hot-tags-label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .hot-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .hot-tag {
+      font-size: 12px;
+      font-weight: 500;
+      color: #4a5568;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 100px;
+      padding: 4px 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      line-height: 1.6;
+
+      &:hover {
+        background: #dbeafe;
+        border-color: #93c5fd;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+      }
+    }
   }
 }
 
@@ -659,20 +1240,32 @@ onMounted(() => {
 
 .list-title {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
-  color: #28414f;
+  color: #1a365d;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.list-title-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 100px;
+  flex-shrink: 0;
 }
 
 .list-count {
   display: inline-flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(76, 175, 80, 0.08);
-  color: #4b7f64;
   font-size: 13px;
   font-weight: 700;
+  transition: all 0.3s ease;
 }
 
 .codes-grid {
@@ -702,16 +1295,16 @@ onMounted(() => {
 }
 
 .species-card {
-  border: 1px solid rgba(110, 155, 130, 0.12);
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 22px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 16px;
   padding: 16px;
   min-height: 240px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 0 10px 24px rgba(88, 120, 103, 0.08);
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
@@ -719,9 +1312,7 @@ onMounted(() => {
 }
 
 .species-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 34px rgba(88, 120, 103, 0.14);
-  border-color: rgba(55, 138, 101, 0.28);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .species-card-top {
@@ -734,9 +1325,9 @@ onMounted(() => {
   justify-content: center;
   min-width: 50px;
   padding: 6px 10px;
-  border-radius: 999px;
-  background: #ecf5ef;
-  color: #2e6e4f;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #22c55e;
   font-size: 13px;
   font-weight: 700;
 }
@@ -778,36 +1369,52 @@ onMounted(() => {
 
 .code-card {
   text-align: left;
-  border: 1px solid rgba(110, 155, 130, 0.12);
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 22px;
+  border: 1px solid #e2e8f0;
+  border-left: 6px solid;
+  background: #ffffff;
+  border-radius: 16px;
   padding: 18px;
   min-height: 160px;
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease, background 0.24s ease;
-  box-shadow: 0 10px 24px rgba(88, 120, 103, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   cursor: pointer;
 }
 
 .code-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 34px rgba(88, 120, 103, 0.14);
-  border-color: rgba(55, 138, 101, 0.28);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
 }
 
 .code-card-top {
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-card-arrow {
+  font-size: 15px;
+  color: #cbd5e1;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: all 0.25s ease;
+}
+
+.code-card:hover .code-card-arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .code-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 88px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  color: #ffffff;
-  font-size: 13px;
+  min-width: 80px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .code-card-title {
@@ -888,6 +1495,10 @@ onMounted(() => {
 }
 
 @media (max-width: 1200px) {
+  .category-card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   .codes-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -898,10 +1509,17 @@ onMounted(() => {
 }
 
 @media (max-width: 968px) {
+  .home-footer-insights {
+    margin-top: clamp(-48px, -8vw, -20px);
+  }
 
   .search-section {
-    margin-top: -24px;
+    margin-top: 0;
     padding-top: 0;
+  }
+
+  .category-card-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .search-section .container :deep(.tabsLabel .el-tabs__nav),
@@ -934,6 +1552,12 @@ onMounted(() => {
     font-size: 36px;
   }
 
+  .hero-pillars {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .search-shell {
     padding: 22px;
   }
@@ -961,9 +1585,29 @@ onMounted(() => {
   .species-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .insight-card-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .insight-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .insight-stat-item:nth-child(2)::after {
+    display: none;
+  }
 }
 
 @media (max-width: 576px) {
+  .home-page {
+    --footer-art-height: clamp(130px, 36vw, 180px);
+  }
+
+  .home-footer-insights {
+    margin-top: -10px;
+  }
+
   .hero-section {
     padding: 24px 20px;
     min-height: auto;
@@ -971,7 +1615,7 @@ onMounted(() => {
 
   .search-section {
     margin-top: 0;
-    padding: 24px 18px 42px;
+    padding: 24px 18px 76px;
   }
 
   .container {
@@ -982,12 +1626,59 @@ onMounted(() => {
     font-size: 32px;
   }
 
+  .hero-pillars {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .pillar-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 10px;
+  }
+
+  .pillar-title,
+  .pillar-subtitle {
+    font-size: 14px;
+  }
+
   .codes-grid {
     grid-template-columns: 1fr;
   }
 
   .species-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-footer-stats {
+    padding-bottom: max(22px, calc(var(--footer-art-height) * 0.68));
+  }
+
+  .insight-card-board {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 12px;
+  }
+
+  .insight-card {
+    padding: 8px 6px;
+  }
+
+  .insight-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-stat-item {
+    padding: 14px 10px;
+
+    &:not(:last-child)::after {
+      display: none;
+    }
+  }
+
+  .insight-stat-value {
+    font-size: 24px;
   }
 }
 
