@@ -1,5 +1,5 @@
 <template>
-	<div class="circulation-modes-grid">
+	<div ref="gridRef" class="circulation-modes-grid" :style="gridStyle">
 		<div class="circle-container">
 			<!-- 中央地球循環圖 -->
 			<div class="center-earth">
@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
 	Operation,
 	Connection,
@@ -81,6 +81,41 @@ const props = defineProps({
 
 const emit = defineEmits(['mode-click'])
 const selectedMode = ref(null)
+const gridRef = ref(null)
+const gridMetrics = ref({
+	width: 0,
+	viewportWidth: 0,
+	viewportHeight: 0
+})
+
+let gridResizeObserver = null
+
+const BASE_GRID_SIZE = 500
+
+const updateGridMetrics = () => {
+	gridMetrics.value = {
+		width: gridRef.value?.clientWidth || 0,
+		viewportWidth: window.innerWidth || 0,
+		viewportHeight: window.innerHeight || 0
+	}
+}
+
+const gridScale = computed(() => {
+	const availableWidth = gridMetrics.value.width || 720
+	const viewportWidth = gridMetrics.value.viewportWidth || 1366
+	const viewportHeight = gridMetrics.value.viewportHeight || 900
+	const horizontalReserve = availableWidth < 420 ? 24 : availableWidth < 560 ? 28 : 36
+	const verticalReserve = availableWidth < 969 ? 250 : 210
+	const widthScale = Math.max((availableWidth - horizontalReserve) / BASE_GRID_SIZE, 0.56)
+	const heightScale = Math.max((viewportHeight - verticalReserve) / BASE_GRID_SIZE, 0.56)
+	const laptopBoost = viewportWidth >= 1800 ? 0.03 : viewportWidth >= 1200 && viewportWidth < 1800 ? 0.34 : viewportWidth >= 992 ? 0.06 : 0
+	return Math.min(Math.max(Math.min(widthScale, heightScale) + laptopBoost, 0.56), 1.42)
+})
+
+const gridStyle = computed(() => ({
+	'--grid-scale': gridScale.value.toFixed(3),
+	minHeight: `${Math.max(Math.round(BASE_GRID_SIZE * gridScale.value) + 56, 380)}px`
+}))
 
 // 圖標映射
 const iconMap = {
@@ -121,7 +156,7 @@ const getShortName = (name) => {
 const getModePosition = (index) => {
 	const totalModes = 10
 	const angle = (index * 360 / totalModes) - 90 // -90度使第一個圖標在頂部
-	const radius = 180 // 圓形半徑（像素）
+	const radius = 190 // 圓形半徑（像素）
 
 	const radian = (angle * Math.PI) / 180
 	const x = radius * Math.cos(radian)
@@ -143,18 +178,38 @@ const handleExploreMode = () => {
 	if (!selectedMode.value) return
 	emit('mode-click', selectedMode.value)
 }
+
+onMounted(() => {
+	updateGridMetrics()
+	window.addEventListener('resize', updateGridMetrics)
+
+	if (typeof ResizeObserver !== 'undefined') {
+		gridResizeObserver = new ResizeObserver(() => {
+			updateGridMetrics()
+		})
+
+		if (gridRef.value) {
+			gridResizeObserver.observe(gridRef.value)
+		}
+	}
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('resize', updateGridMetrics)
+	gridResizeObserver?.disconnect()
+})
 </script>
 
 <style scoped lang="scss">
 .circulation-modes-grid {
-	--grid-scale: clamp(0.76, calc(0.58 + 0.03vw), 1.34);
+	--grid-scale: 1;
 	width: 100%;
 	padding: 0;
 	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: clamp(430px, 42vw, 760px);
+	min-height: 430px;
 }
 
 .circle-container {
@@ -509,7 +564,6 @@ const handleExploreMode = () => {
 /* 手機版 */
 @media (max-width: 968px) {
 	.circulation-modes-grid {
-		--grid-scale: clamp(0.68, calc(0.62 + 0.05vw), 0.86);
 		padding: 16px 0;
 		min-height: 420px;
 	}
@@ -539,10 +593,6 @@ const handleExploreMode = () => {
 
 /* 平板版 */
 @media (min-width: 969px) and (max-width: 1200px) {
-	.circulation-modes-grid {
-		--grid-scale: 0.92;
-	}
-
 	.circle-container {
 		width: 500px;
 		height: 500px;
@@ -561,7 +611,7 @@ const handleExploreMode = () => {
 
 @media (min-width: 1600px) {
 	.circulation-modes-grid {
-		--grid-scale: clamp(1.15, calc(0.72 + 0.028vw), 1.42);
+		min-height: 620px;
 	}
 }
 </style>

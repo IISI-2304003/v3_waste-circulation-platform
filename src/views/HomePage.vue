@@ -67,17 +67,40 @@
     <section class="home-footer-insights" aria-label="平台效益摘要">
       <div class="container">
         <div class="insight-card-board">
-          <article v-for="item in footerHighlights" :key="item.title" class="insight-card">
+          <article v-for="item in footerStatsForInsightCards" :key="item.title" class="insight-card insight-card--metric">
             <div class="insight-icon" :style="{ color: item.color, background: `${item.color}15` }">
               <span v-html="item.icon"></span>
             </div>
-            <div class="insight-texts">
-              <h4 class="insight-title" :style="{ color: item.color }">{{ item.title }}</h4>
-              <p class="insight-subtitle">{{ item.subtitle }}</p>
-              <p class="insight-desc">{{ item.desc }}</p>
+            <div class="insight-metric-copy">
+              <p class="insight-metric-label">{{ item.title }}</p>
+              <p class="insight-metric-value" :style="{ color: item.color }">
+                <span>{{ item.value }}</span>
+                <small>{{ item.unit }}</small>
+              </p>
             </div>
           </article>
         </div>
+        <div class="insight-process-board" aria-label="循環媒合流程">
+          <div v-for="(step, index) in footerProcessSteps" :key="step.title" class="process-step-item">
+            <article class="process-step-card">
+              <div class="process-step-icon" :style="{ color: step.color, background: `${step.color}14` }">
+                <span v-html="step.icon"></span>
+              </div>
+              <div class="process-step-copy">
+                <h4 class="process-step-title" :style="{ color: step.color }">{{ step.title }}</h4>
+                <p class="process-step-subtitle">{{ step.subtitle }}</p>
+              </div>
+            </article>
+            <div v-if="index < footerProcessSteps.length - 1" class="process-step-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14" />
+                <path d="m13 6 6 6-6 6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+
       </div>
     </section>
 
@@ -160,7 +183,7 @@
     <section class="home-footer-stats" aria-label="平台成效統計">
       <div class="insight-stats-bar">
         <div class="container insight-stats-grid">
-          <article v-for="stat in footerStats" :key="stat.label" class="insight-stat-item">
+          <article v-for="stat in footerHighlightsForStatsBar" :key="stat.label" class="insight-stat-item">
             <div class="insight-stat-icon">
               <span v-html="stat.icon"></span>
             </div>
@@ -270,6 +293,33 @@ const footerHighlights = [
   }
 ]
 
+const footerProcessSteps = [
+  {
+    title: '輸入廢棄物',
+    subtitle: '填報廢棄物特性',
+    color: '#3b82f6',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M10 3v8l-5 9a1 1 0 0 0 .9 1.5h12.2a1 1 0 0 0 .9-1.5L14 11V3"/><line x1="7" y1="17" x2="17" y2="17"/></svg>'
+  },
+  {
+    title: '智慧分析',
+    subtitle: '分析可行路徑',
+    color: '#22c55e',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3h5"/><path d="M10 3v2.5"/><path d="M14 3v2.5"/><path d="M8 8a4 4 0 0 1 8 0v3a4 4 0 0 1-8 0z"/><path d="M6 10h2"/><path d="M16 10h2"/><path d="M12 15v3"/><path d="M9 21h6"/></svg>'
+  },
+  {
+    title: '推薦循環模式',
+    subtitle: '最佳再利用方案',
+    color: '#8b5cf6',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1.8 2.7 3 5 3 7.5A5.5 5.5 0 1 1 4 10.5C4 8 5.2 5.7 7 3"/><path d="M13 14c2 0 3.5 1.6 3.5 3.5S15 21 13 21s-3.5-1.6-3.5-3.5S11 14 13 14Z"/><path d="m16.5 7.5 4-1.5-1.5 4"/></svg>'
+  },
+  {
+    title: '媒合供應商',
+    subtitle: '快速找到合作夥伴',
+    color: '#f97316',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11 5.5 8.5a2.5 2.5 0 0 1 0-3.5v0a2.5 2.5 0 0 1 3.5 0L12 8"/><path d="m16 13 2.5 2.5a2.5 2.5 0 0 1 0 3.5v0a2.5 2.5 0 0 1-3.5 0L12 16"/><path d="m9 15 6-6"/><path d="m8 16-2 2"/><path d="m18 8 2-2"/></svg>'
+  }
+]
+
 const footerStats = [
   {
     label: '媒合成功案例',
@@ -296,6 +346,23 @@ const footerStats = [
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.5A4.5 4.5 0 1 1 12 9a4.2 4.2 0 0 1 6.7 3.4A3.6 3.6 0 1 1 18 19H8.8"/><path d="M9 21h6"/><path d="M10 18h4"/></svg>'
   }
 ]
+
+const footerStatsCardColors = ['#57B9E8', '#22c55e', '#22c55e', '#57B9E8']
+
+const footerStatsForInsightCards = footerStats.map((item, index) => ({
+  title: item.label,
+  value: item.value,
+  unit: item.unit || (index === 0 ? '件' : index === 1 ? '家' : ''),
+  color: footerStatsCardColors[index % footerStatsCardColors.length],
+  icon: item.icon
+}))
+
+const footerHighlightsForStatsBar = footerHighlights.map((item) => ({
+  label: item.subtitle,
+  value: item.title,
+  unit: '',
+  icon: item.icon
+}))
 
 const wasteSpeciesCards = getWasteSpeciesCardsLocal()
 const fallbackSpeciesImage = buildSpeciesFallbackImage()
@@ -504,14 +571,21 @@ onMounted(() => {
 
 .hero-section {
   position: relative;
-  background-image: url('../assets/Bg_v3.png');
-  background-size: auto 100%;
-  background-position: right top;
-  background-repeat: no-repeat;
   padding: clamp(20px, 2vw, 36px) clamp(24px, 3vw, 52px);
   overflow: hidden;
   min-height: clamp(640px, 82vh, 900px);
   isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../assets/Bg_v4_850.png') center top / 110% auto no-repeat;
+    mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, rgba(0, 0, 0, 0.78) 38%, #000 60%);
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, rgba(0, 0, 0, 0.78) 38%, #000 60%);
+    z-index: 0;
+    pointer-events: none;
+  }
 
   &::after {
     content: '';
@@ -519,9 +593,9 @@ onMounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 100px;
-    background: linear-gradient(180deg, transparent 0%, rgba(248, 250, 252, 0.7) 70%, rgba(248, 250, 252, 1) 100%);
-    z-index: 0;
+    height: 140px;
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0) 0%, rgba(248, 250, 252, 0.08) 38%, rgba(248, 250, 252, 0.18) 100%);
+    z-index: 1;
     pointer-events: none;
   }
 }
@@ -659,8 +733,94 @@ onMounted(() => {
   z-index: 2;
 }
 
+.insight-process-board {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 30px;
+  box-shadow: 0 16px 36px rgba(16, 24, 40, 0.1);
+  padding: 18px 24px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.process-step-item {
+  display: flex;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 12px;
+}
+
+.process-step-card {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 6px;
+}
+
+.process-step-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  span {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+  }
+
+  :deep(svg) {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+.process-step-copy {
+  min-width: 0;
+}
+
+.process-step-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.process-step-subtitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.process-step-arrow {
+  width: 28px;
+  height: 28px;
+  color: #9fb0c5;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 .insight-card-board {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.596);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 24px;
@@ -679,6 +839,12 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
+}
+
+.insight-card--metric {
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
 }
 
 .insight-icon {
@@ -704,6 +870,40 @@ onMounted(() => {
 
 .insight-texts {
   min-width: 0;
+}
+
+.insight-metric-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.insight-metric-label {
+  margin: 0;
+  font-size: 14px;
+  color: #334155;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.insight-metric-value {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+
+  small {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: inherit;
+  }
 }
 
 .insight-title {
@@ -795,7 +995,7 @@ onMounted(() => {
 .insight-stat-value {
   margin: 2px 0 0;
   color: #ffffff;
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: 0.01em;
   display: flex;
@@ -846,12 +1046,12 @@ onMounted(() => {
 
   .container {
     background: linear-gradient(180deg, rgba(215, 238, 248, 0.87) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
+    // border: 1px solid rgba(255, 255, 255, 0);
+    // backdrop-filter: blur(12px);
     border-radius: 28px;
     padding: 50px 36px;
-    min-height: 600px;
-    box-shadow: 0 16px 48px rgba(26, 54, 93, 0.08);
+    min-height: 800px;
+    // box-shadow: 0 16px 48px rgba(26, 54, 93, 0.08);
 
     .search-header {
       text-align: center;
@@ -1513,6 +1713,27 @@ onMounted(() => {
     margin-top: clamp(-48px, -8vw, -20px);
   }
 
+  .insight-process-board {
+    flex-direction: column;
+    border-radius: 26px;
+    padding: 16px 18px;
+  }
+
+  .process-step-item {
+    width: 100%;
+  }
+
+  .process-step-arrow {
+    width: 100%;
+    height: 18px;
+
+    svg {
+      width: 22px;
+      height: 22px;
+      transform: rotate(90deg);
+    }
+  }
+
   .search-section {
     margin-top: 0;
     padding-top: 0;
@@ -1590,6 +1811,18 @@ onMounted(() => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .insight-card--metric {
+    padding: 16px 18px;
+  }
+
+  .insight-metric-value {
+    font-size: 44px;
+
+    small {
+      font-size: 16px;
+    }
+  }
+
   .insight-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1602,6 +1835,40 @@ onMounted(() => {
 @media (max-width: 576px) {
   .home-page {
     --footer-art-height: clamp(130px, 36vw, 180px);
+  }
+
+  .insight-process-board {
+    border-radius: 22px;
+    padding: 14px;
+    gap: 8px;
+  }
+
+  .process-step-card {
+    gap: 10px;
+    padding: 6px 2px;
+  }
+
+  .process-step-icon {
+    width: 56px;
+    height: 56px;
+
+    span {
+      width: 26px;
+      height: 26px;
+    }
+
+    :deep(svg) {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  .process-step-title {
+    font-size: 18px;
+  }
+
+  .process-step-subtitle {
+    font-size: 13px;
   }
 
   .home-footer-insights {
@@ -1663,6 +1930,23 @@ onMounted(() => {
 
   .insight-card {
     padding: 8px 6px;
+  }
+
+  .insight-card--metric {
+    gap: 14px;
+    padding: 12px 10px;
+  }
+
+  .insight-metric-label {
+    font-size: 13px;
+  }
+
+  .insight-metric-value {
+    font-size: 36px;
+
+    small {
+      font-size: 14px;
+    }
   }
 
   .insight-stats-grid {
