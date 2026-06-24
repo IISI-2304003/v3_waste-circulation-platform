@@ -64,7 +64,7 @@
       </div>
     </section>
 
-    <section class="home-footer-insights" aria-label="平台效益摘要">
+    <section ref="footerInsightsRef" class="home-footer-insights" aria-label="平台效益摘要">
       <div class="container">
         <div class="insight-card-board">
           <article v-for="item in footerStatsForInsightCards" :key="item.title" class="insight-card insight-card--metric">
@@ -204,7 +204,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Search, Management } from '@element-plus/icons-vue'
 import { useCirculationModes } from '../composables/useCirculationModes'
@@ -238,6 +238,11 @@ const activeTab = ref('wasteSpeciesRef')
 const speciesSearchKeyword = ref('')
 const speciesCurrentPage = ref(1)
 const speciesPageSize = 10
+const footerInsightsRef = ref(null)
+const hasFooterStatsAnimated = ref(false)
+const animatedFooterStatValues = ref([])
+let footerStatsObserver = null
+let footerStatsAnimationFrame = null
 
 // 六大類分類顯示信息
 // Lucide-style SVG icons
@@ -295,25 +300,25 @@ const footerHighlights = [
 
 const footerProcessSteps = [
   {
-    title: '輸入廢棄物',
+    title: '1.輸入廢棄物',
     subtitle: '填報廢棄物特性',
     color: '#3b82f6',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M10 3v8l-5 9a1 1 0 0 0 .9 1.5h12.2a1 1 0 0 0 .9-1.5L14 11V3"/><line x1="7" y1="17" x2="17" y2="17"/></svg>'
   },
   {
-    title: '智慧分析',
+    title: '2.智慧分析',
     subtitle: '分析可行路徑',
     color: '#22c55e',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3h5"/><path d="M10 3v2.5"/><path d="M14 3v2.5"/><path d="M8 8a4 4 0 0 1 8 0v3a4 4 0 0 1-8 0z"/><path d="M6 10h2"/><path d="M16 10h2"/><path d="M12 15v3"/><path d="M9 21h6"/></svg>'
   },
   {
-    title: '推薦循環模式',
+    title: '3.推薦循環模式',
     subtitle: '最佳再利用方案',
     color: '#8b5cf6',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1.8 2.7 3 5 3 7.5A5.5 5.5 0 1 1 4 10.5C4 8 5.2 5.7 7 3"/><path d="M13 14c2 0 3.5 1.6 3.5 3.5S15 21 13 21s-3.5-1.6-3.5-3.5S11 14 13 14Z"/><path d="m16.5 7.5 4-1.5-1.5 4"/></svg>'
   },
   {
-    title: '媒合供應商',
+    title: '4.媒合供應商',
     subtitle: '快速找到合作夥伴',
     color: '#f97316',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11 5.5 8.5a2.5 2.5 0 0 1 0-3.5v0a2.5 2.5 0 0 1 3.5 0L12 8"/><path d="m16 13 2.5 2.5a2.5 2.5 0 0 1 0 3.5v0a2.5 2.5 0 0 1-3.5 0L12 16"/><path d="m9 15 6-6"/><path d="m8 16-2 2"/><path d="m18 8 2-2"/></svg>'
@@ -347,15 +352,31 @@ const footerStats = [
   }
 ]
 
+const footerStatsAnimationMeta = footerStats.map((item) => {
+  const raw = String(item.value)
+  const hasPlus = raw.includes('+')
+  const cleanRaw = raw.replace(/,/g, '').replace('+', '')
+  const target = Number(cleanRaw)
+  const decimalPart = cleanRaw.split('.')[1]
+  const decimals = decimalPart ? decimalPart.length : 0
+
+  return {
+    target: Number.isFinite(target) ? target : 0,
+    decimals,
+    hasPlus,
+    raw
+  }
+})
+
 const footerStatsCardColors = ['#57B9E8', '#22c55e', '#22c55e', '#57B9E8']
 
-const footerStatsForInsightCards = footerStats.map((item, index) => ({
+const footerStatsForInsightCards = computed(() => footerStats.map((item, index) => ({
   title: item.label,
-  value: item.value,
+  value: animatedFooterStatValues.value[index] || item.value,
   unit: item.unit || (index === 0 ? '件' : index === 1 ? '家' : ''),
   color: footerStatsCardColors[index % footerStatsCardColors.length],
   icon: item.icon
-}))
+})))
 
 const footerHighlightsForStatsBar = footerHighlights.map((item) => ({
   label: item.subtitle,
@@ -511,7 +532,66 @@ const scrollToSearch = () => {
   })
 }
 
+const animateFooterStats = () => {
+  if (hasFooterStatsAnimated.value) return
+  hasFooterStatsAnimated.value = true
+
+  const duration = 1400
+  const startTime = performance.now()
+  const formatters = footerStatsAnimationMeta.map((meta) => new Intl.NumberFormat('zh-TW', {
+    minimumFractionDigits: meta.decimals,
+    maximumFractionDigits: meta.decimals
+  }))
+
+  const step = (currentTime) => {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const eased = 1 - Math.pow(1 - progress, 3)
+
+    animatedFooterStatValues.value = footerStatsAnimationMeta.map((meta, index) => {
+      const currentValue = meta.target * eased
+      const normalizedValue = meta.decimals > 0
+        ? Number(currentValue.toFixed(meta.decimals))
+        : Math.round(currentValue)
+      const formatted = formatters[index].format(normalizedValue)
+      return `${formatted}${meta.hasPlus ? '+' : ''}`
+    })
+
+    if (progress < 1) {
+      footerStatsAnimationFrame = requestAnimationFrame(step)
+      return
+    }
+
+    animatedFooterStatValues.value = footerStatsAnimationMeta.map((meta) => meta.raw)
+    footerStatsAnimationFrame = null
+  }
+
+  footerStatsAnimationFrame = requestAnimationFrame(step)
+}
+
 onMounted(() => {
+  animatedFooterStatValues.value = footerStats.map(() => '0')
+
+  if (typeof IntersectionObserver !== 'undefined' && footerInsightsRef.value) {
+    footerStatsObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry?.isIntersecting) return
+
+        animateFooterStats()
+        footerStatsObserver?.disconnect()
+        footerStatsObserver = null
+      },
+      {
+        threshold: 0.25
+      }
+    )
+
+    footerStatsObserver.observe(footerInsightsRef.value)
+  } else {
+    animateFooterStats()
+  }
+
   if (route.query.tab) {
     activeTab.value = route.query.tab
   }
@@ -520,6 +600,16 @@ onMounted(() => {
   }
   if (route.query.page) {
     currentPage.value = Number(route.query.page) || 1
+  }
+})
+
+onBeforeUnmount(() => {
+  footerStatsObserver?.disconnect()
+  footerStatsObserver = null
+
+  if (footerStatsAnimationFrame) {
+    cancelAnimationFrame(footerStatsAnimationFrame)
+    footerStatsAnimationFrame = null
   }
 })
 </script>
