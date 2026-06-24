@@ -1,11 +1,12 @@
 import { ref, onMounted } from 'vue';
 import { getCirculationModes, getCirculationModeById } from '../api/circulationModes';
+import circulationModesData from '../data/circulationModes.json';
 
 /**
  * 循環模式相關邏輯封裝
  */
 export function useCirculationModes() {
-    const modes = ref([]);
+    const modes = ref([...circulationModesData]);
     const loading = ref(false);
     const error = ref(null);
 
@@ -17,7 +18,10 @@ export function useCirculationModes() {
         error.value = null;
         try {
             const response = await getCirculationModes();
-            modes.value = response.data || response;
+            const fetchedModes = response.data || response;
+            if (Array.isArray(fetchedModes) && fetchedModes.length > 0) {
+                modes.value = fetchedModes;
+            }
         } catch (err) {
             error.value = err.message || '載入循環模式失敗';
             console.error('fetchModes error:', err);

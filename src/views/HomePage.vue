@@ -58,7 +58,7 @@
           </div>
         </div>
 
-        <div v-if="modes.length > 0" class="hero-right">
+        <div class="hero-right">
           <CirculationModesGrid :modes="modes" @mode-click="showModeDetail" />
         </div>
       </div>
