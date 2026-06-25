@@ -24,10 +24,13 @@ defineProps({
 defineEmits(['select'])
 
 const items = [
-	{ id: 'physical', label: '物化特性', icon: Cpu, theme: 'green' },
-	{ id: 'source', label: '來源條件', icon: OfficeBuilding, theme: 'cyan' },
-	{ id: 'site', label: '場域條件', icon: LocationInformation, theme: 'violet' },
-	// { id: 'business', label: '商業條件', icon: Coin, theme: 'orange' }
+	{ id: 'physical', label: '1.物化特性', icon: Cpu, theme: 'green' },
+	{ id: 'source', label: '2.料源穩定性', icon: OfficeBuilding, theme: 'cyan' },
+	{ id: 'site', label: '3.場地配置', icon: LocationInformation, theme: 'violet' },
+	{ id: 'environment', label: '4.環境影響', icon: LocationInformation, theme: 'violet' },
+	{ id: 'business', label: '5.經濟效益', icon: Coin, theme: 'orange' },
+	{ id: 'technology', label: '6.技術成熟度', icon: Cpu, theme: 'orange' },
+	{ id: 'demand', label: '7.再生產品使用者製程需求', icon: OfficeBuilding, theme: 'cyan' },
 ]
 </script>
 

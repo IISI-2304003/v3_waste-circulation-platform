@@ -11,42 +11,6 @@
           <h1 class="hero-title">產業資源循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
           <p class="hero-description">連結資源循環供需，推動產業共生，實現永續循環經濟</p>
 
-          <!-- <div class="hero-pillars" aria-label="平台核心價值">
-            <div class="pillar-item">
-              <span class="pillar-icon pillar-icon--green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 0 1 7 7L17 13" />
-                  <path d="M14 11a5 5 0 0 1 0 7L12.5 19.5a5 5 0 1 1-7-7L7 11" />
-                </svg>
-              </span>
-              <div class="pillar-title">智慧媒合</div>
-              <div class="pillar-subtitle">智慧媒合供需</div>
-            </div>
-
-            <div class="pillar-item">
-              <span class="pillar-icon pillar-icon--blue" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 3v9l6 3" />
-                </svg>
-              </span>
-              <div class="pillar-title">資源共享</div>
-              <div class="pillar-subtitle">擴大再利用價值</div>
-            </div>
-
-            <div class="pillar-item">
-              <span class="pillar-icon pillar-icon--orange" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 12a8 8 0 0 1 14-5" />
-                  <path d="M20 12a8 8 0 0 1-14 5" />
-                  <path d="M16 4h2.8V6.8" />
-                  <path d="M8 20H5.2v-2.8" />
-                </svg>
-              </span>
-              <div class="pillar-title">永續循環</div>
-              <div class="pillar-subtitle">共創綠色未來</div>
-            </div>
-          </div> -->
 
           <div class="hero-actions">
             <el-button type="primary" size="large" round @click="scrollToSearch">
@@ -132,14 +96,38 @@
 
         <!-- 搜尋卡片 -->
         <div class="search-card">
-          <el-input v-model="searchKeyword" clearable placeholder="請輸入關鍵字（例如：pH值、污泥、廢酸、重金屬）" class="search-input-field" @input="currentPage = 1">
-            <template #prefix>
+          <div class="search-card-input-group">
+            <div class="search-card-label">
               <el-icon>
                 <Search />
               </el-icon>
-            </template>
-          </el-input>
+              <span>關鍵字搜尋</span>
+            </div>
+            <el-input v-model="searchKeyword" clearable placeholder="請輸入關鍵字（例如：pH值、含水率、廢酸、重金屬）" class="search-input-field" @input="currentPage = 1" @keyup.enter="currentPage = 1">
+              <template #prefix>
+                <el-icon>
+                  <Search />
+                </el-icon>
+              </template>
+            </el-input>
+            <el-button type="primary" @click="currentPage = 1" class="search-btn">
+              搜尋
+            </el-button>
+            <el-button @click="searchKeyword = ''; currentPage = 1" class="clear-btn">
+              清除
+            </el-button>
+          </div>
+          <!-- 熱門關鍵字 -->
+          <div class="hot-tags-section">
+            <span class="hot-tags-label">熱門關鍵字：</span>
+            <div class="hot-tags-list">
+              <button v-for="tag in hotTags" :key="tag" class="hot-tag-item" @click="applyTag(tag)">
+                {{ tag }}
+              </button>
+            </div>
+          </div>
         </div>
+
 
         <el-divider style="margin: 24px 0" />
 
@@ -154,13 +142,20 @@
             </div>
 
             <transition-group v-if="currentPageCodes.length > 0" name="card-list" tag="div" class="codes-grid">
-              <button v-for="code in currentPageCodes" :key="`${code.code}-${currentPage}`" type="button" class="code-card" :style="{ '--card-color': getCategoryColor(currentCategory), borderLeftColor: getCategoryColor(currentCategory) }" @click="handleCardClick(code.code)">
+              <button v-for="(code, pageIndex) in currentPageCodes" :key="`${code.code}-${currentPage}`" type="button" class="code-card" :style="{ '--card-color': getCategoryColor(currentCategory), borderLeftColor: getCategoryColor(currentCategory) }" @click="handleCardClick(code.code)">
                 <div class="code-card-top">
                   <span class="code-chip" :style="{ background: getCategoryColor(currentCategory) + '15', color: getCategoryColor(currentCategory), border: `1px solid ${getCategoryColor(currentCategory)}30` }">{{ code.code }}</span>
-                  <span class="code-card-arrow">→</span>
+                  <span class="code-card-top-icon" aria-hidden="true" :style="{ color: getCategoryColor(currentCategory) }">
+                    <span v-html="getCodeCardTopIcon(currentCategory?.id, (currentPage - 1) * pageSize + pageIndex)"></span>
+                  </span>
                 </div>
                 <h4 class="code-card-title">{{ code.name }}</h4>
                 <p class="code-card-description">{{ code.description }}</p>
+                <span class="code-card-arrow" :style="{ color: getCategoryColor(currentCategory) }">
+                  <el-icon>
+                    <DArrowRight />
+                  </el-icon>
+                </span>
               </button>
             </transition-group>
 
@@ -180,7 +175,7 @@
       </div>
     </section>
 
-    <section class="home-footer-stats" aria-label="平台成效統計">
+    <section class="home-footer-stats" aria-label="平台標語">
       <div class="insight-stats-bar">
         <div class="container insight-stats-grid">
           <article v-for="stat in footerHighlightsForStatsBar" :key="stat.label" class="insight-stat-item">
@@ -191,7 +186,6 @@
               <p class="insight-stat-label">{{ stat.label }}</p>
               <p class="insight-stat-value">
                 <span>{{ stat.value }}</span>
-                <small>{{ stat.unit }}</small>
               </p>
             </div>
           </article>
@@ -255,6 +249,25 @@ const categoryIcons = {
   R: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>',
 }
 
+const codeCardDecorIcons = {
+  flask: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M10 3v8l-5 9a1 1 0 0 0 .9 1.5h12.2a1 1 0 0 0 .9-1.5L14 11V3"/><line x1="7" y1="17" x2="17" y2="17"/></svg>',
+  drop: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8c2.3 3.1 5.5 6.8 5.5 10.3A5.5 5.5 0 1 1 6.5 13.1C6.5 9.6 9.7 5.9 12 2.8z"/></svg>',
+  recycle: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h4l-1.5-2.5"/><path d="M7 7l2.5 4.5"/><path d="M17 7l-2.5-4.5"/><path d="M17 7h-4"/><path d="M17 17h-4l1.5 2.5"/><path d="M17 17l-2.5-4.5"/><path d="M7 17l2.5 4.5"/><path d="M7 17h4"/></svg>',
+  leaf: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21c6 0 10-4 10-10 0-2.4-.5-4.5-1.2-6C9.5 5.5 5.5 9.5 5 15c-.2 2.4 0 4.1 0 6z"/><path d="M5 21c2.5-2.5 5.5-4.5 9-6"/></svg>',
+  bin: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 3h6l1 2H8l1-2z"/><rect x="6" y="7" width="12" height="14" rx="2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>',
+  factory: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l5 3V9l5 3V7l4 2v12"/><path d="M8 21v-4"/><path d="M12 21v-3"/><path d="M16 21v-5"/></svg>',
+  truck: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h13v10H1z"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="5" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>'
+}
+
+const codeCardTopIconPools = {
+  A: [codeCardDecorIcons.flask, codeCardDecorIcons.drop, codeCardDecorIcons.bin],
+  B: [codeCardDecorIcons.bin, codeCardDecorIcons.drop, codeCardDecorIcons.recycle, codeCardDecorIcons.truck],
+  C: [codeCardDecorIcons.recycle, codeCardDecorIcons.leaf, codeCardDecorIcons.drop, codeCardDecorIcons.flask],
+  D: [codeCardDecorIcons.factory, codeCardDecorIcons.truck, codeCardDecorIcons.bin],
+  E: [codeCardDecorIcons.factory, codeCardDecorIcons.recycle],
+  R: [codeCardDecorIcons.recycle, codeCardDecorIcons.leaf, codeCardDecorIcons.truck, codeCardDecorIcons.bin]
+}
+
 // 六大類分類顯示信息
 const categoriesDisplay = ref([
   { id: 'A', displayName: '製程有害', color: '#4285F4' },
@@ -265,12 +278,12 @@ const categoriesDisplay = ref([
   { id: 'R', displayName: '公告應回收', color: '#06B6D4' }
 ])
 
-const hotTags = ref(['pH值', '污泥', '廢酸', '廢鹼', 'PCB', '電鍍污泥', '重金屬', '廢油'])
+const hotTags = ref(['pH值', '廢液', '廢鹼', '污泥', '事業廢棄物'])
 
 const footerHighlights = [
   {
     title: '智慧媒合',
-    subtitle: 'AI 精準匹配供需',
+    subtitle: '精準匹配供需',
     desc: '提升媒合效率',
     color: '#22c55e',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11c0 4.4 3.6 8 8 8"/><path d="M13 3c4.4 0 8 3.6 8 8"/><path d="M8 11l8-8"/><path d="M10 3H3v7"/><path d="M14 21h7v-7"/></svg>'
@@ -472,6 +485,11 @@ const getCategoryCountStyle = (catInfo) => {
   const isActive = selectedCategory.value === catInfo.id
   if (isActive) return { color: catInfo.color, background: `${catInfo.color}18`, border: `1px solid ${catInfo.color}36` }
   return { color: '#94a3b8', background: '#f1f5f9' }
+}
+
+const getCodeCardTopIcon = (categoryId, cardIndex) => {
+  const pool = codeCardTopIconPools[categoryId] || codeCardTopIconPools.C
+  return pool[cardIndex % pool.length]
 }
 
 const applyTag = (tag) => {
@@ -910,7 +928,7 @@ onBeforeUnmount(() => {
 }
 
 .insight-card-board {
-  background: rgba(255, 255, 255, 0.596);
+  background: rgba(255, 255, 255, 1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 24px;
@@ -1080,6 +1098,7 @@ onBeforeUnmount(() => {
   color: rgba(255, 255, 255, 0.88);
   font-size: 13px;
   font-weight: 600;
+  font-family: "Noto Serif TC", "Microsoft JhengHei", "PingFang TC", "Times New Roman", serif;
 }
 
 .insight-stat-value {
@@ -1087,16 +1106,12 @@ onBeforeUnmount(() => {
   color: #ffffff;
   font-size: 28px;
   font-weight: 800;
+  font-family: "Noto Serif TC", "Microsoft JhengHei", "PingFang TC", "Times New Roman", serif;
   letter-spacing: 0.01em;
   display: flex;
   align-items: baseline;
   gap: 6px;
 
-  small {
-    font-size: 14px;
-    font-weight: 700;
-    opacity: 0.95;
-  }
 }
 
 @keyframes fadeInUp {
@@ -1250,7 +1265,7 @@ onBeforeUnmount(() => {
     }
 
     .category-card-label {
-      font-size: 11px;
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.08em;
       transition: color 0.3s;
@@ -1258,14 +1273,14 @@ onBeforeUnmount(() => {
     }
 
     .category-card-name {
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 600;
       line-height: 1.4;
       transition: color 0.3s;
     }
 
     .category-card-count {
-      font-size: 11px;
+      font-size: 14px;
       font-weight: 700;
       padding: 3px 10px;
       border-radius: 100px;
@@ -1281,9 +1296,34 @@ onBeforeUnmount(() => {
       margin-bottom: 8px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
       backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .search-card-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a365d;
+
+      :deep(.el-icon) {
+        color: #4285f4;
+        font-size: 20px;
+      }
+    }
+
+    .search-card-input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
 
     .search-input-field {
+      flex: 1;
+
       :deep(.el-input__wrapper) {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 14px;
@@ -1318,19 +1358,88 @@ onBeforeUnmount(() => {
       }
     }
 
+    .search-btn {
+      min-width: 100px;
+      height: 42px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+
+      :deep(.el-button__text) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .clear-btn {
+      min-width: 100px;
+      height: 42px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #4a5568;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #e8edf5;
+        border-color: #cbd5e1;
+        color: #1f2937;
+      }
+    }
+
+    .hot-tags-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .hot-tags-label {
+      font-size: 14px;
+      color: #4a5568;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hot-tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hot-tag-item {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2c5aa0;
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      border-radius: 20px;
+      padding: 3px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      line-height: 1.4;
+      white-space: nowrap;
+
+      &:hover {
+        background: #bfdbfe;
+        border-color: #60a5fa;
+        color: #1d4ed8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
+      }
+    }
+
     .hot-tags-row {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-top: 14px;
       flex-wrap: wrap;
-    }
-
-    .hot-tags-label {
-      font-size: 12px;
-      color: #94a3b8;
-      font-weight: 600;
-      white-space: nowrap;
     }
 
     .hot-tags {
@@ -1682,9 +1791,37 @@ onBeforeUnmount(() => {
   justify-content: space-between;
 }
 
+.code-card-top-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--card-color) 8%, #ffffff 92%);
+  border: 1px solid color-mix(in srgb, var(--card-color) 20%, #ffffff 80%);
+}
+
+.code-card-top-icon span {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+}
+
+.code-card-top-icon :deep(svg) {
+  width: 18px;
+  height: 18px;
+}
+
 .code-card-arrow {
   font-size: 15px;
-  color: #cbd5e1;
+  display: block;
+  /* 確保它佔滿整行 */
+  text-align: right;
   opacity: 0;
   transform: translateX(-6px);
   transition: all 0.25s ease;

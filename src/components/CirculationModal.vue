@@ -111,7 +111,7 @@ const handleSearch = () => {
   :deep(.el-dialog__header) {
     padding: 24px 32px;
     border-bottom: 1px solid #E0E0E0;
-    background: linear-gradient(135deg, #E8F5E9 50%, #FFFFFF 100%);
+    background: linear-gradient(135deg, #E8F5E9 80%, #FFFFFF 100%);
   }
 
   :deep(.el-dialog__title) {

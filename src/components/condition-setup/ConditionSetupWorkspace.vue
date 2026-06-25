@@ -34,6 +34,12 @@
 						</el-form-item>
 					</el-form>
 				</div>
+
+				<div class="friendly-reminder">
+					<p class="reminder-title">貼心提醒</p>
+					<p class="reminder-text">各項條件</p>
+				</div>
+
 				<ConditionAccordionSection id="physical" ref="physicalRef" title="物化特性" theme="green" :expanded="expandedMap.physical" @toggle="toggleSection">
 					<div class="section-subtitle-row">
 						<div class="section-subtitle">
@@ -46,7 +52,7 @@
 
 					<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="initialStandards" @change="handleStandardsChange" />
 
-					<!-- <div class="report-upload">
+					<div class="report-upload">
 						<h4>檢測報告上傳區</h4>
 						<el-upload drag multiple :auto-upload="false" :file-list="uploadFiles" :on-change="onFileChange" :on-remove="onFileRemove">
 							<el-icon class="upload-icon">
@@ -57,10 +63,10 @@
 								<div class="el-upload__tip">支援 PDF / XLSX / CSV，最多 20 MB</div>
 							</template>
 						</el-upload>
-					</div> -->
+					</div>
 				</ConditionAccordionSection>
 
-				<ConditionAccordionSection id="source" ref="sourceRef" title="來源條件" theme="cyan" :expanded="expandedMap.source" @toggle="toggleSection">
+				<ConditionAccordionSection id="source" ref="sourceRef" title="料源穩定性" theme="cyan" :expanded="expandedMap.source" @toggle="toggleSection">
 					<el-form label-position="top" class="form-grid">
 						<el-form-item>
 							<template #label>
@@ -76,33 +82,88 @@
 
 						<el-form-item>
 							<template #label>
-								<span><span class="required-mark">*</span>來源製程</span>
+								<span><span class="required-mark">*</span>廢棄物來源製程</span>
 							</template>
 							<el-select v-model="store.sourceConditions.process" placeholder="選擇來源製程" filterable>
 								<el-option v-for="item in sourceProcessOptions" :key="item.value" :label="item.label" :value="item.value" />
 							</el-select>
 						</el-form-item>
 
-						<el-form-item label="產出量 (公噸/月)">
+						<el-form-item label="月產出量 (公噸)">
 							<el-input-number v-model="store.sourceConditions.outputAmount" :min="0" :max="100000" :step="1" controls-position="right" />
 						</el-form-item>
-
+						<el-form-item>
+							<template #label>
+								<span>產出頻率</span>
+							</template>
+							<el-select v-model="store.sourceConditions.frequency" placeholder="選擇產出頻率" filterable>
+								<el-option v-for="item in sourceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
+							</el-select>
+						</el-form-item>
 					</el-form>
 				</ConditionAccordionSection>
 
-				<ConditionAccordionSection id="site" ref="siteRef" title="場域條件" theme="violet" :expanded="expandedMap.site" @toggle="toggleSection">
+				<ConditionAccordionSection id="site" ref="siteRef" title="場地配置" theme="violet" :expanded="expandedMap.site" @toggle="toggleSection">
 					<el-form label-position="top" class="form-grid">
-
-
 						<el-form-item label="是否有再利用空間">
 							<el-switch v-model="store.siteConditions.hasReuseSpace" active-text="有" inactive-text="無" inline-prompt />
 						</el-form-item>
+					</el-form>
 
-						<el-form-item label="是否有產出衍生廢棄物">
+				</ConditionAccordionSection>
+
+				<ConditionAccordionSection id="environment" ref="environmentRef" title="環境影響" theme="orange" :expanded="expandedMap.environment" @toggle="toggleSection">
+					<el-form label-position="top" class="form-grid">
+						<el-form-item label="是否有產生衍生廢棄物">
 							<el-switch v-model="store.siteConditions.hasSecondaryWaste" active-text="有" inactive-text="無" inline-prompt />
 						</el-form-item>
 					</el-form>
+				</ConditionAccordionSection>
 
+				<ConditionAccordionSection id="business" ref="businessRef" title="經濟效益" theme="violet" :expanded="expandedMap.business" @toggle="toggleSection">
+					<el-form label-position="top" class="form-grid">
+						<el-form-item>
+							<template #label>
+								<span><span class="required-mark">*</span>清除頻率</span>
+							</template>
+							<el-select v-model="store.businessConditions.clearanceFrequency" placeholder="選擇清除頻率">
+								<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
+							</el-select>
+						</el-form-item>
+
+						<el-form-item>
+							<template #label>
+								<span><span class="required-mark">*</span>清除量（公噸）</span>
+							</template>
+							<el-input-number v-model="store.businessConditions.clearanceAmount" :min="0" :max="100000" :step="1" controls-position="right" />
+						</el-form-item>
+					</el-form>
+				</ConditionAccordionSection>
+
+				<ConditionAccordionSection id="technology" ref="technologyRef" title="技術成熟度" theme="violet" :expanded="expandedMap.technology" @toggle="toggleSection">
+					<el-form label-position="top" class="form-grid">
+						<el-form-item>
+							<template #label>
+								<span>請選擇符合之技術成熟度類型（可複選）</span>
+							</template>
+							<el-checkbox-group v-model="technologySelections" class="technology-option-group">
+								<el-checkbox v-for="item in technologyOptions" :key="item.value" :value="item.value">{{ item.label }}</el-checkbox>
+							</el-checkbox-group>
+						</el-form-item>
+					</el-form>
+				</ConditionAccordionSection>
+
+				<ConditionAccordionSection id="demand" ref="demandRef" title="再生產品使用者製程需求" theme="cyan" :expanded="expandedMap.demand" @toggle="toggleSection">
+					<el-form label-position="top" class="form-grid">
+						<el-form-item>
+							<template #label>
+								<span>請選擇符合之使用者需求（可複選）</span>
+							</template>
+							<el-checkbox-group v-model="demandSelections" class="technology-option-group">
+								<el-checkbox v-for="item in demandOptions" :key="item.value" :value="item.value">{{ item.label }}</el-checkbox>
+							</el-checkbox-group>
+						</el-form-item>
+					</el-form>
 				</ConditionAccordionSection>
 			</div>
 		</div>
@@ -158,6 +219,9 @@ const physicalRef = ref(null)
 const sourceRef = ref(null)
 const siteRef = ref(null)
 const businessRef = ref(null)
+const environmentRef = ref(null)
+const technologyRef = ref(null)
+const demandRef = ref(null)
 const businessName = computed({
 	get: () => store.businessConditions.businessName || '',
 	set: (value) => {
@@ -176,7 +240,10 @@ const expandedMap = reactive({
 	physical: true,
 	source: true,
 	site: true,
-	business: true
+	environment: true,
+	business: true,
+	technology: true,
+	demand: true
 })
 
 const regionOptions = [
@@ -232,13 +299,46 @@ const sourceProcessOptions = [
 	{ value: '260013', label: '260013 晶圓包裝程序' }
 ]
 
+const sourceFrequencyOptions = [
+	{ value: 'daily', label: '每日' },
+	{ value: 'weekly', label: '每週' },
+	{ value: 'monthly', label: '每月' },
+	{ value: 'quarterly', label: '每季' }
+]
+
+const clearanceFrequencyOptions = [
+	{ value: 'daily', label: '每日' },
+	{ value: 'weekly', label: '每週' },
+	{ value: 'monthly', label: '每月' },
+	{ value: 'quarterly', label: '每季' },
+	{ value: 'yearly', label: '每年' }
+]
+
+const technologySelections = ref([])
+const demandSelections = ref([])
+
+const technologyOptions = [
+	{ value: 'mature', label: '現有成熟技術（常態化循環）' },
+	{ value: 'imported', label: '導入既有循環技術（跨產業／新場域應用）' },
+	{ value: 'innovative', label: '描述或創新技術（取代原生料）' }
+]
+
+const demandOptions = [
+	{ value: 'replace-raw-material', label: '再生產品可回廠原製程使用' },
+	{ value: 'non-original-process', label: '再生產品非原製程使用' },
+	{ value: 'external-sale', label: '再生產品對外販售' }
+]
+
 const uploadFiles = uploadedReports
 
 const sectionRefMap = {
 	physical: physicalRef,
 	source: sourceRef,
 	site: siteRef,
-	business: businessRef
+	environment: environmentRef,
+	business: businessRef,
+	technology: technologyRef,
+	demand: demandRef
 }
 
 const toggleSection = (sectionId) => {
@@ -399,6 +499,27 @@ defineExpose({
 	display: flex;
 	flex-direction: column;
 	gap: 14px;
+}
+
+.friendly-reminder {
+	padding: 12px 14px;
+	border-radius: 12px;
+	border: 1px solid rgba(73, 154, 114, 0.22);
+	background: linear-gradient(135deg, rgba(236, 251, 242, 0.9), rgba(245, 252, 249, 0.88));
+
+	.reminder-title {
+		margin: 0;
+		font-size: 14px;
+		font-weight: 700;
+		color: #2f6a57;
+	}
+
+	.reminder-text {
+		margin: 4px 0 0;
+		font-size: 13px;
+		font-weight: 600;
+		color: #4f7a6f;
+	}
 }
 
 .section-subtitle-row {

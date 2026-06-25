@@ -9,29 +9,35 @@
 		<div class="standards-list">
 			<div v-for="(standard, index) in standards" :key="standard.id" class="standard-row">
 				<!-- 參數 -->
-				<el-select v-model="standard.parameter" placeholder="選擇參數" filterable allow-create class="param-select">
+				<el-select v-model="standard.parameter" placeholder="選擇參數" filterable allow-create class="param-select" @change="handleParameterChange(standard)">
 					<el-option v-for="param in parameterOptions" :key="param" :label="param" :value="param" />
 				</el-select>
 
-				<!-- 操作符 -->
-				<el-select v-model="standard.operator" placeholder="選擇條件" class="operator-select">
-					<el-option v-for="op in operatorOptions" :key="op.value" :label="op.label" :value="op.value" />
-				</el-select>
-
-				<!-- 數值輸入（單值） -->
-				<el-input v-if="standard.operator !== '範圍'" v-model.number="standard.value" placeholder="輸入數值" type="number" class="value-input" />
-
-				<!-- 數值輸入（範圍） -->
-				<template v-else>
-					<el-input v-model.number="standard.valueMin" placeholder="最小值" type="number" class="value-input-min" />
-					<span class="range-separator">~</span>
-					<el-input v-model.number="standard.valueMax" placeholder="最大值" type="number" class="value-input-max" />
+				<template v-if="standard.parameter === '外觀'">
+					<el-input v-model="standard.value" placeholder="請輸入外觀描述" class="appearance-input" />
 				</template>
 
-				<!-- 單位 -->
-				<el-select v-model="standard.unit" placeholder="單位" class="unit-select">
-					<el-option v-for="unit in unitOptions" :key="unit" :label="unit || '無單位'" :value="unit" />
-				</el-select>
+				<template v-else>
+					<!-- 操作符 -->
+					<el-select v-model="standard.operator" placeholder="選擇條件" class="operator-select">
+						<el-option v-for="op in operatorOptions" :key="op.value" :label="op.label" :value="op.value" />
+					</el-select>
+
+					<!-- 數值輸入（單值） -->
+					<el-input v-if="standard.operator !== '範圍'" v-model.number="standard.value" placeholder="輸入數值" type="number" class="value-input" />
+
+					<!-- 數值輸入（範圍） -->
+					<template v-else>
+						<el-input v-model.number="standard.valueMin" placeholder="最小值" type="number" class="value-input-min" />
+						<span class="range-separator">~</span>
+						<el-input v-model.number="standard.valueMax" placeholder="最大值" type="number" class="value-input-max" />
+					</template>
+
+					<!-- 單位 -->
+					<el-select v-model="standard.unit" placeholder="單位" class="unit-select">
+						<el-option v-for="unit in unitOptions" :key="unit" :label="unit || '無單位'" :value="unit" />
+					</el-select>
+				</template>
 
 				<!-- 刪除按鈕 -->
 				<el-button type="danger" :icon="Delete" circle @click="removeStandard(index)" :disabled="standards.length === 1" />
@@ -129,9 +135,26 @@ const searching = ref(false)
 const hasSearched = ref(false)
 
 // 選項資料
-const parameterOptions = getParameterOptions()
+const parameterOptions = Array.from(new Set([...getParameterOptions(), '外觀']))
 const operatorOptions = getOperatorOptions()
 const unitOptions = getUnitOptions()
+
+const handleParameterChange = (standard) => {
+	if (standard.parameter === '外觀') {
+		standard.operator = '等於'
+		standard.unit = ''
+		standard.valueMin = null
+		standard.valueMax = null
+		if (standard.value === null || standard.value === undefined) {
+			standard.value = ''
+		}
+		return
+	}
+
+	if (typeof standard.value === 'string') {
+		standard.value = null
+	}
+}
 
 // 監聽初始資料
 watch(() => props.initialStandards, (newVal) => {
@@ -233,13 +256,14 @@ defineExpose({
 }
 
 .param-select {
-	flex: 2;
-	min-width: 150px;
+	flex: 0 0 220px;
+	width: 220px;
+	min-width: 220px;
 }
 
 .operator-select {
 	flex: 1;
-	min-width: 120px;
+	min-width: 150px;
 }
 
 .value-input,
@@ -247,6 +271,11 @@ defineExpose({
 .value-input-max {
 	flex: 1;
 	min-width: 100px;
+}
+
+.appearance-input {
+	flex: 1;
+	// min-width: 150px;
 }
 
 .range-separator {
@@ -294,7 +323,8 @@ defineExpose({
 		.value-input,
 		.value-input-min,
 		.value-input-max,
-		.unit-select {
+		.unit-select,
+		.appearance-input {
 			min-width: 100%;
 			flex: 1 1 100%;
 		}
