@@ -111,6 +111,7 @@
         <el-divider style="margin: 24px 0" />
         <!-- 六大類分類卡片 -->
         <div class="category-card-grid">
+        
           <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
             <span v-if="selectedCategory === catInfo.id" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1390,10 +1391,15 @@ onBeforeUnmount(() => {
       display: flex;
       gap: 10px;
       align-items: center;
+
+      :deep(.el-button + .el-button) {
+        margin-left: 0;
+      }
     }
 
     .search-input-field {
       flex: 1;
+      min-width: 0;
 
       :deep(.el-input__wrapper) {
         background: rgba(255, 255, 255, 0.95);
@@ -1993,8 +1999,12 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 1200px) {
-  .category-card-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .search-section {
+    .container {
+      .category-card-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
   }
 
   .codes-grid {
@@ -2042,19 +2052,49 @@ onBeforeUnmount(() => {
     padding-top: 0;
   }
 
-  .category-card-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .search-section {
+    .container {
+      .search-card {
+        padding: 18px 16px;
+      }
 
-  .search-section .container :deep(.tabsLabel .el-tabs__nav),
-  .search-section .container .tab-label-right,
-  .search-section .container .query-controls {
-    grid-template-columns: 1fr;
-    row-gap: 10px;
-  }
+      .search-card-input-group {
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 10px;
+      }
 
-  .search-section .container .tab-label-left {
-    justify-content: flex-start;
+      .search-card-label {
+        width: 100%;
+        margin-bottom: 2px;
+      }
+
+      .search-input-field {
+        flex: 1 1 calc(100% - 180px);
+        min-width: 220px;
+      }
+
+      .search-btn,
+      .clear-btn {
+        min-width: 82px;
+        padding: 0 14px;
+      }
+
+      .category-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      :deep(.tabsLabel .el-tabs__nav),
+      .tab-label-right,
+      .query-controls {
+        grid-template-columns: 1fr;
+        row-gap: 10px;
+      }
+
+      .tab-label-left {
+        justify-content: flex-start;
+      }
+    }
   }
 
   .hero-content {
@@ -2150,7 +2190,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 576px) {
   .home-page {
-    --footer-art-height: clamp(130px, 36vw, 180px);
+    --footer-art-height: clamp(130px, 36vw, 180px)
+    min-height: 100svh;
   }
 
   .hero-section {
@@ -2268,6 +2309,56 @@ onBeforeUnmount(() => {
     padding: 24px 18px 76px;
   }
 
+  .search-section {
+    .container {
+      .search-card {
+        padding: 14px;
+        border-radius: 16px;
+      }
+
+      .search-card-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .search-card-label {
+        font-size: 14px;
+      }
+
+      .search-input-field {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .search-btn,
+      .clear-btn {
+        width: 100%;
+        min-width: 0;
+        height: 40px;
+        font-size: 14px;
+      }
+
+      .hot-tags-section {
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .hot-tags-label {
+        font-size: 13px;
+      }
+
+      .hot-tags-list {
+        gap: 8px;
+      }
+
+      .hot-tag-item {
+        font-size: 13px;
+        padding: 4px 12px;
+      }
+    }
+  }
+
   .container {
     padding: 0 16px;
   }
@@ -2302,6 +2393,7 @@ onBeforeUnmount(() => {
   }
 
   .home-footer-stats {
+    margin-top: auto;
     padding-bottom: max(22px, calc(var(--footer-art-height) * 0.68));
   }
 
@@ -2336,9 +2428,6 @@ onBeforeUnmount(() => {
     }
   }
 
-  .insight-stats-grid {
-    grid-template-columns: 1fr;
-  }
 
   .insight-stat-item {
     padding: 14px 10px;
@@ -2377,17 +2466,21 @@ onBeforeUnmount(() => {
     padding: 64px 72px;
   }
 
-  .search-section .container {
-    padding: 60px 36px;
-  }
+  .search-section {
+    .container {
+      padding: 60px 36px;
 
-  .search-section .container .search-header .section-title {
-    font-size: clamp(44px, 2.1vw, 56px);
-  }
+      .search-header {
+        .section-title {
+          font-size: clamp(44px, 2.1vw, 56px);
+        }
 
-  .search-section .container .search-header .section-description {
-    font-size: clamp(18px, 1vw, 22px);
-    max-width: 980px;
+        .section-description {
+          font-size: clamp(18px, 1vw, 22px);
+          max-width: 980px;
+        }
+      }
+    }
   }
 }
 

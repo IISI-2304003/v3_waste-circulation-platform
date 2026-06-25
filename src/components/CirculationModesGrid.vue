@@ -104,7 +104,7 @@ const gridScale = computed(() => {
 	const verticalReserve = availableWidth < 969 ? 250 : 210
 	const widthScale = Math.max((availableWidth - horizontalReserve) / BASE_GRID_SIZE, 0.56)
 	const heightScale = Math.max((viewportHeight - verticalReserve) / BASE_GRID_SIZE, 0.56)
-	const laptopBoost = viewportWidth >= 1800 ? 0.03 : viewportWidth >= 1200 && viewportWidth < 1800 ? 0.34 : viewportWidth >= 992 ? 0.06 : 0.2
+	const laptopBoost = viewportWidth >= 1800 ? 0.03 : viewportWidth >= 1200 && viewportWidth < 1800 ? 0.2 : viewportWidth >= 992 ? 0.06 : 0.2
 	return Math.min(Math.max(Math.min(widthScale, heightScale) + laptopBoost, 0.56), 1.42)
 })
 

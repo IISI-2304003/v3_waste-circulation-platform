@@ -43,11 +43,30 @@ const goBackHome = () => {
 .standard-input-page {
   // max-width: min(92vw, 1700px);
   margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
   background:
-    radial-gradient(circle at 14% 22%, rgba(87, 166, 255, 0.36), transparent 24%),
-    radial-gradient(circle at 82% 14%, rgba(117, 135, 255, 0.26), transparent 12%),
-    radial-gradient(circle at 70% 78%, rgba(104, 218, 255, 0.2), transparent 16%),
-    linear-gradient(180deg, #e8f4ff 0%, #dceeff 46%, #f4f9ff 100%);
+    radial-gradient(circle at 10% 20%, rgba(143, 178, 224, 0.1), transparent 50%),
+    radial-gradient(circle at 70% 20%, rgba(33, 150, 243, 0.2), transparent 40%),
+    radial-gradient(circle at 10% 100%, rgba(143, 178, 224, 0.3), transparent 50%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: min(540px, 54vh);
+    background: url('../assets/Bg_v4_850.png') center top / 100% auto no-repeat;
+    mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, rgba(0, 0, 0, 0.78) 38%, #000 60%);
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, rgba(0, 0, 0, 0.78) 38%, #000 60%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .page-header {
@@ -81,6 +100,11 @@ const goBackHome = () => {
 @media (max-width: 768px) {
   .standard-input-page {
     padding: 16px;
+
+    &::before {
+      height: min(420px, 42vh);
+      background-size: cover;
+    }
   }
 }
 
