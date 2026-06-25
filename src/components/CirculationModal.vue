@@ -305,4 +305,42 @@ const handleSearch = () => {
     transform: rotate(90deg);
   }
 }
+
+@media (max-width: 576px) {
+  .circulation-modal {
+    :deep(.el-dialog) {
+      width: 95% !important;
+      margin-left: auto;
+      margin-right: auto;
+      top: auto !important;
+      bottom: 20px !important;
+      position: fixed !important;
+    }
+
+    :deep(.el-dialog__header) {
+      padding: 20px;
+    }
+
+    :deep(.el-dialog__title) {
+      font-size: 18px;
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 16px;
+      max-height: 50vh;
+    }
+
+    :deep(.el-dialog__footer) {
+      padding: 12px 16px;
+    }
+  }
+
+  .mode-description {
+    font-size: 15px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+}
 </style>

@@ -11,14 +11,29 @@
           <h1 class="hero-title">產業資源循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
           <p class="hero-description">連結資源循環供需，推動產業共生，實現永續循環經濟</p>
 
-
           <div class="hero-actions">
             <el-button type="primary" size="large" round @click="scrollToSearch">
-              廢棄物搜尋
+              開始探索媒合
               <el-icon class="el-icon--right">
                 <Search />
               </el-icon>
             </el-button>
+          </div>
+
+          <div class="hero-bottom-left">
+            <div class="insight-process-board" aria-label="循環媒合流程">
+              <div v-for="(step, index) in footerProcessSteps" :key="step.title" class="process-step-item">
+                <article class="process-step-card">
+                  <div class="process-step-icon" :style="{ color: step.color, background: `${step.color}14` }">
+                    <span v-html="step.icon"></span>
+                  </div>
+                  <div class="process-step-copy">
+                    <h4 class="process-step-title" :style="{ color: step.color }">{{ step.title }}</h4>
+                    <p class="process-step-subtitle">{{ step.subtitle }}</p>
+                  </div>
+                </article>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -44,25 +59,7 @@
             </div>
           </article>
         </div>
-        <div class="insight-process-board" aria-label="循環媒合流程">
-          <div v-for="(step, index) in footerProcessSteps" :key="step.title" class="process-step-item">
-            <article class="process-step-card">
-              <div class="process-step-icon" :style="{ color: step.color, background: `${step.color}14` }">
-                <span v-html="step.icon"></span>
-              </div>
-              <div class="process-step-copy">
-                <h4 class="process-step-title" :style="{ color: step.color }">{{ step.title }}</h4>
-                <p class="process-step-subtitle">{{ step.subtitle }}</p>
-              </div>
-            </article>
-            <div v-if="index < footerProcessSteps.length - 1" class="process-step-arrow" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12h14" />
-                <path d="m13 6 6 6-6 6" />
-              </svg>
-            </div>
-          </div>
-        </div>
+
 
 
       </div>
@@ -75,23 +72,6 @@
           <p class="section-description">
             點選六大廢棄物類別快速瀏覽，或輸入關鍵字精準查詢各項廢棄物資訊。
           </p>
-        </div>
-
-        <!-- 六大類分類卡片 -->
-        <div class="category-card-grid">
-          <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
-            <span v-if="selectedCategory === catInfo.id" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            </span>
-            <div class="category-card-icon-wrap" :style="getCategoryIconWrapStyle(catInfo)">
-              <span v-html="categoryIcons[catInfo.id]" class="category-svg-icon"></span>
-            </div>
-            <div class="category-card-label" :style="{ color: selectedCategory === catInfo.id ? catInfo.color : catInfo.color }">{{ catInfo.id }}類</div>
-            <div class="category-card-name" :style="{ color: '#1a365d' }">{{ catInfo.displayName }}</div>
-            <div class="category-card-count" :style="getCategoryCountStyle(catInfo)">{{ getCategoryCodeCount(catInfo.id) }} 項</div>
-          </button>
         </div>
 
         <!-- 搜尋卡片 -->
@@ -128,8 +108,27 @@
           </div>
         </div>
 
-
         <el-divider style="margin: 24px 0" />
+        <!-- 六大類分類卡片 -->
+        <div class="category-card-grid">
+          <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
+            <span v-if="selectedCategory === catInfo.id" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            <div class="category-card-icon-wrap" :style="getCategoryIconWrapStyle(catInfo)">
+              <span v-html="categoryIcons[catInfo.id]" class="category-svg-icon"></span>
+            </div>
+            <div class="category-card-label" :style="{ color: selectedCategory === catInfo.id ? catInfo.color : catInfo.color }">{{ catInfo.id }}類</div>
+            <div class="category-card-name" :style="{ color: '#1a365d' }">{{ catInfo.displayName }}</div>
+            <div class="category-card-count" :style="getCategoryCountStyle(catInfo)">{{ getCategoryCodeCount(catInfo.id) }} 項</div>
+          </button>
+        </div>
+
+
+
+
 
         <div class="codes-area">
           <div v-if="displayCodes.length > 0" class="codes-panel">
@@ -688,9 +687,9 @@ onBeforeUnmount(() => {
     content: '';
     position: absolute;
     inset: 0;
-    background: url('../assets/Bg_v4_850.png') center top / 110% auto no-repeat;
-    mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, rgba(0, 0, 0, 0.78) 38%, #000 60%);
-    -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, rgba(0, 0, 0, 0.78) 38%, #000 60%);
+    background: url('../assets/Bg_v4_850.png') center top / 105% auto no-repeat;
+    mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16% #000 60%);
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, #000 20%);
     z-index: 0;
     pointer-events: none;
   }
@@ -712,24 +711,51 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 40px 80px;
 }
 
 .hero-left {
+  grid-column: 1;
+  grid-row: 1;
   flex: 1;
   text-align: left;
   max-width: 620px;
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
 }
 
 .hero-right {
+  grid-column: 2;
+  grid-row: 1 / 3;
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-width: 450px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-start;
+  animation: fadeInUp 0.8s ease-out 0.4s backwards;
+  order: 3;
+}
+
+.hero-bottom-left {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  align-self: start;
+  max-width: 550px;
+  margin-top: 20px;
+  order: 4;
 }
 
 .logo-section {
@@ -820,17 +846,12 @@ onBeforeUnmount(() => {
   line-height: 1.3;
 }
 
-.hero-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: flex-start;
-  animation: fadeInUp 0.8s ease-out 0.4s backwards;
-}
+
 
 .home-footer-insights {
   position: relative;
   z-index: 4;
-  margin-top: clamp(-90px, -7vw, -34px);
+  margin-top: -60px;
   margin-bottom: clamp(18px, 2.4vw, 34px);
 }
 
@@ -847,34 +868,66 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: 30px;
   box-shadow: 0 16px 36px rgba(16, 24, 40, 0.1);
-  padding: 18px 24px;
+  padding: 20px 20px;
   display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 18px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 0;
+}
+
+.process-title {
+  margin: 0;
+  font-size: 0;
+  font-weight: 700;
+  color: #1a365d;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.02em;
+  flex-basis: 100%;
+  width: 100%;
 }
 
 .process-step-item {
   display: flex;
   align-items: center;
-  flex: 1 1 0;
+  flex: 0 1 auto;
   min-width: 0;
-  gap: 12px;
+  gap: 0;
+  position: relative;
+}
+
+.process-step-item:not(:last-child)::after {
+  content: '>';
+  position: absolute;
+  right: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  height: auto;
+  background: transparent;
+  font-size: 16px;
+  color: #9fb0c5;
+  font-weight: 300;
 }
 
 .process-step-card {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 8px 6px;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
 }
 
 .process-step-icon {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -883,47 +936,53 @@ onBeforeUnmount(() => {
 
   span {
     display: inline-flex;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
 
   :deep(svg) {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
 }
 
 .process-step-copy {
   min-width: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .process-step-title {
-  margin: 0 0 6px;
-  font-size: 20px;
-  font-weight: 900;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .process-step-subtitle {
   margin: 0;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 500;
   color: #64748b;
-  line-height: 1.4;
+  line-height: 1.3;
+  white-space: nowrap;
 }
 
 .process-step-arrow {
-  width: 28px;
-  height: 28px;
-  color: #9fb0c5;
+  width: 0;
+  height: 0;
+  color: transparent;
   flex-shrink: 0;
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
 
   svg {
-    width: 28px;
-    height: 28px;
+    width: 0;
+    height: 0;
   }
 }
 
@@ -936,7 +995,7 @@ onBeforeUnmount(() => {
   padding: 14px 18px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 0;
   position: relative;
   z-index: 2;
   margin-bottom: 30px;
@@ -947,6 +1006,17 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    width: 1px;
+    height: 70%;
+    background: rgba(148, 163, 184, 0.2);
+  }
 }
 
 .insight-card--metric {
@@ -990,7 +1060,7 @@ onBeforeUnmount(() => {
 
 .insight-metric-label {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   color: #334155;
   font-weight: 800;
   line-height: 1.35;
@@ -1023,14 +1093,14 @@ onBeforeUnmount(() => {
 
 .insight-subtitle {
   margin: 0 0 2px;
-  font-size: 13px;
+  font-size: 15px;
   color: #334155;
   font-weight: 700;
 }
 
 .insight-desc {
   margin: 0;
-  font-size: 12px;
+  font-size: 15px;
   color: #64748b;
   font-weight: 600;
 }
@@ -1145,8 +1215,8 @@ onBeforeUnmount(() => {
 .search-section {
   position: relative;
   z-index: 3;
-  margin-top: 0;
-  padding: 0 60px clamp(140px, 14vh, 220px);
+  margin-top: -20px;
+  padding: 0 60px clamp(40px, 4vh, 60px);
   flex: 1 0 auto;
 
   .container {
@@ -1281,7 +1351,7 @@ onBeforeUnmount(() => {
     }
 
     .category-card-count {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       padding: 3px 10px;
       border-radius: 100px;
@@ -1450,7 +1520,7 @@ onBeforeUnmount(() => {
     }
 
     .hot-tag {
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 500;
       color: #4a5568;
       background: #f1f5f9;
@@ -1484,7 +1554,7 @@ onBeforeUnmount(() => {
 .search-eyebrow {
   margin: 0 0 10px;
   color: #4f8f6f;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   font-weight: 700;
@@ -1514,7 +1584,7 @@ onBeforeUnmount(() => {
 
 .search-label,
 .search-current {
-  font-size: 14px;
+  font-size: 15px;
   color: #5f7986;
   font-weight: 600;
 }
@@ -1618,7 +1688,7 @@ onBeforeUnmount(() => {
 }
 
 .category-code {
-  font-size: 13px;
+  font-size: 15px;
   color: #6f8592;
   font-weight: 600;
 }
@@ -1663,7 +1733,7 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 6px 14px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   transition: all 0.3s ease;
 }
@@ -1728,7 +1798,7 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   background: #f0fdf4;
   color: #22c55e;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -1937,33 +2007,38 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 968px) {
-  .home-footer-insights {
-    margin-top: clamp(-48px, -8vw, -20px);
-  }
+
 
   .insight-process-board {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     border-radius: 26px;
-    padding: 16px 18px;
+    padding: 16px 12px;
+  }
+
+  .process-title {
+    width: 100%;
+    margin: 0 0 0;
+    display: none;
   }
 
   .process-step-item {
-    width: 100%;
+    width: calc(50% - 8px);
+    margin-bottom: 12px;
+  }
+
+  .process-step-item:nth-child(odd)::after {
+    display: none;
   }
 
   .process-step-arrow {
-    width: 100%;
-    height: 18px;
-
-    svg {
-      width: 22px;
-      height: 22px;
-      transform: rotate(90deg);
-    }
+    width: 0;
+    height: 0;
+    display: none;
   }
 
   .search-section {
-    margin-top: 0;
+    margin-top: -80px;
     padding-top: 0;
   }
 
@@ -1983,6 +2058,7 @@ onBeforeUnmount(() => {
   }
 
   .hero-content {
+    display: flex;
     flex-direction: column;
     gap: 40px;
     text-align: center;
@@ -1991,10 +2067,21 @@ onBeforeUnmount(() => {
   .hero-left {
     text-align: center;
     max-width: 100%;
+    margin-top: 20px;
   }
 
   .hero-right {
     min-width: auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 800px;
+  }
+
+  .hero-bottom-left {
+    max-width: 100%;
+    margin-top: 0;
   }
 
   .hero-title {
@@ -2037,6 +2124,7 @@ onBeforeUnmount(() => {
 
   .insight-card-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: -100px;
   }
 
   .insight-card--metric {
@@ -2065,15 +2153,87 @@ onBeforeUnmount(() => {
     --footer-art-height: clamp(130px, 36vw, 180px);
   }
 
-  .insight-process-board {
-    border-radius: 22px;
-    padding: 14px;
-    gap: 8px;
+  .hero-section {
+    padding: 24px 20px 80px 20px;
+    min-height: auto;
+
+    &::before {
+      background: url('../assets/Bg_mobile.png') center top / 100% auto no-repeat;
+    }
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .hero-left {
+    grid-column: auto;
+    grid-row: auto;
+    max-width: 100%;
+    margin-top: 0;
+    text-align: center;
+    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    order: 1;
+  }
+
+  .hero-right {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    min-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    order: 2;
+    min-height: 720px;
+  }
+
+  .hero-actions {
+    justify-content: center;
   }
 
   .process-step-card {
-    gap: 10px;
-    padding: 6px 2px;
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+
+  }
+
+  .insight-process-board {
+    flex-direction: column;
+    border-radius: 22px;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .process-title {
+    width: 100%;
+    font-size: 0;
+    display: none;
+  }
+
+  .process-step-item {
+    width: 100%;
+  }
+
+  .process-step-item::after {
+    display: none;
+  }
+
+  .process-step-arrow {
+    display: none;
+  }
+
+  .process-step-card {
+    gap: 8px;
+    padding: 0;
   }
 
   .process-step-icon {
@@ -2092,24 +2252,19 @@ onBeforeUnmount(() => {
   }
 
   .process-step-title {
-    font-size: 18px;
+    font-size: 15px;
   }
 
   .process-step-subtitle {
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .home-footer-insights {
     margin-top: -10px;
   }
 
-  .hero-section {
-    padding: 24px 20px;
-    min-height: auto;
-  }
-
   .search-section {
-    margin-top: 0;
+    margin-top: -80px;
     padding: 24px 18px 76px;
   }
 
@@ -2135,7 +2290,7 @@ onBeforeUnmount(() => {
 
   .pillar-title,
   .pillar-subtitle {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .codes-grid {
@@ -2158,6 +2313,10 @@ onBeforeUnmount(() => {
 
   .insight-card {
     padding: 8px 6px;
+
+    &:not(:last-child)::after {
+      display: none;
+    }
   }
 
   .insight-card--metric {
@@ -2166,14 +2325,14 @@ onBeforeUnmount(() => {
   }
 
   .insight-metric-label {
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .insight-metric-value {
     font-size: 36px;
 
     small {
-      font-size: 14px;
+      font-size: 15px;
     }
   }
 

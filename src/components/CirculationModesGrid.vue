@@ -3,10 +3,7 @@
 		<div class="circle-container">
 			<!-- 中央地球循環圖 -->
 			<div class="center-earth">
-				<!-- <div class="earth-glow"></div> -->
-				<!-- <div class="recycle-icon">
-
-				</div> -->
+				<img class="earth-image" src="../assets/earth.png" alt="Earth" />
 			</div>
 
 			<!-- 連接線動畫 -->
@@ -23,7 +20,6 @@
 				<circle class="pulse-circle-2-glow" cx="250" cy="250" r="120" fill="none" stroke="rgba(76, 175, 80, 0.4)" stroke-width="8" />
 
 			</svg>
-			<img class="earth-image" src="../assets/earth.png" alt="Earth" />
 
 			<!-- 環繞的循環模式圖標 -->
 			<div class="modes-circle">
@@ -108,7 +104,7 @@ const gridScale = computed(() => {
 	const verticalReserve = availableWidth < 969 ? 250 : 210
 	const widthScale = Math.max((availableWidth - horizontalReserve) / BASE_GRID_SIZE, 0.56)
 	const heightScale = Math.max((viewportHeight - verticalReserve) / BASE_GRID_SIZE, 0.56)
-	const laptopBoost = viewportWidth >= 1800 ? 0.03 : viewportWidth >= 1200 && viewportWidth < 1800 ? 0.34 : viewportWidth >= 992 ? 0.06 : 0
+	const laptopBoost = viewportWidth >= 1800 ? 0.03 : viewportWidth >= 1200 && viewportWidth < 1800 ? 0.34 : viewportWidth >= 992 ? 0.06 : 0.2
 	return Math.min(Math.max(Math.min(widthScale, heightScale) + laptopBoost, 0.56), 1.42)
 })
 
@@ -224,16 +220,14 @@ onBeforeUnmount(() => {
 
 	/* 中央地球循環圖 */
 	.center-earth {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 120px;
-		height: 120px;
+		position: relative;
+		width: 500px;
+		height: 500px;
 		z-index: 5;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		left: -160px;
 	}
 
 	.earth-glow {
@@ -246,10 +240,9 @@ onBeforeUnmount(() => {
 	}
 
 	.earth-image {
-		position: relative;
-		top: -3%;
-		left: -35%;
 		width: 100%;
+		height: 100%;
+		object-fit: contain;
 		opacity: 0.7;
 	}
 }
@@ -565,30 +558,94 @@ onBeforeUnmount(() => {
 /* 手機版 */
 @media (max-width: 968px) {
 	.circulation-modes-grid {
-		padding: 16px 0;
-		min-height: 420px;
+		padding: 40px 0 16px 0;
+		min-height: 800px;
+		display: flex;
+		justify-content: center;
+		align-items: flex-start;
+		width: 100%;
+		margin: 0 auto;
+		--grid-scale: 1.1;
 	}
 
 	.circle-container {
-		width: 500px;
-		height: 500px;
+		width: 600px;
+		height: 600px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		transform-origin: center center;
+		margin: 0 auto;
+		position: relative;
+		left: 0;
+		right: 0;
+
+		/* 中央地球循環圖 */
+		.center-earth {
+			position: relative;
+			width: 600px;
+			height: 600px;
+			z-index: 5;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			left: 0px;
+			top: -90px;
+		}
+
+		/* 連接線 */
+		.connection-lines {
+			position: absolute;
+			top: -20%;
+			left: 0%;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+			pointer-events: none;
+		}
 	}
 
-	.center-earth {
-		width: 90px;
-		height: 90px;
-	}
-
-	.earth-glow {
-		width: 130px;
-		height: 130px;
-	}
 
 
 
 	.mode-name {
-		font-size: 12px;
-		padding: 4px 8px;
+		font-size: 13px;
+		padding: 6px 10px;
+	}
+
+	.modes-circle {
+		left: -5%;
+		top: -30%;
+	}
+
+	.connection-lines {
+		left: -37%;
+	}
+
+	.mode-detail-card {
+		position: absolute;
+		right: auto;
+		top: auto;
+		bottom: -320px;
+		left: 50%;
+		transform: translateX(-50%);
+		min-width: 0%;
+		max-width: 360px;
+		min-height: 240px;
+		z-index: 30;
+		padding: 24px;
+		font-size: 16px;
+
+		h3 {
+			font-size: 18px;
+			margin-bottom: 8px;
+		}
+
+		p {
+			font-size: 14px;
+			margin-bottom: 12px;
+		}
 	}
 }
 
@@ -600,19 +657,84 @@ onBeforeUnmount(() => {
 	}
 
 	.center-earth {
-		width: 105px;
-		height: 105px;
+		width: 150px;
+		height: 150px;
 	}
 
 	.recycle-icon {
 		width: 90px;
 		height: 90px;
 	}
+
+	.mode-detail-card {
+		right: -30px;
+		width: 180px;
+		min-height: 220px;
+		padding: 16px;
+
+		h3 {
+			font-size: 15px;
+		}
+
+		p {
+			font-size: 13px;
+		}
+	}
 }
 
 @media (min-width: 1600px) {
 	.circulation-modes-grid {
 		min-height: 620px;
+	}
+}
+
+@media (max-width: 576px) {
+	.circulation-modes-grid {
+		min-height: 720px;
+		padding: 30px 12px 20px 12px;
+		width: 100%;
+		margin: 0 auto;
+		--grid-scale: 0.95;
+	}
+
+	.circle-container {
+		margin: 0 auto;
+		left: 0;
+		right: 0;
+	}
+
+	/* 中央地球循環圖 */
+	.center-earth {
+		position: relative;
+		width: 500px;
+		height: 500px;
+		z-index: 5;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		left: 0px;
+	}
+
+	.mode-detail-card {
+		bottom: -100px;
+		width: 100%;
+		max-width: 340px;
+		padding: 20px;
+		min-height: 220px;
+
+		h3 {
+			font-size: 17px;
+			margin-bottom: 8px;
+		}
+
+		p {
+			font-size: 13px;
+			margin-bottom: 12px;
+		}
+
+		.explore-btn {
+			font-size: 14px;
+		}
 	}
 }
 </style>
