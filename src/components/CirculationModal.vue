@@ -1,9 +1,29 @@
 <template>
-  <el-dialog v-model="visible" :title="mode?.name" width="85%" top="5vh" destroy-on-close :close-on-click-modal="true" class="circulation-modal">
+  <el-dialog v-model="visible" :title="mode?.name" width="75%" top="5vh" destroy-on-close :close-on-click-modal="true" class="circulation-modal">
     <div v-if="mode" class="mode-detail-content">
       <el-row :gutter="40">
+        <!-- 上方：流程圖 -->
+        <el-col :xs="24" :md="24" class="right-section">
+          <div class="section-block">
+            <h3 class="section-title">
+              <el-icon color="#4CAF50">
+                <TrendCharts />
+              </el-icon>
+              循環流程圖
+            </h3>
+            <div class="flowchart-container">
+              <!-- 流程圖占位符 -->
+              <div class="flowchart-placeholder">
+                <!-- 簡易流程示意 -->
+                <div class="simple-flow">
+                  <img :src="mode.flowchartUrl" :alt="mode.flowchartAlt" style="width: 80%; height: auto; " />
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-col>
         <!-- 左側：文字說明 -->
-        <el-col :xs="24" :md="10" class="left-section">
+        <el-col :xs="24" :md="24" class="left-section">
           <div class="section-block">
             <h3 class="section-title">
               <el-icon color="#4CAF50">
@@ -29,35 +49,13 @@
           </div>
         </el-col>
 
-        <!-- 右側：流程圖 -->
-        <el-col :xs="24" :md="14" class="right-section">
-          <div class="section-block">
-            <h3 class="section-title">
-              <el-icon color="#4CAF50">
-                <TrendCharts />
-              </el-icon>
-              循環流程圖
-            </h3>
-            <div class="flowchart-container">
-              <!-- 流程圖占位符 -->
-              <div class="flowchart-placeholder">
-                <!-- 簡易流程示意 -->
-                <div class="simple-flow">
-                  <img :src="mode.flowchartUrl" :alt="mode.flowchartAlt" style="width: 100%; height: auto; " />
-                </div>
-              </div>
-            </div>
-          </div>
-        </el-col>
+
       </el-row>
     </div>
 
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="visible = false">關閉</el-button>
-        <el-button type="primary" @click="handleSearch">
-          搜尋相關廢棄物
-        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -109,7 +107,7 @@ const handleSearch = () => {
 <style scoped lang="scss">
 .circulation-modal {
   :deep(.el-dialog__header) {
-    padding: 24px 32px;
+    padding: 32px 32px;
     border-bottom: 1px solid #E0E0E0;
     background: linear-gradient(135deg, #E8F5E9 80%, #FFFFFF 100%);
   }
@@ -145,7 +143,7 @@ const handleSearch = () => {
 
 .section-block {
   margin-bottom: 32px;
-  
+
 
   &:last-child {
     margin-bottom: 0;
@@ -165,7 +163,7 @@ const handleSearch = () => {
 }
 
 .mode-description {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.8;
   color: #2C3E50;
   text-align: justify;
@@ -205,7 +203,6 @@ const handleSearch = () => {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  // padding: 40px 20px;
   text-align: center;
 }
 
@@ -238,7 +235,7 @@ const handleSearch = () => {
   // gap: 20px;
   // margin-top: 24px;
   // padding: 24px;
-  width: 90%;
+  width: 100%;
   background: #FFFFFF;
   border-radius: 8px;
   border: 2px dashed #E0E0E0;

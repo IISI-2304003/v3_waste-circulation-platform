@@ -282,29 +282,29 @@ const hotTags = ref(['pH值', '廢液', '廢鹼', '污泥', '事業廢棄物'])
 
 const footerHighlights = [
   {
-    title: '智慧媒合',
-    subtitle: '精準匹配供需',
+    title: '智慧分析',
+    subtitle: '智慧精準評估',
     desc: '提升媒合效率',
     color: '#22c55e',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11c0 4.4 3.6 8 8 8"/><path d="M13 3c4.4 0 8 3.6 8 8"/><path d="M8 11l8-8"/><path d="M10 3H3v7"/><path d="M14 21h7v-7"/></svg>'
   },
   {
-    title: '數據透明',
-    subtitle: '即時數據分析',
+    title: '資源再生',
+    subtitle: '循環高效利用',
     desc: '掌握資源流向',
     color: '#3b82f6',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="9" rx="1"/><rect x="17" y="5" width="3" height="12" rx="1"/></svg>'
   },
   {
-    title: '安全可靠',
-    subtitle: '嚴格審查機制',
+    title: '綠色永續',
+    subtitle: '環境友善共榮',
     desc: '確保資訊可信',
     color: '#f59e0b',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5.2-3.4 9.5-8 10-4.6-.5-8-4.8-8-10V6z"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8"/></svg>'
   },
   {
-    title: '永續循環',
-    subtitle: '促進資源再生',
+    title: '決策可靠',
+    subtitle: '數據驅動共策',
     desc: '實現淨零未來',
     color: '#22c55e',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>'
@@ -1096,7 +1096,7 @@ onBeforeUnmount(() => {
 .insight-stat-label {
   margin: 0;
   color: rgba(255, 255, 255, 0.88);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   font-family: "Noto Serif TC", "Microsoft JhengHei", "PingFang TC", "Times New Roman", serif;
 }
@@ -1171,12 +1171,13 @@ onBeforeUnmount(() => {
       }
 
       .section-description {
-        font-size: 16px;
+        font-size: 18px;
         color: #4a5568;
         text-align: center;
         max-width: 720px;
         margin: 0 auto;
         line-height: 1.85;
+        font-weight: 600;
       }
     }
 
@@ -1273,7 +1274,7 @@ onBeforeUnmount(() => {
     }
 
     .category-card-name {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       line-height: 1.4;
       transition: color 0.3s;
@@ -1399,7 +1400,7 @@ onBeforeUnmount(() => {
     }
 
     .hot-tags-label {
-      font-size: 14px;
+      font-size: 15px;
       color: #4a5568;
       font-weight: 700;
       white-space: nowrap;
@@ -1412,7 +1413,7 @@ onBeforeUnmount(() => {
     }
 
     .hot-tag-item {
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 600;
       color: #2c5aa0;
       background: #dbeafe;
@@ -1649,7 +1650,7 @@ onBeforeUnmount(() => {
 }
 
 .list-title-badge {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   color: #fff;
   padding: 4px 12px;
@@ -1756,7 +1757,7 @@ onBeforeUnmount(() => {
 
 .species-items {
   margin: 0;
-  font-size: 13px;
+  font-size: 16px;
   color: #667f8d;
   line-height: 1.65;
   display: -webkit-box;
@@ -1839,14 +1840,14 @@ onBeforeUnmount(() => {
   min-width: 80px;
   padding: 6px 12px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 
 .code-card-title {
   margin: 0 0 10px;
-  font-size: 15px;
+  font-size: 18px;
   color: #2e4754;
   line-height: 1.5;
   font-weight: 600;
@@ -1854,7 +1855,7 @@ onBeforeUnmount(() => {
 
 .code-card-description {
   margin: 0;
-  font-size: 13px;
+  font-size: 16px;
   color: #667f8d;
   line-height: 1.65;
   display: -webkit-box;

@@ -423,7 +423,7 @@ onBeforeUnmount(() => {
 	top: 10%;
 	width: 200px;
 	min-height: 250px;
-	background: #fffff990;
+	background: #fffff9cb;
 	border-radius: 16px;
 	padding: 20px;
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
@@ -443,6 +443,7 @@ onBeforeUnmount(() => {
 		color: #333;
 		line-height: 1.6;
 		flex: 1;
+		font-size: 14px;
 	}
 
 	.explore-btn {
