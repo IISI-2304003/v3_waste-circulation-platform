@@ -39,8 +39,8 @@ const nodeClass = (id) => ({
 	width: 100%;
 	box-sizing: border-box;
 	margin: 0 auto;
-	background: rgba(255, 255, 255, 0.56);
-	border: 1px solid rgba(18, 150, 99, 0.4);
+	background: rgba(255, 255, 255, 1);
+	// border: 1px solid rgba(18, 150, 99, 0.4);
 	border-radius: 20px;
 	backdrop-filter: blur(12px);
 	padding: 16px;
@@ -92,7 +92,7 @@ const nodeClass = (id) => ({
 .node-label {
 	margin: 0;
 	text-align: center;
-	font-size: 12px;
+	font-size: clamp(0.938rem, 0.874rem + 0.3vw, 1.25rem);
 	color: #6d7e7b;
 	letter-spacing: 0.2px;
 	line-height: 1.4;

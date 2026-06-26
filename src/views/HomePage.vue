@@ -111,7 +111,7 @@
         <el-divider style="margin: 24px 0" />
         <!-- 六大類分類卡片 -->
         <div class="category-card-grid">
-        
+
           <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
             <span v-if="selectedCategory === catInfo.id" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2190,8 +2190,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 576px) {
   .home-page {
-    --footer-art-height: clamp(130px, 36vw, 180px)
-    min-height: 100svh;
+    --footer-art-height: clamp(130px, 36vw, 180px) min-height: 100svh;
   }
 
   .hero-section {

@@ -2,55 +2,82 @@
   <div class="company-match-page">
     <!-- 頂部頁頭 -->
     <div class="page-header">
-      <el-button text @click="goBackHome" class="back-btn">
-        <el-icon>
-          <ArrowLeft />
-        </el-icon> 返回首頁
-      </el-button>
-      <div class="header-title">
-        <h1>產業廢棄物循環利用智慧媒合平台</h1>
-        <p>循環路徑推薦</p>
-      </div>
+      <el-row :gutter="24" align="middle" class="header-row">
+        <el-col :xs="24" :md="3">
+          <el-button text @click="goBackHome" class="back-btn">
+            <el-icon>
+              <ArrowLeft />
+            </el-icon>
+            返回首頁
+          </el-button>
+        </el-col>
+        <el-col :xs="24" :md="18">
+          <div class="header-title">
+            <h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
+            <p>循環路徑推薦</p>
+          </div>
+        </el-col>
+      </el-row>
     </div>
     <div style="padding: 24px">
       <!-- Step Progress (與條件設定頁共用元件) -->
       <FlowStepProgress :active-step="2" class="progress-top" />
       <!-- AI 分析結果橫幅 -->
       <div class="analysis-banner">
-        <div class="banner-left">
-          <div class="banner-title-row">
-            <div class="ai-icon"><el-icon>
-                <Monitor />
-              </el-icon></div>
-            <div>
-              <h2>AI 媒合分析結果</h2>
-              <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="banner-summary">
-          <div class="summary-title">您本次的條件摘要</div>
-          <div class="summary-list">
-            <div class="summary-row" v-for="item in visibleConditionSummary" :key="item.label">
-              <div class="summary-icon" :style="{ color: item.color }">
-                <el-icon>
-                  <component :is="item.icon" />
-                </el-icon>
+        <el-row :gutter="24" align="middle" class="banner-row">
+          <el-col :xs="24" :md="5">
+            <div class="banner-left">
+              <div class="banner-title-row">
+                <div class="ai-icon"><el-icon>
+                    <Monitor />
+                  </el-icon></div>
+                <div>
+                  <h2>媒合分析結果</h2>
+                  <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
+                </div>
               </div>
-              <div class="summary-label">{{ item.label }}</div>
-              <div class="summary-value">{{ item.value }}</div>
-            </div>
-          </div>
-        </div>
 
-        <div class="banner-illustration">
-          <div class="illustration-circle outer"></div>
-          <div class="illustration-circle inner"></div>
-          <div class="illustration-recycle">♻</div>
-          <div class="illustration-dot" v-for="i in 6" :key="i" :style="dotStyle(i)"></div>
-        </div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :md="12">
+
+            <div class="banner-summary">
+              <div class="summary-title">您本次條件分析</div>
+              <div class="summary-list">
+                <div class="summary-row" v-for="item in conditionSummary" :key="item.id">
+                  <el-row :gutter="24">
+                    <el-col xs="24" :md="2">
+                      <div class="summary-icon" :style="{ color: item.color }">
+                        <el-icon>
+                          <component :is="item.icon" />
+                        </el-icon>
+                      </div>
+                    </el-col>
+                    <el-col xs="24" :md="7">
+                      <div class="summary-label">{{ item.label }}</div>
+                    </el-col>
+                    <el-col xs="24" :md="12">
+                      <div class="summary-value">{{ item.value }}</div>
+                    </el-col>
+                    <el-col xs="24" :md="3">
+                      <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
+                        <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
+                        <span class="impact-label">{{ item.levelLabel }}</span>
+                      </div>
+                    </el-col>
+                  </el-row>
+                </div>
+              </div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :md="7">
+            <div class="banner-radar">
+              <v-chart :option="radarOption" autoresize class="radar-chart" />
+            </div>
+          </el-col>
+        </el-row>
+
+
       </div>
 
       <!-- 推薦循環路徑標頭 -->
@@ -59,46 +86,73 @@
           <div class="section-bar"></div>
           <div>
             <span class="section-title">推薦循環路徑</span>
-            <span class="section-desc">依據您的條件，AI 為您推薦最適合的三種循環路徑</span>
+            <span class="section-desc">依據您的條件，為您推薦最適合的三種循環路徑</span>
           </div>
         </div>
         <el-button text type="primary" class="modes-link">查看十大循環模式說明</el-button>
       </div>
 
-      <!-- 路徑卡片 -->
+      <!-- 路徑卡片 - 三格一排 -->
       <div class="path-list">
-        <div v-for="path in recommendedPaths" :key="path.id" class="path-card">
-          <div class="path-rank-col" :style="{ background: path.gradient }">
-            <div class="rank-label">推薦路徑</div>
-            <div class="rank-number">{{ path.rank }}</div>
-          </div>
-          <div class="path-main">
-            <div class="path-top-row">
-              <div class="path-mode-badge" :style="{ borderColor: path.accentColor, color: path.accentColor }">{{ path.modeName }}</div>
-              <span class="path-title">{{ path.title }}</span>
-              <span v-if="path.rank === 1" class="best-tag">最佳方案</span>
-            </div>
-            <p class="path-summary">{{ path.summary }}</p>
-            <div class="flow-diagram">
-              <template v-for="(step, index) in path.steps" :key="`${path.id}-s${index}`">
-                <div class="flow-step">
-                  <div class="flow-icon" :style="{ borderColor: path.accentColor + '60', color: path.accentColor }">
-                    <el-icon :size="26">
-                      <component :is="step.icon" />
-                    </el-icon>
-                  </div>
-                  <span class="flow-label">{{ step.label }}</span>
+        <el-row :gutter="16">
+          <el-col v-for="path in recommendedPaths" :key="path.id" :xs="24" :md="8">
+            <div class="path-card">
+              <!-- 頂部色塊區 -->
+              <div class="path-header" :style="{ background: path.gradient }">
+                <div class="path-rank-badge">推薦路徑</div>
+                <div class="path-rank-number">{{ path.rank }}</div>
+
+              </div>
+
+              <!-- 流程圖區 -->
+              <div class="path-body">
+                <div class="path-intro">
+                  <span class="path-mode-name" :style="{ color: path.accentColor }">{{ path.modeName }}</span>
+                  <span v-if="path.rank === 1" class="best-tag">最佳方案</span>
+                  <p class="path-summary">{{ path.summary }}</p>
                 </div>
-                <div v-if="index < path.steps.length - 1" class="flow-arrow" :style="{ color: path.accentColor }">→</div>
-              </template>
+                <div class="flow-diagram">
+                  <template v-for="(step, index) in path.steps" :key="`${path.id}-s${index}`">
+                    <div class="flow-step">
+                      <div class="flow-icon" :style="{
+                        borderColor: path.accentColor + '60',
+                        color: path.accentColor,
+                  
+                      }">
+                        <el-icon :size="22">
+                          <component :is="step.icon" />
+                        </el-icon>
+                      </div>
+                      <span class="flow-label">{{ step.label }}</span>
+                    </div>
+                    <div v-if="index < path.steps.length - 1" class="flow-arrow" :style="{ color: path.accentColor }">
+                      <el-icon class="el-icon--right">
+                        <ArrowRight />
+                      </el-icon>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- 統計數字區 -->
+                <div class="path-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">符合廠商總數</span>
+                    <span class="stat-value" :style="{ color: path.accentColor }">
+                      {{ path.matchRate }} <span class="stat-unit" :style="{ color: path.accentColor }">家</span>
+                    </span>
+                  </div>
+                  <el-button text type="primary" class="detail-link" @click="goNext(path)">
+                    技術媒合推薦
+                    <el-icon class="el-icon--right">
+                      <ArrowRight />
+                    </el-icon>
+                  </el-button>
+                </div>
+
+              </div>
             </div>
-          </div>
-          <div class="path-score-col">
-            <el-button text type="primary" class="detail-link" @click="goNext(path)">技術媒合推薦<el-icon class="el-icon--right">
-                <ArrowRight />
-              </el-icon></el-button>
-          </div>
-        </div>
+          </el-col>
+        </el-row>
       </div>
 
       <!-- 媒合分析依據 -->
@@ -144,6 +198,18 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { use } from 'echarts/core'
+import { RadarChart } from 'echarts/charts'
+import {
+  TooltipComponent,
+  LegendComponent
+} from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import VChart from 'vue-echarts'
+
+// 註冊 ECharts 所需模組（按需引入，減少 bundle 大小）
+use([RadarChart, TooltipComponent, LegendComponent, CanvasRenderer])
+
 import {
   ArrowLeft, ArrowRight, Monitor,
   Connection, DataAnalysis, Files, Finished,
@@ -151,6 +217,7 @@ import {
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+// import { b } from 'vue-router/dist/index-CzEDAlw7.js'
 
 const router = useRouter()
 const store = useConditionSetupStore()
@@ -168,57 +235,191 @@ const yesNoText = (value) => {
   return '未設定'
 }
 
-const dotStyle = (i) => {
-  const angle = (i - 1) * 60
-  const rad = (angle - 90) * Math.PI / 180
-  const r = 100
-  return { left: `calc(50% + ${Math.cos(rad) * r}px)`, top: `calc(50% + ${Math.sin(rad) * r}px)` }
+const IMPACT_LEVEL_SCORE_MAP = {
+  high: 100,
+  medium: 65,
+  low: 30
 }
 
+// 計算條件的影響度級別
+const getImpactLevel = (condition) => {
+  // 根據條件的設定情況評估影響度
+  // 高(high): 完整設定，100-75 分
+  // 中(medium): 部分設定，74-50 分
+  // 低(low): 未設定或最少設定，49-0 分
+  const score = condition.score || 0
+  if (score >= 75) return { level: 'high', color: '#22c55e', levelLabel: '高' }
+  if (score >= 50) return { level: 'medium', color: '#eab308', levelLabel: '中' }
+  return { level: 'low', color: '#ef4444', levelLabel: '低' }
+}
+
+const toRadarScore = (level) => IMPACT_LEVEL_SCORE_MAP[level] || 0
+
 const conditionSummary = computed(() => {
+  // 計算每個條件的設定程度和評分
   const acceptanceCount = Array.isArray(store.acceptanceConditions) ? store.acceptanceConditions.length : 0
-  const industry = industryLabelMap[store.sourceConditions.industry] || '未設定'
-  const process = store.sourceConditions.process || '未設定'
-  const outputAmount = store.sourceConditions.outputAmount ?? '未設定'
+  const acceptanceScore = acceptanceCount > 0 ? Math.min(acceptanceCount * 20, 100) : 0
+
+  const sourceScore = (store.sourceConditions.industry && store.sourceConditions.process) ? 80 : 40
+
+  const siteScore = (store.siteConditions.hasReuseSpace !== null || store.siteConditions.hasSecondaryWaste !== null) ? 70 : 20
+
+  const environmentScore = store.siteConditions.hasSecondaryWaste !== null ? 75 : 30
+
+  const businessScore = (store.businessConditions.clearanceFrequency && store.businessConditions.clearanceAmount) ? 85 : 35
+
+  const technologyScore = 50 // 默認中等影響度
+
+  const demandScore = 50 // 默認中等影響度
 
   return [
     {
-      label: '物化特性條件',
-      value: acceptanceCount > 0 ? `已設定 ${acceptanceCount} 項條件` : '未設定',
-      color: '#4caf50',
-      icon: DataAnalysis
+      id: 'physical',
+      label: '物化特性',
+      value: acceptanceCount > 0 ? `已設定 ${acceptanceCount} 項` : '未設定',
+      score: acceptanceScore,
+      icon: DataAnalysis,
+      ...getImpactLevel({ score: acceptanceScore })
     },
     {
-      label: '來源條件',
-      value: `來源產業：${industry} / 來源製程：${process} / 產出量：${outputAmount}`,
-      color: '#26a69a',
-      icon: Connection
+      id: 'source',
+      label: '料源穩定性',
+      value: store.sourceConditions.industry ? `${industryLabelMap[store.sourceConditions.industry]}` : '未設定',
+      score: sourceScore,
+      icon: Connection,
+      ...getImpactLevel({ score: sourceScore })
     },
     {
-      label: '場域條件',
-      value: `再利用空間：${yesNoText(store.siteConditions.hasReuseSpace)} / 衍生廢棄物：${yesNoText(store.siteConditions.hasSecondaryWaste)}`,
-      color: '#9b6dff',
-      icon: Location
+      id: 'site',
+      label: '場地配置',
+      value: `空間：${yesNoText(store.siteConditions.hasReuseSpace)}`,
+      score: siteScore,
+      icon: Location,
+      ...getImpactLevel({ score: siteScore })
     },
     {
-      label: '商業條件',
-      value: store.businessConditions.businessName || '未設定',
-      color: '#ffb84d',
-      icon: Money
+      id: 'environment',
+      label: '環境影響',
+      value: `衍生廢棄物：${yesNoText(store.siteConditions.hasSecondaryWaste)}`,
+      score: environmentScore,
+      icon: Files,
+      ...getImpactLevel({ score: environmentScore })
+    },
+    {
+      id: 'business',
+      label: '經濟效益',
+      value: store.businessConditions.clearanceFrequency ? `${store.businessConditions.clearanceFrequency}` : '未設定',
+      score: businessScore,
+      icon: Money,
+      ...getImpactLevel({ score: businessScore })
+    },
+    {
+      id: 'technology',
+      label: '技術成熟度',
+      value: '已設定',
+      score: technologyScore,
+      icon: Operation,
+      ...getImpactLevel({ score: technologyScore })
+    },
+    {
+      id: 'demand',
+      label: '再生產品使用者製程需求',
+      value: '已設定',
+      score: demandScore,
+      icon: Goods,
+      ...getImpactLevel({ score: demandScore })
     }
   ]
 })
 
-const visibleConditionSummary = computed(() => conditionSummary.value.filter((item) => item.value && item.value !== '未設定'))
+const radarSeriesValues = computed(() => conditionSummary.value.map((item) => toRadarScore(item.level)))
 
+// ★ 新增：ECharts 雷達圖 option（替換原本的 radarPoints computed）
+const radarOption = computed(() => ({
+  tooltip: {
+    trigger: 'item',
+    formatter: () => {
+      return conditionSummary.value
+        .map((item) => {
+          const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${item.color};margin-right:6px;"></span>`
+          return `${dot}<span style="color:#2d554a;font-weight:600">${item.label}</span>：<span style="color:${item.color};font-weight:700">${item.levelLabel}影響</span>`
+        })
+        .join('<br/>')
+    },
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderColor: '#e4ecea',
+    borderWidth: 1,
+    textStyle: {
+      fontSize: 12,
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', sans-serif"
+    },
+    padding: [10, 14]
+  },
+  radar: {
+    indicator: conditionSummary.value.map(item => ({
+      name: item.label,
+      max: 100
+    })),
+    center: ['50%', '50%'],
+    radius: '68%',
+    axisName: {
+      color: '#5d7772',
+      fontSize: 11,
+      fontWeight: 600,
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', sans-serif"
+    },
+    splitLine: {
+      lineStyle: { color: '#e4ecea', width: 1 }
+    },
+    splitArea: {
+      show: true,
+      areaStyle: {
+        color: ['#f4fbf7', '#edf7f3', '#f4fbf7', '#edf7f3']
+      }
+    },
+    axisLine: {
+      lineStyle: { color: '#d0d7d3', width: 1 }
+    }
+  },
+  series: [
+    // ★ 主體面積線（不顯示頂點，只畫面積和邊線）
+    {
+      type: 'radar',
+      data: [{
+        value: radarSeriesValues.value,
+        name: '影響程度',
+        areaStyle: { color: 'rgba(76, 175, 80, 0.15)' },
+        lineStyle: { color: '#22c55e', width: 2 },
+        symbol: 'none' // 頂點由下面的 scatter 系列接管
+      }]
+    },
+    // ★ 每個頂點獨立一個 series，各自設定顏色與大小
+    ...conditionSummary.value.map((item, index) => {
+      // 只在該頂點位置放值，其餘補 null
+      const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : null)
+      const size = item.level === 'high' ? 10 : item.level === 'medium' ? 7 : 5
+      return {
+        type: 'radar',
+        data: [{
+          value,
+          symbol: 'circle',
+          symbolSize: size,
+          itemStyle: { color: item.color },
+          lineStyle: { width: 0 },      // 不畫連線
+          areaStyle: { opacity: 0 }     // 不畫填色
+        }],
+        tooltip: { show: false }         // tooltip 由第一個 series 統一處理
+      }
+    })
+  ]
+}))
 const baseExternalPaths = [
   {
     modeName: '廠外模式 4',
-    title: '純化再製後返回原製程',
-    summary: '將廢棄物純化(再製)與成分調整後，重新投入原製程使用，可最大化材料價值並降低原料採購需求。',
+    summary: '原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。',
     gradient: 'linear-gradient(160deg,#3dc35a,#1e8c3e)',
     accentColor: '#2da84a',
-    score: 96,
+    matchRate: 3,
     steps: [
       { label: '原料購入', icon: Goods },
       { label: '純化(再製)', icon: Operation },
@@ -228,11 +429,10 @@ const baseExternalPaths = [
   },
   {
     modeName: '廠外模式 6',
-    title: '前處理後再製回原製程',
-    summary: '先進行前處理去除雜質，再經純化與成分調整後返回原廠製程使用，提升材料穩定性與純度。',
+    summary: '送至同一法人前處理，再送至其他公司純化（再製）、調整成分與濃度，再返回原廠使用。',
     gradient: 'linear-gradient(160deg,#22b9ae,#0d7a73)',
     accentColor: '#18a89f',
-    score: 89,
+    matchRate: 9,
     steps: [
       { label: '原料購入', icon: Goods },
       { label: '前處理', icon: Files },
@@ -244,10 +444,10 @@ const baseExternalPaths = [
   {
     modeName: '廠外模式 2',
     title: '跨產業再利用',
-    summary: '送至不同廠業處理後，應用於其他產業或成品，創造新的價值與市場機會。',
+    summary: '送至同一法人不同廠區處理及再利用。',
     gradient: 'linear-gradient(160deg,#a67fff,#6d3fd6)',
     accentColor: '#8b55f5',
-    score: 83,
+    matchRate: 5,
     steps: [
       { label: '原料購入', icon: Goods },
       { label: '異業處理', icon: Connection },
@@ -294,14 +494,42 @@ const goNext = (path) => {
 
 <style scoped lang="scss">
 .company-match-page {
+  margin: 0 auto;
   min-height: 100vh;
+  position: relative;
   background:
-    radial-gradient(circle at 14% 22%, rgba(87, 166, 255, 0.36), transparent 24%),
-    radial-gradient(circle at 82% 14%, rgba(117, 135, 255, 0.26), transparent 12%),
-    radial-gradient(circle at 70% 78%, rgba(104, 218, 255, 0.2), transparent 16%),
-    linear-gradient(180deg, #e8f4ff 0%, #dceeff 46%, #f4f9ff 100%);
-  padding: 20px 20px 96px;
+    radial-gradient(circle at 10% 20%, rgba(143, 178, 224, 0.1), transparent 50%),
+    radial-gradient(circle at 70% 20%, rgba(33, 150, 243, 0.2), transparent 40%),
+    radial-gradient(circle at 10% 100%, rgba(143, 178, 224, 0.3), transparent 50%);
+  padding: 24px 20px 96px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: min(400px, 54vh);
+    background: url('../assets/Bg_v4_850.png') center center / 100% auto no-repeat;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    background: url('../assets/Footer_v3.png') center bottom / 100% auto no-repeat;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  >* {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .progress-top {
@@ -312,36 +540,31 @@ const goNext = (path) => {
 
 /* ─── 頁頭 ─── */
 .page-header {
-  backdrop-filter: blur(16px);
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  padding: 24px 24px;
+
+  .header-row {
+    text-align: center;
+    margin-top: 50px;
+
+    h1 {
+      margin: 0;
+      font-size: clamp(36px, 3.2vw, 68px);
+      font-weight: 700;
+      color: #2d554a;
+    }
+
+    p {
+      margin: 3px 0 0;
+      font-size: clamp(24px, 0.898rem + 0.49vw, 36px);
+      color: #5d7772;
+      font-weight: 600;
+    }
+  }
 }
 
 .back-btn {
   color: #5d7772;
   font-size: 14px;
-}
-
-.header-title {
-  flex: 1;
-  text-align: center;
-
-  h1 {
-    margin: 0;
-    font-size: clamp(24px, 2.4vw, 46px);
-    font-weight: 700;
-    color: #2d554a;
-  }
-
-  p {
-    margin: 3px 0 0;
-    font-size: 18px;
-    color: #5d7772;
-    font-weight: 600;
-  }
 }
 
 /* ─── Analysis Banner ─── */
@@ -354,8 +577,8 @@ const goNext = (path) => {
   border: 1px solid rgba(255, 255, 255, 0.82);
   box-shadow: 0 14px 34px rgba(53, 93, 83, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(16px);
-  display: grid;
-  grid-template-columns: 300px 1fr 220px;
+  // display: grid;
+  // grid-template-columns: 300px 1fr 220px;
   gap: 24px;
   align-items: start;
 }
@@ -380,19 +603,29 @@ const goNext = (path) => {
   flex-shrink: 0;
 }
 
-.banner-left {
-  h2 {
-    margin: 0 0 5px;
-    font-size: 21px;
-    font-weight: 700;
-    color: #2d554a;
-  }
+.banner-row {
+  display: flex;
+  align-items: flex-start;
 
-  p {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.6;
-    color: #7a9490;
+  .banner-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    h2 {
+      margin: 0 0 5px;
+      font-size: 21px;
+      font-weight: 700;
+      color: #2d554a;
+    }
+
+    p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #7a9490;
+    }
   }
 }
 
@@ -455,98 +688,95 @@ const goNext = (path) => {
   border-left: 1px solid #e4ecea;
   border-right: 1px solid #e4ecea;
   padding: 0 24px;
+
+  .summary-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a2e2b;
+    margin-bottom: 14px;
+  }
+
+  .summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .summary-row {
+    align-items: center;
+    gap: 10px;
+
+    .summary-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: rgba(76, 175, 80, .08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+
+
+    .summary-label {
+      font-size: clamp(14px, 0.898rem + 0.49vw, 16px);
+      color: #1a2e2b;
+      font-weight: 700;
+    }
+
+    .summary-value {
+      font-size: clamp(12px, 0.898rem + 0.49vw, 14px);
+      color: #4caf50;
+      font-weight: 600;
+
+      &.muted {
+        color: #b0bec5;
+      }
+    }
+
+    .summary-impact-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid;
+      font-size: 12px;
+      font-weight: 600;
+
+      .impact-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .impact-label {
+        color: currentColor;
+      }
+    }
+  }
 }
 
-.summary-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1a2e2b;
-  margin-bottom: 14px;
-}
 
-.summary-list {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-}
 
-.summary-row {
-  display: grid;
-  grid-template-columns: 26px 1fr auto;
-  align-items: center;
-  gap: 10px;
-}
 
-.summary-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: rgba(76, 175, 80, .08);
+/* 雷達圖 */
+.banner-radar {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-}
+  width: 100%;
 
-.summary-label {
-  font-size: 13px;
-  color: #4a6a65;
-  font-weight: 600;
-}
-
-.summary-value {
-  font-size: 12px;
-  color: #4caf50;
-  font-weight: 600;
-  text-align: right;
-
-  &.muted {
-    color: #b0bec5;
+  .radar-chart {
+    width: 100%;
+    height: 280px;
+    max-width: 320px;
   }
 }
 
-.banner-illustration {
-  position: relative;
-  height: 190px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.illustration-circle {
-  position: absolute;
-  border-radius: 50%;
-
-  &.outer {
-    width: 170px;
-    height: 170px;
-    border: 1px dashed rgba(76, 175, 80, .28);
-    animation: spin-slow 24s linear infinite;
-  }
-
-  &.inner {
-    width: 110px;
-    height: 110px;
-    background: radial-gradient(circle, rgba(76, 175, 80, .1), rgba(38, 166, 154, .04));
-    border: 1px solid rgba(76, 175, 80, .12);
-  }
-}
-
-.illustration-recycle {
-  position: absolute;
-  font-size: 48px;
-  filter: drop-shadow(0 4px 10px rgba(76, 175, 80, .28));
-  animation: float 4s ease-in-out infinite;
-}
-
-.illustration-dot {
-  position: absolute;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(76, 175, 80, .45);
-  transform: translate(-50%, -50%);
-}
 
 @keyframes spin-slow {
   to {
@@ -605,192 +835,175 @@ const goNext = (path) => {
   font-weight: 600;
 }
 
-/* ─── Path Cards ─── */
 .path-list {
-  margin: 0 auto 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  width: 100%;
 }
 
 .path-card {
-  display: grid;
-  grid-template-columns: 92px 1fr 170px;
-  background: #ffffffa6;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 24px rgba(53, 93, 83, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(10px);
+  border-radius: 12px;
   overflow: hidden;
-  transition: transform .2s, box-shadow .2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 26px rgba(0, 60, 40, .09);
-  }
-}
-
-.path-rank-col {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 10px;
-  gap: 4px;
+}
+
+/* 頂部漸層色塊 */
+.path-header {
+  padding: 10px 20px 5px;
   color: #fff;
+  position: relative;
+
+  .path-rank-badge {
+    font-size: 15px;
+    opacity: 1;
+    margin-bottom: 2px;
+  }
+
+  .path-rank-number {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 10px;
+
+  }
+
+
 }
 
-.rank-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  opacity: .88;
-}
 
-.rank-number {
-  font-size: 48px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.path-main {
-  padding: 20px 22px;
+/* 卡片主體 */
+.path-body {
+  padding: 16px 20px 12px;
+  background: #fff;
   display: flex;
   flex-direction: column;
-  gap: 11px;
-}
 
-.path-top-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+  .path-intro {
+    min-height: 50px;
+  }
 
-.path-mode-badge {
-  display: inline-flex;
-  padding: 3px 12px;
-  border-radius: 999px;
-  border: 1.5px solid currentColor;
-  font-size: 12px;
-  font-weight: 700;
-}
 
-.path-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #2d554a;
-}
+  .path-mode-name {
+    display: inline-block;
+    font-size: 28px;
+    font-weight: 700;
+    margin-right: 10px;
+    // padding: 2px 8px;
+    // border-radius: 20px;
+  }
 
-.best-tag {
-  display: inline-flex;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: #fff3cd;
-  color: #b5771a;
-  font-size: 11px;
-  font-weight: 700;
-  border: 1px solid #ffd97a;
-}
 
-.path-summary {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.7;
-  color: #6a8682;
+
+  .path-summary {
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0.9;
+    margin: 0;
+    line-height: 1.6;
+    margin-top: 10px;
+    min-height: 3.2em;
+    max-height: 7.2em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+
+  /* 方案標籤 */
+  .best-tag,
+  .alt-tag,
+  .new-tag {
+    font-size: 15px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: rgba(255, 226, 192, 0.726);
+    color: #ff9c2c;
+    white-space: nowrap;
+  }
 }
 
 /* 流程圖 */
 .flow-diagram {
   display: flex;
   align-items: center;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 4px 0 2px;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin: 16px 0px;
+  min-height: 82px;
+
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .flow-icon {
+      width: 44px;
+      height: 44px;
+      border: 1.5px solid;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      // background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .flow-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: #666;
+      white-space: nowrap;
+    }
+  }
+
+  .flow-arrow {
+    font-size: 16px;
+    margin-bottom: 18px;
+    flex-shrink: 0;
+  }
 }
 
-.flow-step {
+/* 統計數字 */
+.path-stats {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 7px;
-  min-width: 72px;
-}
+  gap: 0;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+  margin-bottom: 12px;
 
-.flow-icon {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  background: #f8fcfa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 
-.flow-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #3a5a55;
-  text-align: center;
-  line-height: 1.35;
-}
+    .stat-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: #999;
+    }
 
-.flow-arrow {
-  font-size: 22px;
-  flex-shrink: 0;
-  margin-bottom: 20px;
-  line-height: 1;
-}
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
 
-/* 右側分數欄 */
-.path-score-col {
-  border-left: 1px solid #f0f5f3;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 20px 16px;
-  gap: 10px;
-}
+    .stat-unit {
+      font-size: 16px;
+      font-weight: 700;
 
-.donut-wrap {
-  position: relative;
-  width: 96px;
-  height: 96px;
-}
-
-.donut-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.donut-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-}
-
-.donut-score {
-  font-size: 20px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.donut-text {
-  font-size: 9px;
-  color: #7a9490;
-  font-weight: 600;
+    }
+  }
 }
 
 .detail-link {
-  font-size: 12px;
-  font-weight: 700;
+  align-self: flex-end;
+  margin-top: auto;
+  font-size: 15px;
 }
 
 /* ─── Analysis Basis ─── */
@@ -848,11 +1061,10 @@ const goNext = (path) => {
 
 /* ─── Footer Nav ─── */
 .page-footer-nav {
-  // max-width: 1360px;
   margin: 20px 18px 0;
   padding: 12px 16px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   position: sticky;
   bottom: 14px;
@@ -882,80 +1094,17 @@ const goNext = (path) => {
   }
 }
 
-/* ─── RWD ─── */
-@media (max-width: 1100px) {
-  .analysis-banner {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .banner-illustration {
-    display: none;
-  }
-
-  .banner-summary {
-    border-right: none;
-  }
-
-  .basis-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
   .company-match-page {
-    padding: 14px 12px 110px;
-  }
+    padding: 24px 20px 80px 20px;
+    min-height: auto;
 
-  .page-header {
-    padding: 12px 14px;
-  }
-
-  .analysis-banner {
-    grid-template-columns: 1fr;
-    padding: 18px;
-    margin: 16px;
-    gap: 16px;
-  }
-
-  .banner-summary {
-    border: none;
-    padding: 0;
-  }
-
-  .section-header-row,
-  .path-list,
-  .analysis-basis,
-  .page-footer-nav {
-    padding: 0 14px;
-  }
-
-  .path-card {
-    grid-template-columns: 76px 1fr;
-  }
-
-  .path-score-col {
-    display: none;
-  }
-
-  .basis-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .page-footer-nav {
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-
-    button {
-      width: 100%;
-      justify-content: center;
+    &::before {
+      height: min(850px, 150vh);
+      background: url('../assets/Bg_mobile.png') center top / 100% auto no-repeat;
+      mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16% #000 60%);
+      -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, #000 20%);
     }
-  }
-}
-
-@media (max-width: 480px) {
-  .basis-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

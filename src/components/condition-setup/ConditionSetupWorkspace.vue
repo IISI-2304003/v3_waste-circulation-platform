@@ -1,171 +1,214 @@
 <template>
 	<div class="condition-setup-shell" :class="{ embedded: embeddedMode }">
+
 		<FlowStepProgress v-if="showProgress" :active-step="1" class="progress-top" />
 		<div class="layout-grid">
-			<VerticalConditionNav :active-section="store.activeSection" @select="handleSectionSelect" />
+			<el-row :gutter="20">
+				<!-- 左側 Step Nav -->
+				<el-col :xs="24" :sm="24" :md="7" :lg="6" :xl="5" class="nav-col">
+					<VerticalConditionNav :active-section="store.activeSection" :configured-sections="configuredSections" @select="handleSectionSelect" />
+				</el-col>
 
-			<div class="content-panel glass-panel">
-				<div class="business-info-form">
-					<el-form label-position="top" class="business-form-grid">
-						<el-form-item>
-							<template #label>
-								<div class="label-with-icon">
-									<el-icon>
-										<House />
-									</el-icon>
-									<span>事業名稱</span>
-								</div>
-							</template>
-							<el-input v-model="businessName" placeholder="輸入事業名稱" />
-						</el-form-item>
-						<el-form-item>
-							<template #label>
-								<div class="label-with-icon">
-									<el-icon>
-										<Location />
-									</el-icon>
-									<span>事業地址</span>
-								</div>
-							</template>
-							<div class="address-input-row">
-								<el-input v-model="businessAddress" placeholder="輸入地址或點擊按鈕自動定位" />
-								<el-button :icon="Location" @click="getGeolocation" :loading="geoLoading">定位</el-button>
+				<!-- 右側表單內容 -->
+				<el-col :xs="24" :sm="24" :md="17" :lg="18" :xl="19">
+					<div class="content-col-inner">
+						<div class="content-panel glass-panel">
+							<div class="business-info-form">
+								<el-form label-position="top">
+									<el-row :gutter="24">
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<div class="label-with-icon">
+														<el-icon>
+															<House />
+														</el-icon>
+														<span>事業名稱</span>
+													</div>
+												</template>
+												<el-input v-model="businessName" placeholder="輸入事業名稱" />
+											</el-form-item>
+										</el-col>
+
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<div class="label-with-icon">
+														<el-icon>
+															<Location />
+														</el-icon>
+														<span>事業地址</span>
+													</div>
+												</template>
+
+												<div class="address-input-row">
+													<el-input v-model="businessAddress" placeholder="輸入地址或點擊按鈕自動定位" />
+													<el-button :icon="Location" @click="getGeolocation" :loading="geoLoading">
+														定位
+													</el-button>
+												</div>
+											</el-form-item>
+										</el-col>
+									</el-row>
+								</el-form>
 							</div>
-						</el-form-item>
-					</el-form>
-				</div>
 
-				<div class="friendly-reminder">
-					<p class="reminder-title">貼心提醒</p>
-					<p class="reminder-text">各項條件</p>
-				</div>
 
-				<ConditionAccordionSection id="physical" ref="physicalRef" title="物化特性" theme="green" :expanded="expandedMap.physical" @toggle="toggleSection">
-					<div class="section-subtitle-row">
-						<div class="section-subtitle">
-							依據檢測數據設定允收條件，支援自由新增條件組合。
+							<ConditionAccordionSection id="physical" ref="physicalRef" title="物化特性" theme="green" :expanded="expandedMap.physical" @toggle="toggleSection">
+								<div class="section-subtitle-row">
+									<div class="section-subtitle">
+										依據檢測數據設定允收條件，支援自由新增條件組合。
+									</div>
+									<el-button class="semantic-button" type="primary" plain :icon="Search" @click="openSemanticModal">
+										語意化搜尋
+									</el-button>
+								</div>
+
+								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="initialStandards" @change="handleStandardsChange" />
+
+								<!-- <div class="report-upload">
+									<h4>檢測報告上傳區</h4>
+									<el-upload drag multiple :auto-upload="false" :file-list="uploadFiles" :on-change="onFileChange" :on-remove="onFileRemove">
+										<el-icon class="upload-icon">
+											<UploadFilled />
+										</el-icon>
+										<div class="el-upload__text">拖曳檔案到此或 <em>點擊上傳</em></div>
+										<template #tip>
+											<div class="el-upload__tip">支援 PDF / XLSX / CSV，最多 20 MB</div>
+										</template>
+									</el-upload>
+								</div> -->
+							</ConditionAccordionSection>
+
+							<ConditionAccordionSection id="source" ref="sourceRef" title="料源穩定性" theme="cyan" :expanded="expandedMap.source" @toggle="toggleSection">
+								<el-form label-position="top">
+									<el-row :gutter="24" class="form-row">
+										<el-col :xs="24" :sm="24" :md="12" class="form-col">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>來源產業</span>
+												</template>
+												<el-select v-model="store.sourceConditions.industry" placeholder="選擇來源產業">
+													<el-option label="電子與半導體" value="semiconductor" />
+													<el-option label="鋼鐵冶金" value="steel" />
+													<el-option label="化工製程" value="chemical" />
+													<el-option label="食品加工" value="food" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>廢棄物來源製程</span>
+												</template>
+												<el-select v-model="store.sourceConditions.process" placeholder="選擇來源製程" filterable>
+													<el-option v-for="item in sourceProcessOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item label="月產出量 (公噸)">
+												<el-input-number v-model="store.sourceConditions.outputAmount" :min="0" :max="100000" :step="1" controls-position="right" />
+											</el-form-item>
+										</el-col>
+
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item label="產出頻率">
+												<el-select v-model="store.sourceConditions.frequency" placeholder="選擇產出頻率" filterable>
+													<el-option v-for="item in sourceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+									</el-row>
+								</el-form>
+							</ConditionAccordionSection>
+
+							<ConditionAccordionSection id="site" ref="siteRef" title="場地配置" theme="violet" :expanded="expandedMap.site" @toggle="toggleSection">
+								<el-form label-position="top" class="form-grid">
+									<el-form-item label="是否有再利用空間">
+										<el-switch v-model="store.siteConditions.hasReuseSpace" active-text="有" inactive-text="無" inline-prompt />
+									</el-form-item>
+								</el-form>
+
+							</ConditionAccordionSection>
+
+							<ConditionAccordionSection id="environment" ref="environmentRef" title="環境影響" theme="orange" :expanded="expandedMap.environment" @toggle="toggleSection">
+								<el-form label-position="top" class="form-grid">
+									<el-form-item label="是否有產生衍生廢棄物">
+										<el-switch v-model="store.siteConditions.hasSecondaryWaste" active-text="有" inactive-text="無" inline-prompt />
+									</el-form-item>
+								</el-form>
+							</ConditionAccordionSection>
+
+							<ConditionAccordionSection id="business" ref="businessRef" title="經濟效益" theme="violet" :expanded="expandedMap.business" @toggle="toggleSection">
+								<el-form label-position="top">
+									<el-row :gutter="24" class="form-row">
+										<el-col :xs="24" :sm="24" :md="12" class="form-col">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>清除頻率</span>
+												</template>
+												<el-select v-model="store.businessConditions.clearanceFrequency" placeholder="選擇清除頻率">
+													<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>清除量（公噸）</span>
+												</template>
+												<el-input-number v-model="store.businessConditions.clearanceAmount" :min="0" :max="100000" :step="1" controls-position="right" />
+											</el-form-item>
+										</el-col>
+									</el-row>
+								</el-form>
+							</ConditionAccordionSection>
+
+							<ConditionAccordionSection id="technology" ref="technologyRef" title="技術成熟度" theme="violet" :expanded="expandedMap.technology" @toggle="toggleSection">
+								<el-form label-position="top">
+									<el-row :gutter="24" class="form-row">
+										<el-col :xs="24" :sm="24" :md="24" class="form-col">
+											<el-form-item>
+												<template #label>
+													<span>請選擇符合之技術成熟度類型（可複選）</span>
+												</template>
+
+												<el-checkbox-group v-model="technologySelections" class="option-checkbox-group">
+													<el-checkbox v-for="item in technologyOptions" :key="item.value" :value="item.value">
+														{{ item.label }}
+													</el-checkbox>
+												</el-checkbox-group>
+											</el-form-item>
+										</el-col>
+									</el-row>
+								</el-form>
+							</ConditionAccordionSection>
+							<ConditionAccordionSection id="demand" ref="demandRef" title="再生產品使用者製程需求" theme="cyan" :expanded="expandedMap.demand" @toggle="toggleSection">
+								<el-form label-position="top">
+									<el-row :gutter="24" class="form-row">
+										<el-col :xs="24" :sm="24" :md="24" class="form-col">
+											<el-form-item>
+												<template #label>
+													<span>請選擇符合之使用者需求（可複選）</span>
+												</template>
+
+												<el-checkbox-group v-model="demandSelections" class="option-checkbox-group">
+													<el-checkbox v-for="item in demandOptions" :key="item.value" :value="item.value">
+														{{ item.label }}
+													</el-checkbox>
+												</el-checkbox-group>
+											</el-form-item>
+										</el-col>
+									</el-row>
+								</el-form>
+							</ConditionAccordionSection>
 						</div>
-						<el-button class="semantic-button" type="primary" plain :icon="Search" @click="openSemanticModal">
-							語意化搜尋
-						</el-button>
 					</div>
-
-					<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="initialStandards" @change="handleStandardsChange" />
-
-					<div class="report-upload">
-						<h4>檢測報告上傳區</h4>
-						<el-upload drag multiple :auto-upload="false" :file-list="uploadFiles" :on-change="onFileChange" :on-remove="onFileRemove">
-							<el-icon class="upload-icon">
-								<UploadFilled />
-							</el-icon>
-							<div class="el-upload__text">拖曳檔案到此或 <em>點擊上傳</em></div>
-							<template #tip>
-								<div class="el-upload__tip">支援 PDF / XLSX / CSV，最多 20 MB</div>
-							</template>
-						</el-upload>
-					</div>
-				</ConditionAccordionSection>
-
-				<ConditionAccordionSection id="source" ref="sourceRef" title="料源穩定性" theme="cyan" :expanded="expandedMap.source" @toggle="toggleSection">
-					<el-form label-position="top" class="form-grid">
-						<el-form-item>
-							<template #label>
-								<span><span class="required-mark">*</span>來源產業</span>
-							</template>
-							<el-select v-model="store.sourceConditions.industry" placeholder="選擇來源產業">
-								<el-option label="電子與半導體" value="semiconductor" />
-								<el-option label="鋼鐵冶金" value="steel" />
-								<el-option label="化工製程" value="chemical" />
-								<el-option label="食品加工" value="food" />
-							</el-select>
-						</el-form-item>
-
-						<el-form-item>
-							<template #label>
-								<span><span class="required-mark">*</span>廢棄物來源製程</span>
-							</template>
-							<el-select v-model="store.sourceConditions.process" placeholder="選擇來源製程" filterable>
-								<el-option v-for="item in sourceProcessOptions" :key="item.value" :label="item.label" :value="item.value" />
-							</el-select>
-						</el-form-item>
-
-						<el-form-item label="月產出量 (公噸)">
-							<el-input-number v-model="store.sourceConditions.outputAmount" :min="0" :max="100000" :step="1" controls-position="right" />
-						</el-form-item>
-						<el-form-item>
-							<template #label>
-								<span>產出頻率</span>
-							</template>
-							<el-select v-model="store.sourceConditions.frequency" placeholder="選擇產出頻率" filterable>
-								<el-option v-for="item in sourceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
-							</el-select>
-						</el-form-item>
-					</el-form>
-				</ConditionAccordionSection>
-
-				<ConditionAccordionSection id="site" ref="siteRef" title="場地配置" theme="violet" :expanded="expandedMap.site" @toggle="toggleSection">
-					<el-form label-position="top" class="form-grid">
-						<el-form-item label="是否有再利用空間">
-							<el-switch v-model="store.siteConditions.hasReuseSpace" active-text="有" inactive-text="無" inline-prompt />
-						</el-form-item>
-					</el-form>
-
-				</ConditionAccordionSection>
-
-				<ConditionAccordionSection id="environment" ref="environmentRef" title="環境影響" theme="orange" :expanded="expandedMap.environment" @toggle="toggleSection">
-					<el-form label-position="top" class="form-grid">
-						<el-form-item label="是否有產生衍生廢棄物">
-							<el-switch v-model="store.siteConditions.hasSecondaryWaste" active-text="有" inactive-text="無" inline-prompt />
-						</el-form-item>
-					</el-form>
-				</ConditionAccordionSection>
-
-				<ConditionAccordionSection id="business" ref="businessRef" title="經濟效益" theme="violet" :expanded="expandedMap.business" @toggle="toggleSection">
-					<el-form label-position="top" class="form-grid">
-						<el-form-item>
-							<template #label>
-								<span><span class="required-mark">*</span>清除頻率</span>
-							</template>
-							<el-select v-model="store.businessConditions.clearanceFrequency" placeholder="選擇清除頻率">
-								<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
-							</el-select>
-						</el-form-item>
-
-						<el-form-item>
-							<template #label>
-								<span><span class="required-mark">*</span>清除量（公噸）</span>
-							</template>
-							<el-input-number v-model="store.businessConditions.clearanceAmount" :min="0" :max="100000" :step="1" controls-position="right" />
-						</el-form-item>
-					</el-form>
-				</ConditionAccordionSection>
-
-				<ConditionAccordionSection id="technology" ref="technologyRef" title="技術成熟度" theme="violet" :expanded="expandedMap.technology" @toggle="toggleSection">
-					<el-form label-position="top" class="form-grid">
-						<el-form-item>
-							<template #label>
-								<span>請選擇符合之技術成熟度類型（可複選）</span>
-							</template>
-							<el-checkbox-group v-model="technologySelections" class="technology-option-group">
-								<el-checkbox v-for="item in technologyOptions" :key="item.value" :value="item.value">{{ item.label }}</el-checkbox>
-							</el-checkbox-group>
-						</el-form-item>
-					</el-form>
-				</ConditionAccordionSection>
-
-				<ConditionAccordionSection id="demand" ref="demandRef" title="再生產品使用者製程需求" theme="cyan" :expanded="expandedMap.demand" @toggle="toggleSection">
-					<el-form label-position="top" class="form-grid">
-						<el-form-item>
-							<template #label>
-								<span>請選擇符合之使用者需求（可複選）</span>
-							</template>
-							<el-checkbox-group v-model="demandSelections" class="technology-option-group">
-								<el-checkbox v-for="item in demandOptions" :key="item.value" :value="item.value">{{ item.label }}</el-checkbox>
-							</el-checkbox-group>
-						</el-form-item>
-					</el-form>
-				</ConditionAccordionSection>
-			</div>
+				</el-col>
+			</el-row>
 		</div>
 
 		<div class="floating-actions glass-panel">
@@ -317,6 +360,45 @@ const clearanceFrequencyOptions = [
 const technologySelections = ref([])
 const demandSelections = ref([])
 
+// 各區塊「已設定」狀態判斷：不以必填為標準，而是公瓡輸入就計入
+const configuredSections = computed(() => {
+	const result = []
+	const src = store.sourceConditions
+	const site = store.siteConditions
+	const biz = store.businessConditions
+
+	// 物化特性：有允收條件或上傳檔案
+	if (store.acceptanceConditions.length > 0 || store.uploadedReports.length > 0) {
+		result.push('physical')
+	}
+	// 來源穩定性：任一欄位有內容
+	if (src.industry || src.process || src.outputAmount || src.frequency) {
+		result.push('source')
+	}
+	// 場地配置：區域已選或包含再利用空間被設定
+	if ((site.region && site.region.length > 0) || site.hasReuseSpace !== null) {
+		result.push('site')
+	}
+	// 環境影響：衍生廢棄物設定被動進
+	if (site.hasSecondaryWaste !== null) {
+		result.push('environment')
+	}
+	// 經濟效益：清除頻率或清除量
+	if (biz.clearanceFrequency || biz.clearanceAmount) {
+		result.push('business')
+	}
+	// 技術成熟度：已勾選任一選項
+	if (technologySelections.value.length > 0) {
+		result.push('technology')
+	}
+	// 再生產品使用者需求：已勾選任一選項
+	if (demandSelections.value.length > 0) {
+		result.push('demand')
+	}
+
+	return result
+})
+
 const technologyOptions = [
 	{ value: 'mature', label: '現有成熟技術（常態化循環）' },
 	{ value: 'imported', label: '導入既有循環技術（跨產業／新場域應用）' },
@@ -442,20 +524,14 @@ defineExpose({
 
 <style scoped lang="scss">
 .condition-setup-shell {
-	// position: relative;
-	padding: 24px
+	padding: 24px;
+	margin-top: 50px;
+
+	&.embedded {
+		padding-top: 0;
+		min-height: auto;
+	}
 }
-
-.condition-setup-shell.embedded {
-	padding-top: 0;
-	min-height: auto;
-}
-
-
-
-// .condition-setup-shell.embedded .tech-particle-bg {
-// 	border-radius: 24px;
-// }
 
 .progress-top,
 .layout-grid,
@@ -471,27 +547,32 @@ defineExpose({
 
 .layout-grid {
 	margin-top: 0;
-	display: grid;
-	grid-template-columns: 260px 1fr;
-	gap: 18px;
 	padding: 18px;
+}
+
+.content-col-inner {
+	width: 100%;
+}
+
+.nav-col {
+	display: flex;
+	flex-direction: column;
+	position: sticky;
+	top: 10px;
+
+	:deep(.step-nav) {
+		width: 100%;
+	}
 }
 
 .glass-panel {
 	border: 1px solid rgba(255, 255, 255, 0.82);
-	background: #ffffff62;
-	box-shadow: 0 14px 34px rgba(53, 93, 83, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+	background: rgba(255, 255, 255, 0.66);
+	box-shadow:
+		0 14px 34px rgba(53, 93, 83, 0.14),
+		inset 0 1px 0 rgba(255, 255, 255, 0.78);
 	backdrop-filter: blur(16px);
 	border-radius: 20px;
-}
-
-.semantic-button {
-	background: linear-gradient(135deg, rgb(78, 76, 99), rgb(34, 13, 109));
-	color: white;
-
-	&:hover {
-		background: linear-gradient(135deg, rgb(98, 95, 122), rgb(54, 33, 129));
-	}
 }
 
 .content-panel {
@@ -501,25 +582,10 @@ defineExpose({
 	gap: 14px;
 }
 
-.friendly-reminder {
-	padding: 12px 14px;
-	border-radius: 12px;
-	border: 1px solid rgba(73, 154, 114, 0.22);
-	background: linear-gradient(135deg, rgba(236, 251, 242, 0.9), rgba(245, 252, 249, 0.88));
-
-	.reminder-title {
-		margin: 0;
-		font-size: 14px;
-		font-weight: 700;
-		color: #2f6a57;
-	}
-
-	.reminder-text {
-		margin: 4px 0 0;
-		font-size: 13px;
-		font-weight: 600;
-		color: #4f7a6f;
-	}
+.business-info-form {
+	padding: 14px 0 18px;
+	margin-bottom: 14px;
+	border-bottom: 1px solid rgba(76, 175, 80, 0.15);
 }
 
 .section-subtitle-row {
@@ -535,9 +601,51 @@ defineExpose({
 }
 
 .section-subtitle {
-	color: #5d7370;
-	font-size: 13px;
 	margin-bottom: 0;
+	color: #5d7370;
+	font-size: 16px;
+}
+
+.label-with-icon {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	color: #426b64;
+	font-size: 15px;
+	font-weight: 600;
+
+	:deep(.el-icon) {
+		color: #26a69a;
+		font-size: 16px;
+	}
+
+	span {
+		line-height: 1.3;
+	}
+}
+
+.address-input-row {
+	display: flex;
+	width: 100%;
+	gap: 8px;
+
+	:deep(.el-input) {
+		flex: 1;
+	}
+
+	:deep(.el-button) {
+		flex-shrink: 0;
+	}
+}
+
+.semantic-button {
+	color: #ffffff;
+	background: linear-gradient(135deg, rgb(78, 76, 99), rgb(34, 13, 109));
+
+	&:hover {
+		color: #ffffff;
+		background: linear-gradient(135deg, rgb(98, 95, 122), rgb(54, 33, 129));
+	}
 }
 
 .report-upload {
@@ -549,13 +657,13 @@ defineExpose({
 
 	h4 {
 		margin: 0 0 12px;
-		font-size: 14px;
 		color: #305a4f;
+		font-size: 16px;
 	}
 
 	:deep(.el-upload-dragger) {
-		background: rgba(255, 255, 255, 0.84);
 		border-color: rgba(52, 157, 96, 0.38);
+		background: rgba(255, 255, 255, 0.84);
 	}
 
 	.upload-icon {
@@ -564,64 +672,114 @@ defineExpose({
 	}
 }
 
-.form-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 20px 24px;
+.required-mark {
+	margin-right: 4px;
+	color: #f56c6c;
+	font-weight: 700;
+}
 
-	:deep(.el-form-item) {
-		width: 100%;
-		margin-bottom: 8px;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 10px;
-	}
+/* Element Plus Row / Col 表單 Layout */
+.form-row {
+	width: 100%;
+}
 
-	:deep(.el-form-item__content) {
-		width: 100%;
-	}
+.form-col {
+	margin-bottom: 18px;
 
-	:deep(.el-form-item__label) {
-		line-height: 1.3;
-		color: #426b64;
-		font-weight: 600;
-	}
-
-	:deep(.el-input),
+	:deep(.el-form-item),
+	:deep(.el-form-item__content),
 	:deep(.el-select),
-	:deep(.el-cascader),
+	:deep(.el-input),
 	:deep(.el-input-number),
-	:deep(.el-textarea) {
+	:deep(.el-textarea),
+	:deep(.el-cascader) {
 		width: 100%;
 	}
+}
 
-	:deep(.el-slider__runway) {
-		margin: 12px 0;
-	}
+:deep(.el-row) {
+	align-items: flex-start;
+}
 
-	:deep(.el-radio-group) {
-		display: inline-flex;
+:deep(.el-form-item) {
+	width: 100%;
+	margin-bottom: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+:deep(.el-form-item__content) {
+	width: 100%;
+}
+
+:deep(.el-form-item__label) {
+	color: #426b64;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+:deep(.el-input),
+:deep(.el-select),
+:deep(.el-cascader),
+:deep(.el-input-number),
+:deep(.el-textarea) {
+	width: 100%;
+}
+
+:deep(.el-slider__runway) {
+	margin: 12px 0;
+}
+
+:deep(.el-radio-group) {
+	display: inline-flex;
+	width: auto;
+}
+
+.frequency-item {
+	:deep(.el-form-item__content) {
 		width: auto;
 	}
 }
 
-.frequency-item :deep(.el-form-item__content) {
-	width: auto;
+/* Checkbox 選項 RWD */
+.option-checkbox-group,
+.technology-option-group {
+	width: 100%;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px 18px;
+
+	:deep(.el-checkbox) {
+		height: auto;
+		margin-right: 0;
+		white-space: normal;
+		align-items: flex-start;
+	}
+
+	:deep(.el-checkbox__label) {
+		line-height: 1.5;
+		white-space: normal;
+		word-break: break-word;
+	}
 }
 
-.source-theme :deep(.el-radio-button__inner) {
-	border-color: rgba(38, 166, 154, 0.32);
+.source-theme {
+	:deep(.el-radio-button__inner) {
+		border-color: rgba(38, 166, 154, 0.32);
+	}
 }
 
 .map-placeholder {
-	margin-top: 18px;
+	position: relative;
+	overflow: hidden;
 	height: 200px;
+	margin-top: 18px;
 	border-radius: 16px;
 	border: 1px solid rgba(155, 109, 255, 0.35);
 	background: linear-gradient(135deg, rgba(248, 243, 255, 0.84), rgba(236, 248, 255, 0.78));
-	position: relative;
-	overflow: hidden;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -638,84 +796,10 @@ defineExpose({
 	p {
 		position: relative;
 		margin: 0;
-		font-size: 13px;
 		color: #5f4f8a;
+		font-size: 15px;
 		font-weight: 600;
 	}
-}
-
-.business-info-form {
-	padding: 14px 0 18px;
-	border-bottom: 1px solid rgba(76, 175, 80, 0.15);
-	margin-bottom: 14px;
-}
-
-.business-form-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 14px 32px;
-
-	:deep(.el-form-item) {
-		width: 100%;
-		margin-bottom: 0;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 8px;
-	}
-
-	:deep(.el-form-item__content) {
-		width: 100%;
-	}
-
-	:deep(.el-form-item__label) {
-		line-height: 1.3;
-		color: #426b64;
-		font-weight: 600;
-		font-size: 13px;
-	}
-
-	:deep(.el-input) {
-		width: 100%;
-	}
-}
-
-.label-with-icon {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	color: #426b64;
-	font-weight: 600;
-	font-size: 13px;
-
-	:deep(.el-icon) {
-		font-size: 14px;
-		color: #26a69a;
-	}
-
-	span {
-		line-height: 1.3;
-	}
-}
-
-.address-input-row {
-	display: flex;
-	gap: 8px;
-	width: 100%;
-
-	:deep(.el-input) {
-		flex: 1;
-	}
-
-	:deep(.el-button) {
-		flex-shrink: 0;
-	}
-}
-
-.required-mark {
-	color: #f56c6c;
-	font-weight: 700;
-	margin-right: 4px;
 }
 
 .floating-actions {
@@ -738,44 +822,127 @@ defineExpose({
 	}
 }
 
-@media (max-width: 1200px) {
-	.layout-grid {
-		grid-template-columns: 1fr;
+@media (max-width: 992px) {
+	.nav-col {
+		position: static;
+		margin-bottom: 16px;
+	}
+
+	.content-panel {
+		padding: 16px;
+	}
+
+	.option-checkbox-group,
+	.technology-option-group {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
 @media (max-width: 768px) {
 	.condition-setup-shell {
-		padding-bottom: 110px;
-	}
-
-	.layout-grid {
-		padding: 14px;
+		padding: 16px 12px 110px;
+		margin-top: 36px;
 	}
 
 	.progress-top {
 		width: calc(100% - 28px);
-		margin: 0 auto;
+	}
+
+	.layout-grid {
+		padding: 12px;
+	}
+
+	.glass-panel {
+		border-radius: 18px;
+	}
+
+	.content-panel {
+		padding: 14px;
+		gap: 12px;
+	}
+
+	.business-info-form {
+		padding: 10px 0 14px;
+		margin-bottom: 12px;
 	}
 
 	.section-subtitle-row {
 		flex-direction: column;
 		align-items: flex-start;
+		gap: 10px;
+
+		:deep(.el-button) {
+			width: 100%;
+		}
 	}
 
-	.business-form-grid {
-		grid-template-columns: 1fr;
+	.section-subtitle {
+		font-size: 15px;
+		line-height: 1.6;
 	}
 
-	.form-grid {
+	.address-input-row {
+		flex-direction: column;
+
+		:deep(.el-button) {
+			width: 100%;
+		}
+	}
+
+	.form-col {
+		margin-bottom: 16px;
+	}
+
+	:deep(.el-form-item__label) {
+		font-size: 14px;
+	}
+
+	.option-checkbox-group,
+	.technology-option-group {
 		grid-template-columns: 1fr;
+		gap: 10px;
 	}
 
 	.floating-actions {
+		margin: 16px 12px 0;
+		padding: 12px;
 		justify-content: stretch;
+		gap: 10px;
 
 		:deep(.el-button) {
 			flex: 1;
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.condition-setup-shell {
+		padding: 12px 8px 110px;
+		margin-top: 28px;
+	}
+
+	.layout-grid {
+		padding: 8px;
+	}
+
+	.glass-panel {
+		border-radius: 16px;
+	}
+
+	.content-panel {
+		padding: 12px;
+	}
+
+	.section-subtitle {
+		font-size: 14px;
+	}
+
+	.floating-actions {
+		flex-direction: column;
+
+		:deep(.el-button) {
+			width: 100%;
+			margin-left: 0;
 		}
 	}
 }
