@@ -20,8 +20,8 @@ const props = defineProps({
 
 const steps = [
 	{ id: 1, label: '條件設定' },
-	{ id: 2, label: '循環路徑推薦' },
-	{ id: 3, label: '技術媒合推薦' },
+	{ id: 2, label: '路徑推薦' },
+	{ id: 3, label: '技術媒合' },
 	// { id: 4, label: '決策建議' },
 ]
 

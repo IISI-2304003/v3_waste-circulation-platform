@@ -14,7 +14,7 @@
         <el-col :xs="24" :md="18">
           <div class="header-title">
             <h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
-            <p>循環路徑推薦</p>
+            <p>路徑推薦</p>
           </div>
         </el-col>
       </el-row>
@@ -89,7 +89,11 @@
             <span class="section-desc">依據您的條件，為您推薦最適合的三種循環路徑</span>
           </div>
         </div>
-        <el-button text type="primary" class="modes-link">查看十大循環模式說明</el-button>
+        <el-button text type="primary" class="modes-link">
+          <el-icon>
+            <WarningFilled />
+          </el-icon>查看十大循環模式說明
+        </el-button>
       </div>
 
       <!-- 路徑卡片 - 三格一排 -->
@@ -98,9 +102,9 @@
           <el-col v-for="path in recommendedPaths" :key="path.id" :xs="24" :md="8">
             <div class="path-card">
               <!-- 頂部色塊區 -->
-              <div class="path-header" :style="{ background: path.gradient }">
-                <div class="path-rank-badge">推薦路徑</div>
-                <div class="path-rank-number">{{ path.rank }}</div>
+              <div class="path-header">
+                <span class="path-rank-badge" :style="{ background: path.gradient }">推薦路徑{{ path.rank }}</span>
+
 
               </div>
 
@@ -117,7 +121,7 @@
                       <div class="flow-icon" :style="{
                         borderColor: path.accentColor + '60',
                         color: path.accentColor,
-                  
+
                       }">
                         <el-icon :size="22">
                           <component :is="step.icon" />
@@ -461,7 +465,7 @@ const baseInternalPath = {
   title: '廠內處理回原製程',
   summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。',
   gradient: 'linear-gradient(160deg,#f29f3a,#e27400)',
-  accentColor: '#de7a10',
+   accentColor: '#2da84a',
   score: 94,
   steps: [
     { label: '原料購入', icon: Goods },
@@ -831,7 +835,7 @@ const goNext = (path) => {
 }
 
 .modes-link {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -852,20 +856,14 @@ const goNext = (path) => {
 .path-header {
   padding: 10px 20px 5px;
   color: #fff;
-  position: relative;
+  background: #FFF;
 
   .path-rank-badge {
-    font-size: 15px;
-    opacity: 1;
-    margin-bottom: 2px;
-  }
-
-  .path-rank-number {
-    font-size: 42px;
+    font-size: 18px;
     font-weight: 700;
-    line-height: 1;
-    margin-bottom: 10px;
-
+    margin-bottom: 2px;
+    padding: 4px 30px;
+    border-radius: 20px 0px;
   }
 
 

@@ -1,75 +1,100 @@
 <template>
 	<div class="technology-match-page">
 		<div class="page-header">
-			<el-button text class="back-btn" @click="goBackHome">
-				<el-icon>
-					<ArrowLeft />
-				</el-icon>
-				返回首頁
-			</el-button>
-			<div class="header-title">
-				<h1>產業廢棄物循環利用智慧媒合平台</h1>
-				<p>技術媒合推薦</p>
-			</div>
+			<el-row :gutter="24" align="middle" class="header-row">
+				<el-col :xs="24" :md="3">
+					<el-button text @click="goBackHome" class="back-btn">
+						<el-icon>
+							<ArrowLeft />
+						</el-icon>
+						返回首頁
+					</el-button>
+				</el-col>
+				<el-col :xs="24" :md="18">
+					<div class="header-title">
+						<h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
+						<p>技術媒合</p>
+					</div>
+				</el-col>
+			</el-row>
 		</div>
 
 		<div class="page-shell">
 			<FlowStepProgress :active-step="3" />
 
-			<section class="panel-card summary-panel">
-				<div class="section-header">
-					<div class="ai-icon">
-						<el-icon>
-							<Monitor />
-						</el-icon>
+			<div class="summary-mode-row panel-card">
+				<!-- 左：媒合需求摘要 -->
+				<section class="summary-panel-inner">
+					<div class="section-header">
+						<div class="ai-icon"><el-icon>
+								<Monitor />
+							</el-icon></div>
+						<h2>媒合需求摘要</h2>
 					</div>
-					<h2>媒合需求摘要</h2>
-				</div>
-				<div class="summary-grid">
-					<div v-for="item in visibleDemandSummary" :key="item.label" class="summary-item">
-						<span class="summary-icon">
-							<el-icon>
-								<component :is="item.icon" />
-							</el-icon>
-						</span>
-						<div>
-							<p class="summary-label">{{ item.label }}</p>
-							<p class="summary-value">{{ item.value }}</p>
+					<div class="summary-grid">
+						<div v-for="item in visibleDemandSummary" :key="item.label" class="summary-item">
+							<span class="summary-icon">
+								<el-icon>
+									<component :is="item.icon" />
+								</el-icon>
+							</span>
+							<div>
+								<p class="summary-label">{{ item.label }}</p>
+								<p class="summary-value">{{ item.value }}</p>
+							</div>
 						</div>
 					</div>
-				</div>
-			</section>
+				</section>
 
-			<section class="panel-card mode-panel">
-				<div class="section-header">
-					<div class="ai-icon mode-ai-icon">
-						<el-icon>
-							<Orange />
-						</el-icon>
+				<!-- 分隔線 -->
+				<div class="panel-divider" />
+
+				<!-- 右：推薦循環模式 -->
+				<section class="mode-panel-inner">
+					<div class="section-header">
+						<div class="ai-icon mode-ai-icon"><el-icon>
+								<Orange />
+							</el-icon></div>
+						<h2>推薦循環模式</h2>
+						<a class="mode-explain-link">查看模式說明 ›</a>
 					</div>
-					<h2>推薦循環模式</h2>
-				</div>
-				<div class="mode-title-row">
-					<span class="mode-badge">{{ selectedMode.modeName }}</span>
-					<h3>{{ selectedMode.title }}</h3>
-				</div>
-				<p class="mode-desc">{{ selectedMode.summary }}</p>
-				<div class="mode-flow">
-					<div v-for="(node, index) in modeFlow" :key="node.title" class="flow-node">
-						<div class="node-icon">
-							<el-icon>
-								<component :is="node.icon" />
-							</el-icon>
+					<div class="mode-title-row">
+						<span class="mode-badge">{{ selectedMode.modeName }}</span>
+						<h3>{{ selectedMode.title }}</h3>
+					</div>
+					<div class="flow-diagram">
+						<template v-for="(node, index) in selectedMode.steps" :key="node.label">
+							<div class="flow-step">
+								<div class="flow-icon" :style="{
+									borderColor: selectedMode.accentColor + '60',
+									color: selectedMode.accentColor,
+
+								}">
+									<el-icon :size="22">
+										<component :is="node.icon" />
+									</el-icon>
+								</div>
+								<span class="flow-label">{{ node.label }}</span>
+							</div>
+							<div v-if="index < selectedMode.steps.length - 1" class="flow-arrow" :style="{ color: selectedMode.accentColor }">
+								<el-icon>
+									<ArrowRight />
+								</el-icon>
+							</div>
+						</template>
+					</div>
+					<!-- <div class="mode-flow">
+						<div v-for="(node, index) in modeFlow" :key="node.title" class="flow-node">
+							<div class="node-icon">
+								<el-icon>
+									<component :is="node.icon" />
+								</el-icon></div>
+							<p class="node-title">{{ node.title }}</p>
+							<span v-if="index < modeFlow.length - 1" class="flow-arrow">→</span>
 						</div>
-						<p class="node-title">{{ node.title }}</p>
-						<p class="node-sub">{{ node.sub }}</p>
-						<span v-if="index < modeFlow.length - 1" class="flow-arrow">→</span>
-					</div>
-				</div>
-				<div class="mode-tags">
-					<span v-for="tag in modeTags" :key="tag">{{ tag }}</span>
-				</div>
-			</section>
+					</div> -->
+				</section>
+			</div>
 
 			<section class="panel-card suppliers-panel">
 				<div class="suppliers-header">
@@ -89,67 +114,111 @@
 				</div>
 
 				<div class="supplier-list">
-					<article v-for="(vendor, index) in pagedVendors" :key="vendor.id" class="supplier-card" role="button" tabindex="0" @click="openVendorDetail(vendor)" @keydown.enter.prevent="openVendorDetail(vendor)">
-						<div class="rank-badge">{{ (currentPage - 1) * pageSize + index + 1 }}</div>
-						<img class="supplier-photo" :src="vendor.image" :alt="vendor.name" />
-						<div class="supplier-main">
-							<div class="card-meta">
-								<span class="meta-chip ann_category">{{ vendor.category }}</span>
-								<span class="meta-chip ann_reuse">{{ vendor.isReuseOrg ? '再利用機構' : '處理機構' }}</span>
-							</div>
-							<h3>{{ vendor.name }}</h3>
-							<el-row>
-								<el-col :span="16">
-									<div class="supplier-meta">
-										<div>
-											<p class="meta-title"><span class="ai-icon small"><el-icon>
-														<Opportunity />
-													</el-icon></span>再利用廢棄物</p>
-											<p class="meta-text">{{ vendor.wasteReuse }}</p>
-										</div>
-										<div>
-											<p class="meta-title"><span class="ai-icon small"><el-icon>
-														<Location />
-													</el-icon></span>所在地</p>
-											<p class="meta-text">{{ vendor.location }}</p>
-										</div>
-										<div>
-											<p class="meta-title"><span class="ai-icon small"><el-icon>
-														<Location />
-													</el-icon></span>距離</p>
-											<p class="meta-text">{{ vendor.distance }} km</p>
-										</div>
-										<div>
-											<p class="meta-title"><span class="ai-icon small"><el-icon>
-														<Location />
-													</el-icon></span>再生產品</p>
-											<p class="meta-text">{{ vendor.product }}</p>
-										</div>
-										<div>
-											<p class="meta-title"><span class="ai-icon small"><el-icon>
-														<Location />
-													</el-icon></span>最大再利用量</p>
-											<p class="meta-text">{{ vendor.capacity }} 噸/月</p>
-										</div>
-										<div>
-											<p class="meta-title"><span class="ai-icon small"><el-icon>
-														<House />
-													</el-icon></span>事業管制編號</p>
-											<p class="meta-text">{{ vendor.controlNo }}</p>
+					<el-row :gutter="16">
+						<el-col v-for="(vendor, index) in pagedVendors" :key="vendor.id" :span="12" style="margin-bottom: 16px" :xs="24" :sm="12">
+							<article class="supplier-card" role="button" tabindex="0">
+								<!-- 左側：排名 + 圖片 -->
+								<div class="card-left">
+									<div class="rank-badge">{{ (currentPage - 1) * pageSize + index + 1 }}</div>
+									<img class="supplier-photo" :src="vendor.image" :alt="vendor.name" />
+								</div>
+
+								<!-- 右側：內容 -->
+								<div class="supplier-main">
+									<!-- 頂部：標籤列 -->
+									<div class="card-tags">
+										<span class="meta-chip ann_category">{{ vendor.category }}</span>
+										<span class="meta-chip ann_reuse">{{ vendor.isReuseOrg ? '再利用機構' : '處理機構' }}</span>
+									</div>
+
+									<!-- 名稱 +  前月收受能力 -->
+									<div class="card-header-row">
+										<div class="name-match">
+											<h3>{{ vendor.name }}</h3>
+
 										</div>
 									</div>
-								</el-col>
-								<el-col :span="8" class="score-col">
-									<div class="reason-block">
-										<p>適合原因</p>
-										<ul>
-											<li v-for="reason in vendor.reasons" :key="reason">{{ reason }}</li>
-										</ul>
+
+									<!-- Meta 資訊：3欄 grid -->
+									<div class="meta-grid">
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Location />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">再利用廢棄物</p>
+												<p class="meta-text">{{ vendor.wasteReuse }}</p>
+											</div>
+										</div>
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Location />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">所在地</p>
+												<p class="meta-text">{{ vendor.location }}</p>
+											</div>
+										</div>
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Position />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">距離</p>
+												<p class="meta-text">{{ vendor.distance }} km</p>
+											</div>
+										</div>
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Box />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">再生產品</p>
+												<p class="meta-text">{{ vendor.product }}</p>
+											</div>
+										</div>
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Box />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">許可總量</p>
+												<p class="meta-text">{{ vendor.capacity }} 噸/月</p>
+											</div>
+										</div>
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Box />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">前月收受總量</p>
+												<div class="capacity-dots">
+													<div class="dots-container">
+														<span class="dot" :class="getDotClass(vendor.capacityLevel, 1)"></span>
+														<span class="dot" :class="getDotClass(vendor.capacityLevel, 2)"></span>
+														<span class="dot" :class="getDotClass(vendor.capacityLevel, 3)"></span>
+													</div>
+													<span class="capacity-text">{{ vendor.capacityLevelText }}</span>
+												</div>
+
+											</div>
+										</div>
 									</div>
-								</el-col>
-							</el-row>
-						</div>
-					</article>
+
+									<!-- 底部：適合原因 + 查看詳情 -->
+									<div class="card-footer">
+										<span class="reason-label">適合原因</span>
+										<div class="footer-row">
+											<div class="reason-block">
+												<span v-for="reason in vendor.reasons" :key="reason" class="reason-chip">{{ reason }}</span>
+											</div>
+											<button class="detail-btn" @click.stop="openVendorDetail(vendor)">查看詳情</button>
+										</div>
+									</div>
+								</div>
+							</article>
+						</el-col>
+					</el-row>
 				</div>
 
 				<div v-if="totalPages > 1" class="pagination-wrap">
@@ -159,42 +228,88 @@
 
 			<el-dialog v-model="detailDialogVisible" class="vendor-detail-dialog " width="min(1120px, 94vw)" align-center destroy-on-close :close-on-click-modal="true" :close-on-press-escape="true" append-to-body @closed="closeVendorDetail">
 				<template #header>
-					<div v-if="activeVendor" class="dialog-header">
-						<div>
-							<h3>{{ activeVendor.name }}</h3>
-						</div>
-						<div class="dialog-chips">
-							<span class="meta-chip ann_category">{{ activeVendor.category }}</span>
-							<span class="meta-chip ann_reuse">{{ activeVendor.isReuseOrg ? '再利用機構' : '處理機構' }}</span>
+					<div v-if="activeVendor" class="dialog-top-header">
+						<div class="top-header-main">
+							<div class="top-left-copy">
+								<span class="vendor-tag">再利用廠商</span>
+								<h3>{{ activeVendor.name }}</h3>
+								<p class="dialog-specialty">專長：{{ activeVendor.reuseTech }}</p>
+							</div>
 
+							<div class="top-right-media">
+								<img class="dialog-hero-image" :src="activeVendor.image" :alt="activeVendor.name" />
+							</div>
 						</div>
 					</div>
 				</template>
 
-				<div v-if="activeVendor" class="dialog-body">
-					<div class="dialog-hero">
-						<img class="dialog-hero-image" :src="activeVendor.image" :alt="activeVendor.name" />
-						<div class="dialog-hero-copy">
-							<div class="hero-stat-grid">
-								<div class="hero-stat"><span>再利用廢棄物</span><strong>{{ activeVendor.wasteReuse }}</strong></div>
-								<div class="hero-stat"><span>距離</span><strong>{{ activeVendor.distance }} km</strong></div>
-								<div class="hero-stat"><span>再生產品</span><strong>{{ activeVendor.product }}</strong></div>
-								<div class="hero-stat"><span>最大再利用量</span><strong>{{ activeVendor.capacity }} 噸/月</strong></div>
-							</div>
-							<p class="dialog-note">{{ activeVendor.reasonText }}</p>
+				<div v-if="activeVendor" class="dialog-body-v2">
+					<div class="hero-stat-grid-v2 top-metrics">
+						<div class="hero-stat">
+							<div class="hero-stat-head"><el-icon class="stat-icon">
+									<Location />
+								</el-icon><span>所在地</span></div>
+							<strong>{{ activeVendor.location }}</strong>
+						</div>
+						<div class="hero-stat">
+							<div class="hero-stat-head"><el-icon class="stat-icon">
+									<Promotion />
+								</el-icon><span>距離</span></div>
+							<strong>{{ activeVendor.distance }} km</strong>
+						</div>
+						<div class="hero-stat">
+							<div class="hero-stat-head"><el-icon class="stat-icon">
+									<Goods />
+								</el-icon><span>再生產品</span></div>
+							<strong>{{ activeVendor.product }}</strong>
+						</div>
+						<div class="hero-stat">
+							<div class="hero-stat-head"><el-icon class="stat-icon">
+									<DataAnalysis />
+								</el-icon><span>最大再利用量</span></div>
+							<strong>{{ activeVendor.capacity }} 噸/月</strong>
+						</div>
+						<div class="hero-stat">
+							<div class="hero-stat-head"><el-icon class="stat-icon">
+									<Finished />
+								</el-icon><span>有效收受期限</span></div>
+							<strong>{{ activeVendor.validityPeriod }}</strong>
+						</div>
+						<div class="hero-stat">
+							<div class="hero-stat-head"><el-icon class="stat-icon">
+									<Files />
+								</el-icon><span>事業管制編號</span></div>
+							<strong>{{ activeVendor.controlNo }}</strong>
 						</div>
 					</div>
 
-					<div class="detail-grid ">
-						<section class="detail-card wide-card">
-							<p class="detail-title">六項概要</p>
-							<div class="detail-chip-grid">
-								<div class="detail-chip"><span>公告類別</span><strong>{{ activeVendor.category }}</strong></div>
-								<div class="detail-chip"><span>再利用機構</span><strong>{{ activeVendor.isReuseOrg ? '是' : '否' }}</strong></div>
-								<div class="detail-chip"><span>距離</span><strong>{{ activeVendor.distance }} km</strong></div>
-								<div class="detail-chip"><span>再生產品</span><strong>{{ activeVendor.product }}</strong></div>
-								<div class="detail-chip"><span>最大再利用量</span><strong>{{ activeVendor.capacity }} 噸/月</strong></div>
-								<div class="detail-chip"><span>事業管制編號</span><strong>{{ activeVendor.controlNo }}</strong></div>
+					<div class="detail-grid-v2">
+						<section class="detail-card">
+							<p class="detail-title">可收受條件</p>
+							<ul class="condition-list">
+								<li v-for="item in activeVendor.acceptanceStandards" :key="item">{{ item }}</li>
+							</ul>
+						</section>
+
+						<section class="detail-card">
+							<p class="detail-title">前月收受能力</p>
+							<div class="capacity-panel">
+								<div class="capacity-dots">
+									<div class="dots-container">
+										<span class="dot" :class="getDotClass(activeVendor.capacityLevel, 1)"></span>
+										<span class="dot" :class="getDotClass(activeVendor.capacityLevel, 2)"></span>
+										<span class="dot" :class="getDotClass(activeVendor.capacityLevel, 3)"></span>
+									</div>
+									<span class="capacity-text">{{ activeVendor.capacityLevelText }}</span>
+								</div>
+								<p class="capacity-note">（{{ activeVendor.capacityLevelText }}）目前收受能力充足，可立即媒合合作。</p>
+							</div>
+						</section>
+
+						<section class="detail-card">
+							<p class="detail-title">適合合作項目</p>
+							<div class="tag-wrap">
+								<span v-for="item in activeVendor.reasons" :key="item" class="detail-tag green">{{ item }}</span>
 							</div>
 						</section>
 
@@ -203,38 +318,12 @@
 							<p class="detail-text">{{ activeVendor.reuseTech }}</p>
 						</section>
 
-						<section class="detail-card">
-							<p class="detail-title">允收標準</p>
-							<div class="tag-wrap">
-								<span v-for="item in activeVendor.acceptanceStandards" :key="item" class="detail-tag">{{ item }}</span>
-							</div>
-						</section>
-
-						<section class="detail-card">
-							<p class="detail-title">製程單元</p>
-							<div class="tag-wrap">
-								<span v-for="item in activeVendor.processUnits" :key="item" class="detail-tag blue">{{ item }}</span>
-							</div>
-						</section>
-
-						<section class="detail-card">
-							<p class="detail-title">品質標準</p>
-							<div class="tag-wrap">
-								<span v-for="item in activeVendor.qualityStandards" :key="item" class="detail-tag purple">{{ item }}</span>
-							</div>
-						</section>
-
-						<section class="detail-card">
-							<p class="detail-title">產品銷售對象產業類別</p>
-							<div class="tag-wrap">
-								<span v-for="item in activeVendor.salesTargetIndustries" :key="item" class="detail-tag green">{{ item }}</span>
-							</div>
-						</section>
-
-						<section class="detail-card contact-card">
+						<section class="detail-card contact-card wide-card">
 							<p class="detail-title">聯絡資訊</p>
-							<div class="contact-item"><span>連絡電話</span><strong>{{ activeVendor.contactPhone }}</strong></div>
-							<div class="contact-item"><span>工廠地址</span><strong>{{ activeVendor.factoryAddress }}</strong></div>
+							<div class="contact-row">
+								<div class="contact-item"><span>聯絡電話</span><strong>{{ activeVendor.contactPhone }}</strong></div>
+								<div class="contact-item"><span>工廠地址</span><strong>{{ activeVendor.factoryAddress }}</strong></div>
+							</div>
 						</section>
 					</div>
 
@@ -243,7 +332,13 @@
 							<el-icon class="el-icon--left">
 								<Download />
 							</el-icon>
-							匯出 PDF
+							下載綜合報告
+						</el-button>
+						<el-button class="contact-vendor-btn" type="success" @click="contactVendor">
+							<el-icon class="el-icon--left">
+								<Promotion />
+							</el-icon>
+							聯絡廠商
 						</el-button>
 					</div>
 				</div>
@@ -272,7 +367,11 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, Close, Download } from '@element-plus/icons-vue'
+import {
+	ArrowLeft, ArrowRight, Monitor,
+	Connection, DataAnalysis, Files, Finished,
+	Goods, Location, Money, Operation, Promotion, SetUp
+} from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
 
@@ -361,17 +460,40 @@ const selectedMode = computed(() => {
 	if (conditionStore.siteConditions.hasReuseSpace === true) {
 		return {
 			modeName: '廠內模式 1',
-			title: '廠內處理回原製程',
-			summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。'
+			title: "物料製程內未排出，逕自循環使用",
+			summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。',
+			accentColor: '#2da84a',
+			steps: [
+				{ label: '原料購入', icon: Goods },
+				{ label: '廠內前處理', icon: Files },
+				{ label: '純化(再製)', icon: Operation },
+				{ label: '返回原製程', icon: Promotion }
+			]
 		}
 	}
 
 	return {
 		modeName: '廠外模式 4',
-		title: '純化再製後返回原製程',
-		summary: '原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。'
+		title: "原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。",
+		summary: '原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。',
+		accentColor: '#2da84a',
+		steps: [
+			{ label: '原料購入', icon: Goods },
+			{ label: '純化(再製)', icon: Operation },
+			{ label: '調整成分', icon: SetUp },
+			{ label: '返回原製程', icon: Promotion }
+		]
+
 	}
 })
+
+// 根據等級與點的索引，返回對應的 CSS 類別
+const getDotClass = (level, dotIndex) => {
+	if (dotIndex > level) return 'inactive'
+	if (level === 1) return 'active red'
+	if (level === 2) return 'active yellow'
+	if (level === 3) return 'active green'
+}
 
 const modeFlow = [
 	{ icon: 'Location', title: '原料入廠', sub: '供應商' },
@@ -383,11 +505,11 @@ const modeFlow = [
 const modeTags = ['模式成熟度高', '材料價值最大化', '降低原料採購需求', '穩定供應鏈']
 
 const vendors = [
-	{ id: 1, name: '永豐化工廢液處理有限公司', category: '工業再利用', wasteReuse: 'C-0202', isReuseOrg: true, distance: 12, product: '再生硫酸(60~70%)', capacity: 3200, score: 95, controlNo: 'D2876543', location: '桃園市', reuseTech: '酸洗廢液純化、濃縮再製與循環回用', acceptanceStandards: ['pH 2.0 - 6.0', '含固量 < 15%', '金屬雜質符合批次規範'], processUnits: ['前處理槽', '蒸餾純化單元', '濃縮再製單元'], qualityStandards: ['批次檢驗報告', '出貨前抽驗', 'ISO 14001 流程管理'], salesTargetIndustries: ['化工原料', '電子材料', '金屬表面處理'], contactPhone: '03-1234-5678', factoryAddress: '桃園市觀音區工業路 88 號', image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近', '具再利用機構資格'], reasonText: '本公司具備高純化能力與穩定出貨紀錄，適合依現有允收條件直接導入。' },
-	{ id: 2, name: '盈昌科技工業股份有限公司', category: '化工再生', wasteReuse: 'C-0202', isReuseOrg: true, distance: 18, product: '工業用稀硫酸(50~60%)', capacity: 2400, score: 91, controlNo: 'D3209843', location: '台南市', reuseTech: '稀硫酸回收、再生濃縮與品質調整', acceptanceStandards: ['酸鹼值符合回收規格', '含水率 < 20%', '雜質含量低於上限'], processUnits: ['收料暫存槽', '再生處理單元', '品質調整單元'], qualityStandards: ['批次分析報告', '檢驗留樣制度', '製程參數紀錄'], salesTargetIndustries: ['化工原料', '電鍍材料', '工業清洗'], contactPhone: '06-2345-6789', factoryAddress: '台南市永康區環工路 12 號', image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '具備穩定批次控制能力，適合需要持續供應與快速補貨的情境。' },
-	{ id: 3, name: '貝民股份有限公司台中港廠', category: '化學材料製造業', wasteReuse: 'C-0202', isReuseOrg: true, distance: 26, product: '電子級硫酸', capacity: 3200, score: 93, controlNo: 'D3209843', location: '台中市', reuseTech: '高純度硫酸再生、分級純化與電子級製程支援', acceptanceStandards: ['低金屬離子含量', '純度符合電子級需求', '批次波動控制'], processUnits: ['精餾單元', '分子篩純化單元', '終端過濾單元'], qualityStandards: ['電子級檢測報告', '進料與出貨雙向查核', '製程 SOP 管控'], salesTargetIndustries: ['半導體', '電子材料', '精密化工'], contactPhone: '04-2468-1357', factoryAddress: '台中市梧棲區港埠路 101 號', image: 'https://images.unsplash.com/photo-1513828742140-ccaa28f3eda0?auto=format&fit=crop&w=960&q=80', reasons: ['最大再利用量', '距離最近'], reasonText: '能承接較大量且高純度需求，適合對電子級品質要求較高的製程。' },
-	{ id: 4, name: '光宇應用材料股份有限公司', category: '化學品再生', wasteReuse: 'C-0202', isReuseOrg: false, distance: 34, product: '稀硫酸', capacity: 2200, score: 86, controlNo: 'D9202688', location: '高雄市', reuseTech: '稀硫酸回收與濃度微調再製', acceptanceStandards: ['濃度落在再利用範圍', '酸鹼值符合入料規格', '懸浮物低於管制值'], processUnits: ['前處理區', '濃縮回收區', '成品調整區'], qualityStandards: ['化驗報告追蹤', '批次標示管理', '出貨前複檢'], salesTargetIndustries: ['化工原料', '工業清洗', '表面處理'], contactPhone: '07-3698-2584', factoryAddress: '高雄市小港區海工一路 36 號', image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '可作為中距離備援供應來源，適合兼顧成本與供應穩定性。' },
-	{ id: 5, name: '遠見循環科技有限公司', category: '材料再製', wasteReuse: 'C-0202', isReuseOrg: true, distance: 42, product: '再生鹽類原料', capacity: 700, score: 80, controlNo: 'D8801122', location: '高雄市', reuseTech: '再生鹽類回收、濃縮與再製供應', acceptanceStandards: ['鹽類純度符合再製門檻', '含水率 < 10%', '雜質需低於批次上限'], processUnits: ['蒸發濃縮單元', '結晶分離單元', '乾燥包裝單元'], qualityStandards: ['批次純度檢驗', '留樣保存制度', '出貨文件齊備'], salesTargetIndustries: ['化工原料', '電池材料', '工業製程'], contactPhone: '07-7788-9900', factoryAddress: '高雄市大社區再生路 18 號', image: 'https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合'], reasonText: '適合中長距離供應與多樣化客戶銷售配置，具備擴量潛力。' }
+	{ id: 1, name: '鴻成科技有限公司', category: '???', wasteReuse: 'C-0202', isReuseOrg: true, distance: 12, product: '稀硫酸(65%以下)', capacity: 3200, score: 95, controlNo: 'D2876543', location: '桃園市', reuseTech: '酸洗廢液純化、濃縮再製與循環回用', acceptanceStandards: ['pH 2.0 - 6.0', '含固量 < 15%', '金屬雜質符合批次規範'], processUnits: ['前處理槽', '蒸餾純化單元', '濃縮再製單元'], qualityStandards: ['批次檢驗報告', '出貨前抽驗', 'ISO 14001 流程管理'], salesTargetIndustries: ['化工原料', '電子材料', '金屬表面處理'], contactPhone: '03-1234-5678', factoryAddress: '桃園市觀音區工業路 88 號', image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=960&q=80', previousMonthReceived: 3000, validityPeriod: '2026-12-31', reasons: ['允收條件符合', '距離最近', '具再利用機構資格'], reasonText: '本公司具備高純化能力與穩定出貨紀錄，適合依現有允收條件直接導入。', capacityLevel: 3, capacityLevelText: '高' },
+	{ id: 2, name: '盈昌科技工業股份有限公司', category: '化工再生', wasteReuse: 'C-0202', isReuseOrg: true, distance: 18, product: '工業用稀硫酸(50~60%)', capacity: 2400, score: 91, controlNo: 'D3209843', location: '台南市', reuseTech: '稀硫酸回收、再生濃縮與品質調整', acceptanceStandards: ['酸鹼值符合回收規格', '含水率 < 20%', '雜質含量低於上限'], processUnits: ['收料暫存槽', '再生處理單元', '品質調整單元'], qualityStandards: ['批次分析報告', '檢驗留樣制度', '製程參數紀錄'], salesTargetIndustries: ['化工原料', '電鍍材料', '工業清洗'], contactPhone: '06-2345-6789', factoryAddress: '台南市永康區環工路 12 號', image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '具備穩定批次控制能力，適合需要持續供應與快速補貨的情境。', previousMonthReceived: 2000, validityPeriod: '2028-06-30', capacityLevel: 2, capacityLevelText: '中' },
+	{ id: 3, name: '貝民股份有限公司台中港廠', category: '化學材料製造業', wasteReuse: 'C-0202', isReuseOrg: true, distance: 26, product: '電子級硫酸', capacity: 3200, score: 93, controlNo: 'D3209843', location: '台中市', reuseTech: '高純度硫酸再生、分級純化與電子級製程支援', acceptanceStandards: ['低金屬離子含量', '純度符合電子級需求', '批次波動控制'], processUnits: ['精餾單元', '分子篩純化單元', '終端過濾單元'], qualityStandards: ['電子級檢測報告', '進料與出貨雙向查核', '製程 SOP 管控'], salesTargetIndustries: ['半導體', '電子材料', '精密化工'], contactPhone: '04-2468-1357', factoryAddress: '台中市梧棲區港埠路 101 號', image: 'https://images.unsplash.com/photo-1513828742140-ccaa28f3eda0?auto=format&fit=crop&w=960&q=80', reasons: ['最大再利用量', '距離最近'], reasonText: '能承接較大量且高純度需求，適合對電子級品質要求較高的製程。', previousMonthReceived: 2500, validityPeriod: '2027-03-31', capacityLevel: 3, capacityLevelText: '高' },
+	{ id: 4, name: '光宇應用材料股份有限公司', category: '化學品再生', wasteReuse: 'C-0202', isReuseOrg: false, distance: 34, product: '稀硫酸', capacity: 2200, score: 86, controlNo: 'D9202688', location: '高雄市', reuseTech: '稀硫酸回收與濃度微調再製', acceptanceStandards: ['濃度落在再利用範圍', '酸鹼值符合入料規格', '懸浮物低於管制值'], processUnits: ['前處理區', '濃縮回收區', '成品調整區'], qualityStandards: ['化驗報告追蹤', '批次標示管理', '出貨前複檢'], salesTargetIndustries: ['化工原料', '工業清洗', '表面處理'], contactPhone: '07-3698-2584', factoryAddress: '高雄市小港區海工一路 36 號', image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '可作為中距離備援供應來源，適合兼顧成本與供應穩定性。', previousMonthReceived: 1800, validityPeriod: '2028-11-30', capacityLevel: 2, capacityLevelText: '中' },
+	{ id: 5, name: '遠見循環科技有限公司', category: '材料再製', wasteReuse: 'C-0202', isReuseOrg: true, distance: 42, product: '再生鹽類原料', capacity: 700, score: 80, controlNo: 'D8801122', location: '高雄市', reuseTech: '再生鹽類回收、濃縮與再製供應', acceptanceStandards: ['鹽類純度符合再製門檻', '含水率 < 10%', '雜質需低於批次上限'], processUnits: ['蒸發濃縮單元', '結晶分離單元', '乾燥包裝單元'], qualityStandards: ['批次純度檢驗', '留樣保存制度', '出貨文件齊備'], salesTargetIndustries: ['化工原料', '電池材料', '工業製程'], contactPhone: '07-7788-9900', factoryAddress: '高雄市大社區再生路 18 號', image: 'https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合'], reasonText: '適合中長距離供應與多樣化客戶銷售配置，具備擴量潛力。', previousMonthReceived: 600, validityPeriod: '2029-05-31', capacityLevel: 1, capacityLevelText: '低' }
 ]
 
 const sortedVendors = computed(() => {
@@ -415,6 +537,11 @@ const openVendorDetail = (vendor) => {
 
 const closeVendorDetail = () => {
 	detailDialogVisible.value = false
+}
+
+const contactVendor = () => {
+	if (!activeVendor.value) return
+	ElMessage.info(`請洽 ${activeVendor.value.contactPhone} 進一步聯絡合作細節`)
 }
 
 const escapeHtml = (value) => String(value ?? '')
@@ -507,23 +634,66 @@ const goBackHome = () => {
 
 <style scoped lang="scss">
 .technology-match-page {
+	margin: 0 auto;
 	min-height: 100vh;
-	padding: 20px 20px 96px;
+	position: relative;
 	background:
-		radial-gradient(circle at 14% 22%, rgba(87, 166, 255, 0.36), transparent 24%),
-		radial-gradient(circle at 82% 14%, rgba(117, 135, 255, 0.26), transparent 12%),
-		radial-gradient(circle at 70% 78%, rgba(104, 218, 255, 0.2), transparent 16%),
-		linear-gradient(180deg, #e8f4ff 0%, #dceeff 46%, #f4f9ff 100%);
+		radial-gradient(circle at 10% 20%, rgba(143, 178, 224, 0.1), transparent 50%),
+		radial-gradient(circle at 70% 20%, rgba(33, 150, 243, 0.2), transparent 40%),
+		radial-gradient(circle at 10% 100%, rgba(143, 178, 224, 0.3), transparent 50%);
+	padding: 24px 20px 96px;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: min(400px, 54vh);
+		background: url('../assets/Bg_v4_850.png') center center / 100% auto no-repeat;
+		z-index: 0;
+		pointer-events: none;
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 100%;
+		background: url('../assets/Footer_v3.png') center bottom / 100% auto no-repeat;
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	>* {
+		position: relative;
+		z-index: 1;
+	}
 }
 
+/* ─── 頁頭 ─── */
 .page-header {
-	backdrop-filter: blur(16px);
-	padding: 16px 24px;
-	display: flex;
-	align-items: center;
-	gap: 16px;
-	margin-bottom: 16px;
+	padding: 24px 24px;
+
+	.header-row {
+		text-align: center;
+		margin-top: 50px;
+
+		h1 {
+			margin: 0;
+			font-size: clamp(36px, 3.2vw, 68px);
+			font-weight: 700;
+			color: #2d554a;
+		}
+
+		p {
+			margin: 3px 0 0;
+			font-size: clamp(24px, 0.898rem + 0.49vw, 36px);
+			color: #5d7772;
+			font-weight: 600;
+		}
+	}
 }
 
 .back-btn {
@@ -565,6 +735,126 @@ const goBackHome = () => {
 	background: linear-gradient(160deg, rgba(255, 255, 255, 0.86), rgba(239, 248, 255, 0.74));
 	backdrop-filter: blur(16px);
 	box-shadow: 0 14px 34px rgba(47, 91, 114, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.84);
+}
+
+.summary-mode-row {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	gap: 0;
+	align-items: start;
+	padding: 24px 28px;
+}
+
+.panel-divider {
+	width: 1px;
+	align-self: stretch;
+	background: linear-gradient(to bottom,
+			transparent,
+			rgba(120, 190, 180, 0.35) 20%,
+			rgba(120, 190, 180, 0.35) 80%,
+			transparent);
+	margin: 0 28px;
+}
+
+.summary-panel-inner {
+	.summary-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+	}
+}
+
+.mode-panel-inner {
+	.section-header {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-bottom: 14px;
+
+		h2 {
+			flex: 1;
+		}
+	}
+
+	.mode-explain-link {
+		font-size: 16px;
+		color: #3a8fd8;
+		cursor: pointer;
+		white-space: nowrap;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	.mode-title-row {
+		margin-bottom: 16px;
+
+		h3 {
+			font-size: 18px;
+		}
+	}
+
+
+	/* 流程圖 */
+	.flow-diagram {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin: 16px 0px;
+		min-height: 82px;
+
+		.flow-step {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 4px;
+
+			.flow-icon {
+				width: 50px;
+				height: 50px;
+				border: 1.5px solid;
+				border-radius: 50px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				// background: #fff;
+				box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+			}
+
+			.flow-label {
+				font-size: 15px;
+				font-weight: 500;
+				color: #666;
+				white-space: nowrap;
+			}
+		}
+
+		.flow-arrow {
+			font-size: 18px;
+			margin-bottom: 18px;
+			flex-shrink: 0;
+		}
+	}
+}
+
+// 響應式：小螢幕堆疊
+@media (max-width: 900px) {
+	.summary-mode-row {
+		grid-template-columns: 1fr;
+	}
+
+	.panel-divider {
+		width: auto;
+		height: 1px;
+		margin: 16px 0;
+		background: linear-gradient(to right,
+				transparent,
+				rgba(120, 190, 180, 0.35) 20%,
+				rgba(120, 190, 180, 0.35) 80%,
+				transparent);
+	}
 }
 
 .section-header {
@@ -636,13 +926,13 @@ const goBackHome = () => {
 }
 
 .summary-label {
-	font-size: 12px;
+	font-size: 15px;
 	color: #5f7976;
 }
 
 .summary-value {
 	margin-top: 2px;
-	font-size: 14px;
+	font-size: 15px;
 	font-weight: 600;
 	color: #244f4a;
 	line-height: 1.4;
@@ -673,19 +963,22 @@ const goBackHome = () => {
 		font-size: 22px;
 		color: #1f4f49;
 	}
+
+	.mode-badge {
+		white-space: nowrap; // ← 加這行
+		flex-shrink: 0;
+		padding: 6px 14px;
+		border-radius: 999px;
+		font-size: 15px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		color: #0f4f9f;
+		background: linear-gradient(135deg, rgba(122, 206, 255, 0.4), rgba(178, 149, 255, 0.38));
+		border: 1px solid rgba(118, 139, 246, 0.46);
+		box-shadow: 0 6px 16px rgba(91, 124, 245, 0.18);
+	}
 }
 
-.mode-badge {
-	padding: 6px 14px;
-	border-radius: 999px;
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: 0.04em;
-	color: #0f4f9f;
-	background: linear-gradient(135deg, rgba(122, 206, 255, 0.4), rgba(178, 149, 255, 0.38));
-	border: 1px solid rgba(118, 139, 246, 0.46);
-	box-shadow: 0 6px 16px rgba(91, 124, 245, 0.18);
-}
 
 .mode-desc {
 	margin: 10px 0 16px;
@@ -749,17 +1042,7 @@ const goBackHome = () => {
 	color: #5f7691;
 }
 
-.flow-arrow {
-	position: absolute;
-	right: -14px;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 22px;
-	font-weight: 700;
-	color: #5683ff;
-	text-shadow: 0 2px 8px rgba(86, 131, 255, 0.35);
-	z-index: 2;
-}
+
 
 .mode-tags {
 	margin-top: 14px;
@@ -796,143 +1079,268 @@ const goBackHome = () => {
 .supplier-list {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 16px;
 }
 
 .supplier-card {
-	display: grid;
-	grid-template-columns: 260px 1fr;
-	gap: 14px;
-	padding: 12px;
-	position: relative;
-	border-radius: 16px;
-	border: 1px solid rgba(180, 215, 240, 0.42);
-	background: rgba(255, 255, 255, 0.75);
-	cursor: pointer;
-	transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-
-	&:hover {
-		transform: translateY(-3px);
-		border-color: rgba(84, 178, 157, 0.42);
-		box-shadow: 0 18px 38px rgba(53, 106, 138, 0.16);
-	}
-}
-
-.rank-badge {
-	position: absolute;
-	top: 10px;
-	left: 10px;
-	padding: 4px 10px;
-	border-radius: 999px;
-	font-size: 12px;
-	font-weight: 800;
-	letter-spacing: 0.02em;
-	color: #fff;
-	background: linear-gradient(135deg, #2f80ed, #56ccf2);
-	box-shadow: 0 8px 18px rgba(47, 128, 237, 0.28);
-	z-index: 3;
-}
-
-.supplier-photo {
-	width: 100%;
-	height: 170px;
-	object-fit: cover;
-	border-radius: 12px;
-}
-
-.supplier-main h3 {
-	margin: 10px 0;
-	font-size: 22px;
-	color: #1f4d47;
-}
-
-.card-meta {
 	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
-}
-
-.meta-chip {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	padding: 3px 10px;
+	flex-direction: row;
+	background: #fff;
+	border: 1px solid #e8e8e8;
 	border-radius: 12px;
-	font-size: 11px;
-	font-weight: 600;
-}
+	overflow: hidden;
+	cursor: pointer;
+	transition: box-shadow 0.2s;
+	position: relative;
 
-.meta-chip.ann_category {
-	color: #753007;
-	background: rgb(247, 213, 102);
-	border: 1px solid rgba(194, 108, 38, 0.3);
-}
-
-.meta-chip.ann_reuse {
-	color: #2b6d64;
-	background: rgba(203, 243, 235, 0.7);
-	border: 1px solid rgba(84, 178, 157, 0.2);
-}
-
-.supplier-meta {
-	margin-top: 10px;
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 12px;
-}
-
-.meta-title {
-	font-size: 14px;
-	font-weight: 700;
-	color: #0c5cc5;
-	margin: 0;
-}
-
-.meta-text {
-	font-size: 14px;
-	color: #4b6865;
-	padding-left: 18px;
-	margin: 2px 0 0;
-}
-
-.reason-block {
-	padding: 10px 12px;
-	border-radius: 12px;
-	background: rgba(237, 249, 245, 0.78);
-	border: 1px solid rgba(166, 224, 208, 0.4);
-
-	p {
-		margin: 0 0 6px;
-		font-size: 14px;
-		font-weight: 700;
-		color: #24645b;
+	// gap: 10px 10px;
+	&:hover {
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 	}
 
-	ul {
-		margin: 0;
-		padding-left: 18px;
+	// ── 左側 ──────────────────────────────────
+	.card-left {
+		position: relative;
+		flex-shrink: 0;
+		width: 200px;
+
+		.rank-badge {
+			position: absolute;
+			top: 8px;
+			left: 8px;
+			z-index: 1;
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			background: #f5a623;
+			color: #fff;
+			font-weight: bold;
+			font-size: 14px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.supplier-photo {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+		}
 	}
 
-	li {
-		margin: 4px 0;
-		font-size: 14px;
-		line-height: 1.45;
-		color: #4b6865;
+	// ── 右側 ──────────────────────────────────
+	.supplier-main {
+		flex: 1;
+		padding: 14px 18px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		min-width: 0;
 	}
-}
 
-.card-cta {
-	margin-top: 12px;
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	font-size: 12px;
-	font-weight: 700;
-	color: #1c79d0;
-	padding: 6px 10px;
-	border-radius: 999px;
-	background: rgba(225, 241, 255, 0.86);
-	border: 1px solid rgba(76, 147, 221, 0.22);
+	// 標籤列
+	.card-tags {
+		display: flex;
+		gap: 6px;
+		flex-wrap: wrap;
+
+		.meta-chip {
+			padding: 2px 10px;
+			border-radius: 12px;
+			font-size: 15px;
+			font-weight: 700;
+
+			&.ann_category {
+				background: #e8f4ff;
+				color: #1a73e8;
+			}
+
+			&.ann_reuse {
+				background: #e8fff0;
+				color: #1aaa5c;
+			}
+		}
+	}
+
+	// 名稱行 + 前月收受能力
+	.card-header-row {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
+
+		.name-match {
+			h3 {
+				font-size: 18px;
+				font-weight: 600;
+				margin: 0 0 4px;
+				color: #1a1a1a;
+			}
+
+		}
+
+		// 前月收受能力
+		.capacity-indicator {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 4px;
+			flex-shrink: 0;
+
+			.capacity-label {
+				font-size: 15px;
+				font-weight: 700;
+				color: #888;
+				white-space: nowrap;
+			}
+
+
+
+
+		}
+	}
+
+	// Meta 資訊 3欄
+	.meta-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0px 20px;
+		min-height: 130px;
+
+		.meta-item {
+			display: flex;
+			align-items: flex-start;
+			gap: 6px;
+
+			.meta-icon {
+				color: #26a69a;
+				margin-top: 2px;
+				flex-shrink: 0;
+			}
+
+			.meta-title {
+				font-size: 15px;
+				font-weight: 700;
+				color: #26a69a;
+				margin: 0;
+			}
+
+			.meta-text {
+				font-size: 16px;
+				font-weight: 700;
+				color: #333;
+				margin: 0;
+				font-weight: 500;
+			}
+
+			.capacity-dots {
+				display: flex;
+				align-items: center;
+
+				.dots-container {
+					gap: 4px;
+					padding: 4px 10px;
+					border: 1px solid #c7ccd3;
+					border-radius: 50px;
+					display: flex;
+					align-items: center;
+
+					.dot {
+						width: 13px;
+						height: 13px;
+						border-radius: 50%;
+
+						&.active {
+							&.green {
+								background: #2ecc71;
+							}
+
+							&.yellow {
+								background: #f5a623;
+							}
+
+							&.red {
+								background: #e74c3c;
+							}
+						}
+
+
+						&.inactive {
+							background: #e0e0e0;
+						}
+					}
+				}
+
+				.capacity-text {
+					font-size: 16px;
+					color: #333;
+					font-weight: 500;
+					margin-left: 6px;
+				}
+			}
+		}
+	}
+
+	// 底部：適合原因 + 按鈕
+	.card-footer {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: space-between;
+		margin-top: auto;
+		padding-top: 8px;
+		border-top: 1px solid #f0f0f0;
+
+		.reason-label {
+			font-size: 15px;
+			color: #888;
+		}
+
+		.footer-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			width: 100%;
+
+			.reason-block {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+
+				.reason-chip {
+					padding: 2px 15px;
+					background: #faedb5;
+					border-radius: 12px;
+					font-size: 14px;
+					font-weight: 700;
+					color: #c78305;
+					margin-right: 3px;
+				}
+			}
+		}
+
+
+		.detail-btn {
+			flex-shrink: 0;
+			padding: 8px 10px;
+			border: 1.5px solid #1a73e8;
+			border-radius: 8px;
+			background: #fff;
+			color: #1a73e8;
+			font-size: 14px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background 0.2s, color 0.2s;
+			margin-left: auto;
+
+			&:hover {
+				background: #1a73e8;
+				color: #fff;
+			}
+		}
+	}
 }
 
 .pagination-wrap {
@@ -960,10 +1368,10 @@ const goBackHome = () => {
 	}
 }
 
-.dialog-header {
+.dialog-top-header {
 	display: flex;
-	justify-content: space-between;
-	gap: 14px;
+	justify-content: stretch;
+	gap: 0;
 	padding: 22px 24px 18px;
 	background:
 		radial-gradient(circle at 10% 0%, rgba(87, 166, 255, 0.18), transparent 28%),
@@ -971,50 +1379,121 @@ const goBackHome = () => {
 		linear-gradient(135deg, rgba(248, 252, 255, 0.96), rgba(235, 246, 255, 0.92));
 	border-bottom: 1px solid rgba(179, 208, 233, 0.28);
 
+
 	h3 {
-		margin: 6px 0 4px;
+		margin: 6px 0 6px;
 		font-size: 28px;
 		color: #183e61;
 	}
 }
 
-.dialog-eyebrow {
-	margin: 0;
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: 0.2em;
-	text-transform: uppercase;
-	color: #3f78d8;
+.top-header-main {
+	display: grid;
+	grid-template-columns: minmax(340px, 1fr) minmax(320px, 0.95fr);
+	gap: 18px;
+	width: 100%;
 }
 
-.dialog-subtitle {
+.top-left-copy {
+	min-width: 0;
+}
+
+.vendor-tag {
+	display: inline-flex;
+	padding: 4px 10px;
+	font-size: 12px;
+	line-height: 1;
+	border-radius: 999px;
+	font-weight: 700;
+	color: #2f9e44;
+	background: rgba(199, 247, 213, 0.7);
+}
+
+
+.rating-row {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0 0 8px;
+}
+
+.stars {
+	font-size: 16px;
+	letter-spacing: 1px;
+	color: #f5b400;
+	line-height: 1;
+}
+
+.ai-match-label {
+	font-size: 18px;
+	font-weight: 600;
+	color: #5d6f85;
+}
+
+.ai-match-value {
+	font-size: 34px;
+	font-weight: 800;
+	line-height: 1;
+	color: #1aa65a;
+}
+
+.dialog-kicker {
 	margin: 0;
 	font-size: 13px;
-	color: #5b7890;
+	font-weight: 700;
+	color: #2f9e44;
 }
 
-.dialog-chips {
+.dialog-specialty {
+	margin: 2px 0 0;
+	font-size: 14px;
+	color: #536a83;
+	line-height: 1.7;
+}
+
+.top-right-media {
 	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+
+.thumb-row {
+	display: flex;
+	align-items: center;
 	gap: 8px;
-	flex-wrap: wrap;
-	align-items: flex-start;
+}
+
+.thumb-item {
+	width: 52px;
+	height: 36px;
+	border-radius: 8px;
+	overflow: hidden;
+	border: 1px solid rgba(169, 188, 210, 0.5);
+	opacity: 0.5;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	&.active {
+		opacity: 1;
+		border-color: rgba(67, 125, 201, 0.64);
+		box-shadow: 0 4px 12px rgba(72, 126, 194, 0.24);
+	}
 }
 
 .dialog-close-btn {
 	color: #3f78d8;
 }
 
-.dialog-body {
+.dialog-body-v2 {
 	padding: 22px 24px 24px;
 	display: flex;
 	flex-direction: column;
-}
-
-.dialog-hero {
-	display: grid;
-	grid-template-columns: 320px 1fr;
-	gap: 18px;
-	margin-bottom: 18px;
 }
 
 .dialog-hero-image {
@@ -1026,18 +1505,14 @@ const goBackHome = () => {
 	box-shadow: 0 12px 28px rgba(66, 122, 190, 0.12);
 }
 
-.dialog-hero-copy {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	gap: 16px;
-	padding: 14px 0;
+.hero-stat-grid-v2 {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
 }
 
-.hero-stat-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 12px;
+.top-metrics {
+	margin-bottom: 14px;
 }
 
 .hero-stat {
@@ -1045,12 +1520,26 @@ const goBackHome = () => {
 	border-radius: 16px;
 	background: linear-gradient(160deg, rgba(244, 249, 255, 0.96), rgba(232, 245, 255, 0.9));
 	border: 1px solid rgba(154, 196, 231, 0.35);
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 
-	span {
-		display: block;
-		font-size: 12px;
-		color: #5f7892;
-		margin-bottom: 4px;
+	.hero-stat-head {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+
+		span {
+			display: block;
+			font-size: 12px;
+			color: #5f7892;
+			margin-bottom: 0;
+		}
+	}
+
+	.stat-icon {
+		color: #26a69a;
+		font-size: 14px;
 	}
 
 	strong {
@@ -1060,24 +1549,7 @@ const goBackHome = () => {
 	}
 }
 
-.dialog-note {
-	margin: 0;
-	padding: 14px 16px;
-	border-radius: 16px;
-	background: linear-gradient(135deg, rgba(199, 232, 255, 0.45), rgba(211, 245, 233, 0.45));
-	border: 1px solid rgba(111, 173, 221, 0.24);
-	color: #32526d;
-	line-height: 1.7;
-	font-size: 14px;
-}
-
-.dialog-scroll-area {
-	max-height: calc(90vh - 290px);
-	overflow-y: auto;
-	padding-right: 4px;
-}
-
-.detail-grid {
+.detail-grid-v2 {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 14px;
@@ -1104,37 +1576,81 @@ const goBackHome = () => {
 	letter-spacing: 0.05em;
 }
 
-.detail-chip-grid {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 10px;
-}
-
-.detail-chip {
-	padding: 10px 12px;
-	border-radius: 14px;
-	background: rgba(242, 250, 255, 0.95);
-	border: 1px solid rgba(158, 200, 232, 0.32);
-
-	span {
-		display: block;
-		font-size: 12px;
-		color: #5d7994;
-		margin-bottom: 4px;
-	}
-
-	strong {
-		font-size: 14px;
-		color: #1c4568;
-		line-height: 1.45;
-	}
-}
-
 .detail-text {
 	margin: 0;
 	font-size: 14px;
 	line-height: 1.8;
 	color: #3e5e7d;
+}
+
+.condition-list {
+	margin: 0;
+	padding-left: 18px;
+	display: grid;
+	gap: 8px;
+
+	li {
+		font-size: 14px;
+		color: #3e5e7d;
+		line-height: 1.5;
+	}
+}
+
+.capacity-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+
+	.capacity-dots {
+		display: flex;
+		align-items: center;
+
+		.dots-container {
+			gap: 4px;
+			padding: 4px 10px;
+			border: 1px solid #c7ccd3;
+			border-radius: 50px;
+			display: flex;
+			align-items: center;
+
+			.dot {
+				width: 13px;
+				height: 13px;
+				border-radius: 50%;
+
+				&.active {
+					&.green {
+						background: #2ecc71;
+					}
+
+					&.yellow {
+						background: #f5a623;
+					}
+
+					&.red {
+						background: #e74c3c;
+					}
+				}
+
+				&.inactive {
+					background: #e0e0e0;
+				}
+			}
+		}
+
+		.capacity-text {
+			font-size: 16px;
+			color: #333;
+			font-weight: 500;
+			margin-left: 6px;
+		}
+	}
+}
+
+.capacity-note {
+	margin: 0;
+	font-size: 14px;
+	color: #3e7a47;
 }
 
 .tag-wrap {
@@ -1176,6 +1692,12 @@ const goBackHome = () => {
 	gap: 12px;
 }
 
+.contact-row {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+}
+
 .contact-item {
 	display: flex;
 	justify-content: space-between;
@@ -1202,6 +1724,7 @@ const goBackHome = () => {
 	margin-top: 16px;
 	display: flex;
 	justify-content: flex-end;
+	gap: 10px;
 }
 
 .pdf-export-btn {
@@ -1212,6 +1735,10 @@ const goBackHome = () => {
 	&:hover {
 		background: linear-gradient(135deg, #1f6fd8, #40b8e8);
 	}
+}
+
+.contact-vendor-btn {
+	font-weight: 700;
 }
 
 .actions {
@@ -1236,11 +1763,11 @@ const goBackHome = () => {
 		grid-template-columns: 220px 1fr;
 	}
 
-	.dialog-hero {
+	.top-header-main {
 		grid-template-columns: 1fr;
 	}
 
-	.detail-chip-grid {
+	.hero-stat-grid-v2 {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
@@ -1272,9 +1799,22 @@ const goBackHome = () => {
 
 	.summary-grid,
 	.mode-flow,
-	.detail-grid,
-	.detail-chip-grid {
+	.detail-grid-v2 {
 		grid-template-columns: 1fr;
+	}
+
+	.hero-stat-grid-v2,
+	.contact-row {
+		grid-template-columns: 1fr;
+	}
+
+	.rating-row {
+		flex-wrap: wrap;
+		gap: 6px 10px;
+	}
+
+	.ai-match-value {
+		font-size: 26px;
 	}
 
 	.mode-title-row {
@@ -1296,10 +1836,6 @@ const goBackHome = () => {
 
 	.supplier-meta {
 		grid-template-columns: 1fr;
-	}
-
-	.dialog-scroll-area {
-		max-height: calc(90vh - 260px);
 	}
 
 	.contact-item {

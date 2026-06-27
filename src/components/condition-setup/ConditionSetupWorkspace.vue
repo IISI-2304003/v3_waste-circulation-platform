@@ -148,6 +148,16 @@
 										<el-col :xs="24" :sm="24" :md="12" class="form-col">
 											<el-form-item>
 												<template #label>
+													<span><span class="required-mark">*</span>資本額(元)</span>
+												</template>
+												<el-select v-model="store.businessConditions.capitalAmount" placeholder="選擇資本額">
+													<el-option v-for="item in capitalAmountOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="12" class="form-col">
+											<el-form-item>
+												<template #label>
 													<span><span class="required-mark">*</span>清除頻率</span>
 												</template>
 												<el-select v-model="store.businessConditions.clearanceFrequency" placeholder="選擇清除頻率">
@@ -161,6 +171,30 @@
 													<span><span class="required-mark">*</span>清除量（公噸）</span>
 												</template>
 												<el-input-number v-model="store.businessConditions.clearanceAmount" :min="0" :max="100000" :step="1" controls-position="right" />
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>清除費用（元/公噸）</span>
+												</template>
+												<el-input-number v-model="store.businessConditions.clearanceCost" :min="0" :max="100000" :step="1" controls-position="right" />
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>處理量（公噸）</span>
+												</template>
+												<el-input-number v-model="store.businessConditions.processingAmount" :min="0" :max="100000" :step="1" controls-position="right" />
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>處理費用（元/公噸）</span>
+												</template>
+												<el-input-number v-model="store.businessConditions.processingCost" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
 										</el-col>
 									</el-row>
@@ -355,6 +389,15 @@ const clearanceFrequencyOptions = [
 	{ value: 'monthly', label: '每月' },
 	{ value: 'quarterly', label: '每季' },
 	{ value: 'yearly', label: '每年' }
+]
+
+const capitalAmountOptions = [
+	{ value: '0-1000000', label: '0 ~ 1,000,000 元' },
+	{ value: '1000001-5000000', label: '1,000,001 ~ 5,000,000 元' },
+	{ value: '5000001-10000000', label: '5,000,001 ~ 10,000,000 元' },
+	{ value: '10000001-50000000', label: '10,000,001 ~ 50,000,000 元' },
+	{ value: '50000001-100000000', label: '50,000,001 ~ 100,000,000 元' },
+	{ value: '100000001+', label: '100,000,001 元以上' }
 ]
 
 const technologySelections = ref([])
