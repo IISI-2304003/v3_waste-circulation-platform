@@ -46,11 +46,14 @@ const goBackHome = () => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .standard-input-page {
   // max-width: min(92vw, 1700px);
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
+  padding: 24px 20px 96px;
   // isolation: isolate;
   background:
     radial-gradient(circle at 10% 20%, rgba(143, 178, 224, 0.1), transparent 50%),
@@ -89,13 +92,13 @@ const goBackHome = () => {
 
 .page-header {
   // backdrop-filter: blur(16px);
-  padding: 24px 24px;
+  // padding: 24px 24px;
 
 
   .header-row {
     text-align: center;
     margin-top: 50px;
-  
+
 
     h1 {
       margin: 0;
@@ -115,7 +118,7 @@ const goBackHome = () => {
 
 @media (max-width: 768px) {
   .standard-input-page {
-    padding: 24px 20px 80px 20px;
+    padding: 18px 12px 88px;
     min-height: auto;
 
     &::before {

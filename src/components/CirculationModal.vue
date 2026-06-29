@@ -105,6 +105,8 @@ const handleSearch = () => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .circulation-modal {
   :deep(.el-dialog__header) {
     padding: 32px 32px;

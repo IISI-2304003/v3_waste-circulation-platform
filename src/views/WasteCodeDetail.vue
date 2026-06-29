@@ -401,7 +401,7 @@ const handleExport = () => {
 .waste-code-detail {
 	max-width: min(92vw, 1640px);
 	margin: 0 auto;
-	padding: 24px;
+	padding: 24px 20px 96px;
 	min-height: 80vh;
 	background: linear-gradient(180deg, rgba(239, 248, 241, 0.3) 0%, rgba(255, 255, 255, 1) 100%);
 }
@@ -1067,7 +1067,7 @@ const handleExport = () => {
 /* 響應式 */
 @media (max-width: 768px) {
 	.waste-code-detail {
-		padding: 16px;
+		padding: 18px 12px 88px;
 	}
 
 	.detail-header {

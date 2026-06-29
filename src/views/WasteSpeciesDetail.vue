@@ -177,7 +177,7 @@ const handleNextStep = () => {
 .waste-species-detail {
 	min-height: 100vh;
 	background: linear-gradient(135deg, rgba(245, 250, 248, 0.95), rgba(240, 248, 245, 0.98));
-	padding: 24px 0;
+	padding: 24px 20px 96px;
 }
 
 .detail-header-nav {
@@ -469,7 +469,7 @@ const handleNextStep = () => {
 
 @media (max-width: 768px) {
 	.waste-species-detail {
-		padding: 16px 0;
+		padding: 18px 12px 88px;
 	}
 
 	.detail-wrapper {

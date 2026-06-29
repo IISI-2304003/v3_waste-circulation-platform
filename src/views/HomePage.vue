@@ -957,7 +957,7 @@ onBeforeUnmount(() => {
 
 .process-step-title {
   margin: 0;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
@@ -1061,7 +1061,7 @@ onBeforeUnmount(() => {
 
 .insight-metric-label {
   margin: 0;
-  font-size: 15px;
+  font-size: 18px;
   color: #334155;
   font-weight: 800;
   line-height: 1.35;

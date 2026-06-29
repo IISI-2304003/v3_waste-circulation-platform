@@ -159,7 +159,7 @@ const handleQuickAccess = (code) => {
 .waste-search-page {
 	max-width: 1200px;
 	margin: 0 auto;
-	padding: 40px 24px;
+	padding: 24px 20px 96px;
 	min-height: 80vh;
 	background: linear-gradient(180deg, rgba(236, 246, 239, 0.72), rgba(255, 255, 255, 0.98));
 	border-radius: 32px;
@@ -348,7 +348,7 @@ const handleQuickAccess = (code) => {
 /* 响应式 */
 @media (max-width: 768px) {
 	.waste-search-page {
-		padding: 24px 16px;
+		padding: 18px 12px 88px;
 	}
 
 	.page-title {

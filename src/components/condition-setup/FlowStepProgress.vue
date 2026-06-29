@@ -32,6 +32,8 @@ const nodeClass = (id) => ({
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .flow-step-progress {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);

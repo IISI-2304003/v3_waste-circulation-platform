@@ -166,6 +166,8 @@ const completedCount = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .step-nav {
 	width: 100%;
 	position: sticky;
@@ -261,11 +263,12 @@ const completedCount = computed(() => {
 	padding: 0;
 	display: flex;
 	flex-direction: column;
+	gap: 8px;
 
 	@media (max-width: 992px) {
 		flex-direction: row;
 		flex-wrap: wrap;
-		gap: 6px;
+		gap: 8px;
 	}
 }
 
@@ -277,6 +280,7 @@ const completedCount = computed(() => {
 			#cbd5e1 0px, #cbd5e1 4px,
 			transparent 4px, transparent 8px);
 	margin-top: -20px;
+
 	@media (max-width: 992px) {
 		display: none;
 	}

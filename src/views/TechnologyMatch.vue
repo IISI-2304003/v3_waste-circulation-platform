@@ -19,7 +19,7 @@
 			</el-row>
 		</div>
 
-		<div class="page-shell">
+		<div class="page-shell" style="padding: 24px;">
 			<FlowStepProgress :active-step="3" />
 
 			<div class="summary-mode-row panel-card">
@@ -128,7 +128,7 @@
 									<!-- 頂部：標籤列 -->
 									<div class="card-tags">
 										<span class="meta-chip ann_category">{{ vendor.category }}</span>
-										<span class="meta-chip ann_reuse">{{ vendor.isReuseOrg ? '再利用機構' : '處理機構' }}</span>
+										<span v-if="vendor.isReuseOrg && vendor.category !== '再利用機構'" class="meta-chip ann_reuse">再利用機構</span>
 									</div>
 
 									<!-- 名稱 +  前月收受能力 -->
@@ -210,7 +210,7 @@
 										<span class="reason-label">適合原因</span>
 										<div class="footer-row">
 											<div class="reason-block">
-												<span v-for="reason in vendor.reasons" :key="reason" class="reason-chip">{{ reason }}</span>
+												<span v-for="reason in vendor.reasons" :key="reason" class="detail-tag yellow">{{ reason }}</span>
 											</div>
 											<button class="detail-btn" @click.stop="openVendorDetail(vendor)">查看詳情</button>
 										</div>
@@ -231,9 +231,33 @@
 					<div v-if="activeVendor" class="dialog-top-header">
 						<div class="top-header-main">
 							<div class="top-left-copy">
-								<span class="vendor-tag">再利用廠商</span>
+								<span class="vendor-tag">{{ activeVendor.isReuseOrg ? '再利用廠商' : '處理機構' }}</span>
 								<h3>{{ activeVendor.name }}</h3>
-								<p class="dialog-specialty">專長：{{ activeVendor.reuseTech }}</p>
+								<!-- <p class="dialog-specialty">專長：{{ activeVendor.reuseTech }}</p> -->
+								<div class="mode-title-row">
+									<span class="mode-badge">{{ selectedMode.modeName }}</span>
+								</div>
+								<div class="flow-diagram">
+									<template v-for="(node, index) in selectedMode.steps" :key="node.label">
+										<div class="flow-step">
+											<div class="flow-icon" :style="{
+												borderColor: selectedMode.accentColor + '60',
+												color: selectedMode.accentColor,
+
+											}">
+												<el-icon :size="22">
+													<component :is="node.icon" />
+												</el-icon>
+											</div>
+											<span class="flow-label">{{ node.label }}</span>
+										</div>
+										<div v-if="index < selectedMode.steps.length - 1" class="flow-arrow" :style="{ color: selectedMode.accentColor }">
+											<el-icon>
+												<ArrowRight />
+											</el-icon>
+										</div>
+									</template>
+								</div>
 							</div>
 
 							<div class="top-right-media">
@@ -244,55 +268,69 @@
 				</template>
 
 				<div v-if="activeVendor" class="dialog-body-v2">
-					<div class="hero-stat-grid-v2 top-metrics">
-						<div class="hero-stat">
-							<div class="hero-stat-head"><el-icon class="stat-icon">
-									<Location />
-								</el-icon><span>所在地</span></div>
-							<strong>{{ activeVendor.location }}</strong>
-						</div>
-						<div class="hero-stat">
-							<div class="hero-stat-head"><el-icon class="stat-icon">
-									<Promotion />
-								</el-icon><span>距離</span></div>
-							<strong>{{ activeVendor.distance }} km</strong>
-						</div>
-						<div class="hero-stat">
-							<div class="hero-stat-head"><el-icon class="stat-icon">
-									<Goods />
-								</el-icon><span>再生產品</span></div>
-							<strong>{{ activeVendor.product }}</strong>
-						</div>
-						<div class="hero-stat">
-							<div class="hero-stat-head"><el-icon class="stat-icon">
-									<DataAnalysis />
-								</el-icon><span>最大再利用量</span></div>
-							<strong>{{ activeVendor.capacity }} 噸/月</strong>
-						</div>
-						<div class="hero-stat">
-							<div class="hero-stat-head"><el-icon class="stat-icon">
-									<Finished />
-								</el-icon><span>有效收受期限</span></div>
-							<strong>{{ activeVendor.validityPeriod }}</strong>
-						</div>
-						<div class="hero-stat">
-							<div class="hero-stat-head"><el-icon class="stat-icon">
-									<Files />
-								</el-icon><span>事業管制編號</span></div>
-							<strong>{{ activeVendor.controlNo }}</strong>
-						</div>
-					</div>
+					<el-row :gutter="12" class="top-metrics-row">
+						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+							<div class="hero-stat">
+								<div class="hero-stat-head"><el-icon class="stat-icon">
+										<Location />
+									</el-icon><span>所在地</span></div>
+								<strong>{{ activeVendor.location }}</strong>
+							</div>
+						</el-col>
+						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+							<div class="hero-stat">
+								<div class="hero-stat-head"><el-icon class="stat-icon">
+										<Promotion />
+									</el-icon><span>距離</span></div>
+								<strong>{{ activeVendor.distance }} km</strong>
+							</div>
+						</el-col>
+						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+							<div class="hero-stat">
+								<div class="hero-stat-head"><el-icon class="stat-icon">
+										<Goods />
+									</el-icon><span>再生產品</span></div>
+								<strong>{{ activeVendor.product }}</strong>
+							</div>
+						</el-col>
+						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+							<div class="hero-stat">
+								<div class="hero-stat-head"><el-icon class="stat-icon">
+										<DataAnalysis />
+									</el-icon><span>許可總量</span></div>
+								<strong>{{ activeVendor.capacity }} 噸/月</strong>
+							</div>
+						</el-col>
+						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+							<div class="hero-stat">
+								<div class="hero-stat-head"><el-icon class="stat-icon">
+										<Finished />
+									</el-icon><span>有效許可期限</span></div>
+								<strong>{{ activeVendor.validityPeriod }}</strong>
+							</div>
+						</el-col>
+						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+							<div class="hero-stat">
+								<div class="hero-stat-head"><el-icon class="stat-icon">
+										<Files />
+									</el-icon><span>事業管制編號</span></div>
+								<strong>{{ activeVendor.controlNo }}</strong>
+							</div>
+						</el-col>
+					</el-row>
 
 					<div class="detail-grid-v2">
 						<section class="detail-card">
-							<p class="detail-title">可收受條件</p>
+							<p class="detail-title">允收條件</p>
+							<el-divider />
 							<ul class="condition-list">
 								<li v-for="item in activeVendor.acceptanceStandards" :key="item">{{ item }}</li>
 							</ul>
 						</section>
 
 						<section class="detail-card">
-							<p class="detail-title">前月收受能力</p>
+							<p class="detail-title">前月收受總量</p>
+							<el-divider />
 							<div class="capacity-panel">
 								<div class="capacity-dots">
 									<div class="dots-container">
@@ -302,21 +340,43 @@
 									</div>
 									<span class="capacity-text">{{ activeVendor.capacityLevelText }}</span>
 								</div>
-								<p class="capacity-note">（{{ activeVendor.capacityLevelText }}）目前收受能力充足，可立即媒合合作。</p>
-							</div>
-						</section>
-
-						<section class="detail-card">
-							<p class="detail-title">適合合作項目</p>
-							<div class="tag-wrap">
-								<span v-for="item in activeVendor.reasons" :key="item" class="detail-tag green">{{ item }}</span>
+								<p class="capacity-note">（{{ activeVendor.capacityLevelText }}）收受能力充足，可立即媒合合作。</p>
 							</div>
 						</section>
 
 						<section class="detail-card">
 							<p class="detail-title">再利用技術</p>
+							<el-divider />
 							<p class="detail-text">{{ activeVendor.reuseTech }}</p>
 						</section>
+						<section class="detail-card">
+							<p class="detail-title">製程單元</p>
+							<el-divider />
+							<div class="tag-wrap">
+								<span v-for="item in activeVendor.processUnits" :key="item" class="detail-tag green">{{ item }}</span>
+							</div>
+						</section>
+
+						<section class="detail-card">
+							<p class="detail-title">再生產品應用領域</p>
+							<el-divider />
+							<div class="tag-wrap">
+								<span v-for="item in activeVendor.salesTargetIndustries" :key="item" class="detail-tag green">{{ item }}</span>
+							</div>
+						</section>
+						<section class="detail-card">
+							<p class="detail-title">適合原因</p>
+							<el-divider />
+							<div class="tag-wrap">
+								<span v-for="item in activeVendor.reasons" :key="item" class="detail-tag yellow">{{ item }}</span>
+							</div>
+						</section>
+						<section class="detail-card contact-card wide-card" style="background: rgba(225, 250, 232, 0.84);;">
+							<p class="detail-title">決策結論</p>
+							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ selectedMode.modeName }}」,並與「{{ activeVendor.name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
+						</section>
+
+
 
 						<section class="detail-card contact-card wide-card">
 							<p class="detail-title">聯絡資訊</p>
@@ -490,9 +550,9 @@ const selectedMode = computed(() => {
 // 根據等級與點的索引，返回對應的 CSS 類別
 const getDotClass = (level, dotIndex) => {
 	if (dotIndex > level) return 'inactive'
-	if (level === 1) return 'active red'
+	if (level === 1) return 'active green'
 	if (level === 2) return 'active yellow'
-	if (level === 3) return 'active green'
+	if (level === 3) return 'active red'
 }
 
 const modeFlow = [
@@ -505,11 +565,11 @@ const modeFlow = [
 const modeTags = ['模式成熟度高', '材料價值最大化', '降低原料採購需求', '穩定供應鏈']
 
 const vendors = [
-	{ id: 1, name: '鴻成科技有限公司', category: '???', wasteReuse: 'C-0202', isReuseOrg: true, distance: 12, product: '稀硫酸(65%以下)', capacity: 3200, score: 95, controlNo: 'D2876543', location: '桃園市', reuseTech: '酸洗廢液純化、濃縮再製與循環回用', acceptanceStandards: ['pH 2.0 - 6.0', '含固量 < 15%', '金屬雜質符合批次規範'], processUnits: ['前處理槽', '蒸餾純化單元', '濃縮再製單元'], qualityStandards: ['批次檢驗報告', '出貨前抽驗', 'ISO 14001 流程管理'], salesTargetIndustries: ['化工原料', '電子材料', '金屬表面處理'], contactPhone: '03-1234-5678', factoryAddress: '桃園市觀音區工業路 88 號', image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=960&q=80', previousMonthReceived: 3000, validityPeriod: '2026-12-31', reasons: ['允收條件符合', '距離最近', '具再利用機構資格'], reasonText: '本公司具備高純化能力與穩定出貨紀錄，適合依現有允收條件直接導入。', capacityLevel: 3, capacityLevelText: '高' },
-	{ id: 2, name: '盈昌科技工業股份有限公司', category: '化工再生', wasteReuse: 'C-0202', isReuseOrg: true, distance: 18, product: '工業用稀硫酸(50~60%)', capacity: 2400, score: 91, controlNo: 'D3209843', location: '台南市', reuseTech: '稀硫酸回收、再生濃縮與品質調整', acceptanceStandards: ['酸鹼值符合回收規格', '含水率 < 20%', '雜質含量低於上限'], processUnits: ['收料暫存槽', '再生處理單元', '品質調整單元'], qualityStandards: ['批次分析報告', '檢驗留樣制度', '製程參數紀錄'], salesTargetIndustries: ['化工原料', '電鍍材料', '工業清洗'], contactPhone: '06-2345-6789', factoryAddress: '台南市永康區環工路 12 號', image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '具備穩定批次控制能力，適合需要持續供應與快速補貨的情境。', previousMonthReceived: 2000, validityPeriod: '2028-06-30', capacityLevel: 2, capacityLevelText: '中' },
-	{ id: 3, name: '貝民股份有限公司台中港廠', category: '化學材料製造業', wasteReuse: 'C-0202', isReuseOrg: true, distance: 26, product: '電子級硫酸', capacity: 3200, score: 93, controlNo: 'D3209843', location: '台中市', reuseTech: '高純度硫酸再生、分級純化與電子級製程支援', acceptanceStandards: ['低金屬離子含量', '純度符合電子級需求', '批次波動控制'], processUnits: ['精餾單元', '分子篩純化單元', '終端過濾單元'], qualityStandards: ['電子級檢測報告', '進料與出貨雙向查核', '製程 SOP 管控'], salesTargetIndustries: ['半導體', '電子材料', '精密化工'], contactPhone: '04-2468-1357', factoryAddress: '台中市梧棲區港埠路 101 號', image: 'https://images.unsplash.com/photo-1513828742140-ccaa28f3eda0?auto=format&fit=crop&w=960&q=80', reasons: ['最大再利用量', '距離最近'], reasonText: '能承接較大量且高純度需求，適合對電子級品質要求較高的製程。', previousMonthReceived: 2500, validityPeriod: '2027-03-31', capacityLevel: 3, capacityLevelText: '高' },
+	{ id: 1, name: '鴻成科技有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 12, product: '稀硫酸(65%以下)', capacity: 3200, score: 95, controlNo: 'D2876543', location: '桃園市', reuseTech: '酸洗廢液純化、濃縮再製與循環回用', acceptanceStandards: ['pH 2.0 - 6.0', '含固量 < 15%', '金屬雜質符合批次規範'], processUnits: ['前處理槽', '蒸餾純化單元', '濃縮再製單元'], qualityStandards: ['批次檢驗報告', '出貨前抽驗', 'ISO 14001 流程管理'], salesTargetIndustries: ['化工原料', '電子材料', '金屬表面處理'], contactPhone: '03-1234-5678', factoryAddress: '桃園市觀音區工業路 88 號', image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=960&q=80', previousMonthReceived: 3000, validityPeriod: '2026-12-31', reasons: ['允收條件符合', '距離最近', '具再利用機構資格'], reasonText: '本公司具備高純化能力與穩定出貨紀錄，適合依現有允收條件直接導入。', capacityLevel: 1, capacityLevelText: '低' },
+	{ id: 2, name: '盈昌科技工業股份有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 18, product: '工業用稀硫酸(50~60%)', capacity: 2400, score: 91, controlNo: 'D3209843', location: '台南市', reuseTech: '稀硫酸回收、再生濃縮與品質調整', acceptanceStandards: ['酸鹼值符合回收規格', '含水率 < 20%', '雜質含量低於上限'], processUnits: ['收料暫存槽', '再生處理單元', '品質調整單元'], qualityStandards: ['批次分析報告', '檢驗留樣制度', '製程參數紀錄'], salesTargetIndustries: ['化工原料', '電鍍材料', '工業清洗'], contactPhone: '06-2345-6789', factoryAddress: '台南市永康區環工路 12 號', image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '具備穩定批次控制能力，適合需要持續供應與快速補貨的情境。', previousMonthReceived: 2000, validityPeriod: '2028-06-30', capacityLevel: 2, capacityLevelText: '中' },
+	{ id: 3, name: '貝民股份有限公司台中港廠', category: '化學材料製造業', wasteReuse: 'C-0202', isReuseOrg: true, distance: 26, product: '電子級硫酸', capacity: 3200, score: 93, controlNo: 'D3209843', location: '台中市', reuseTech: '高純度硫酸再生、分級純化與電子級製程支援', acceptanceStandards: ['低金屬離子含量', '純度符合電子級需求', '批次波動控制'], processUnits: ['精餾單元', '分子篩純化單元', '終端過濾單元'], qualityStandards: ['電子級檢測報告', '進料與出貨雙向查核', '製程 SOP 管控'], salesTargetIndustries: ['半導體', '電子材料', '精密化工'], contactPhone: '04-2468-1357', factoryAddress: '台中市梧棲區港埠路 101 號', image: 'https://images.unsplash.com/photo-1513828742140-ccaa28f3eda0?auto=format&fit=crop&w=960&q=80', reasons: ['最大再利用量', '距離最近'], reasonText: '能承接較大量且高純度需求，適合對電子級品質要求較高的製程。', previousMonthReceived: 2500, validityPeriod: '2027-03-31', capacityLevel: 1, capacityLevelText: '低' },
 	{ id: 4, name: '光宇應用材料股份有限公司', category: '化學品再生', wasteReuse: 'C-0202', isReuseOrg: false, distance: 34, product: '稀硫酸', capacity: 2200, score: 86, controlNo: 'D9202688', location: '高雄市', reuseTech: '稀硫酸回收與濃度微調再製', acceptanceStandards: ['濃度落在再利用範圍', '酸鹼值符合入料規格', '懸浮物低於管制值'], processUnits: ['前處理區', '濃縮回收區', '成品調整區'], qualityStandards: ['化驗報告追蹤', '批次標示管理', '出貨前複檢'], salesTargetIndustries: ['化工原料', '工業清洗', '表面處理'], contactPhone: '07-3698-2584', factoryAddress: '高雄市小港區海工一路 36 號', image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '可作為中距離備援供應來源，適合兼顧成本與供應穩定性。', previousMonthReceived: 1800, validityPeriod: '2028-11-30', capacityLevel: 2, capacityLevelText: '中' },
-	{ id: 5, name: '遠見循環科技有限公司', category: '材料再製', wasteReuse: 'C-0202', isReuseOrg: true, distance: 42, product: '再生鹽類原料', capacity: 700, score: 80, controlNo: 'D8801122', location: '高雄市', reuseTech: '再生鹽類回收、濃縮與再製供應', acceptanceStandards: ['鹽類純度符合再製門檻', '含水率 < 10%', '雜質需低於批次上限'], processUnits: ['蒸發濃縮單元', '結晶分離單元', '乾燥包裝單元'], qualityStandards: ['批次純度檢驗', '留樣保存制度', '出貨文件齊備'], salesTargetIndustries: ['化工原料', '電池材料', '工業製程'], contactPhone: '07-7788-9900', factoryAddress: '高雄市大社區再生路 18 號', image: 'https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合'], reasonText: '適合中長距離供應與多樣化客戶銷售配置，具備擴量潛力。', previousMonthReceived: 600, validityPeriod: '2029-05-31', capacityLevel: 1, capacityLevelText: '低' }
+	{ id: 5, name: '遠見循環科技有限公司', category: '材料再製', wasteReuse: 'C-0202', isReuseOrg: true, distance: 42, product: '再生鹽類原料', capacity: 700, score: 80, controlNo: 'D8801122', location: '高雄市', reuseTech: '再生鹽類回收、濃縮與再製供應', acceptanceStandards: ['鹽類純度符合再製門檻', '含水率 < 10%', '雜質需低於批次上限'], processUnits: ['蒸發濃縮單元', '結晶分離單元', '乾燥包裝單元'], qualityStandards: ['批次純度檢驗', '留樣保存制度', '出貨文件齊備'], salesTargetIndustries: ['化工原料', '電池材料', '工業製程'], contactPhone: '07-7788-9900', factoryAddress: '高雄市大社區再生路 18 號', image: 'https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合'], reasonText: '適合中長距離供應與多樣化客戶銷售配置，具備擴量潛力。', previousMonthReceived: 600, validityPeriod: '2029-05-31', capacityLevel: 3, capacityLevelText: '高' }
 ]
 
 const sortedVendors = computed(() => {
@@ -633,6 +693,8 @@ const goBackHome = () => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .technology-match-page {
 	margin: 0 auto;
 	min-height: 100vh;
@@ -721,11 +783,15 @@ const goBackHome = () => {
 }
 
 .page-shell {
-	max-width: min(94vw, 1480px);
+	// max-width: min(94vw, 1480px);
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;
 	gap: 18px;
+}
+
+.suppliers-panel {
+	overflow: hidden;
 }
 
 .panel-card {
@@ -796,46 +862,48 @@ const goBackHome = () => {
 	}
 
 
-	/* 流程圖 */
-	.flow-diagram {
+
+}
+
+/* 流程圖 */
+.flow-diagram {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin: 16px 0px;
+	min-height: 82px;
+
+	.flow-step {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
-		gap: 8px;
-		flex-wrap: wrap;
-		margin: 16px 0px;
-		min-height: 82px;
+		gap: 4px;
 
-		.flow-step {
+		.flow-icon {
+			width: 50px;
+			height: 50px;
+			border: 1.5px solid;
+			border-radius: 50px;
 			display: flex;
-			flex-direction: column;
 			align-items: center;
-			gap: 4px;
-
-			.flow-icon {
-				width: 50px;
-				height: 50px;
-				border: 1.5px solid;
-				border-radius: 50px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				// background: #fff;
-				box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-			}
-
-			.flow-label {
-				font-size: 15px;
-				font-weight: 500;
-				color: #666;
-				white-space: nowrap;
-			}
+			justify-content: center;
+			// background: #fff;
+			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 		}
 
-		.flow-arrow {
-			font-size: 18px;
-			margin-bottom: 18px;
-			flex-shrink: 0;
+		.flow-label {
+			font-size: 15px;
+			font-weight: 500;
+			color: #666;
+			white-space: nowrap;
 		}
+	}
+
+	.flow-arrow {
+		font-size: 18px;
+		margin-bottom: 18px;
+		flex-shrink: 0;
 	}
 }
 
@@ -1378,6 +1446,7 @@ const goBackHome = () => {
 		radial-gradient(circle at 92% 16%, rgba(92, 114, 255, 0.16), transparent 30%),
 		linear-gradient(135deg, rgba(248, 252, 255, 0.96), rgba(235, 246, 255, 0.92));
 	border-bottom: 1px solid rgba(179, 208, 233, 0.28);
+	border-radius: 20px;
 
 
 	h3 {
@@ -1400,8 +1469,8 @@ const goBackHome = () => {
 
 .vendor-tag {
 	display: inline-flex;
-	padding: 4px 10px;
-	font-size: 12px;
+	padding: 4px 15px;
+	font-size: 16px;
 	line-height: 1;
 	border-radius: 999px;
 	font-weight: 700;
@@ -1505,24 +1574,23 @@ const goBackHome = () => {
 	box-shadow: 0 12px 28px rgba(66, 122, 190, 0.12);
 }
 
-.hero-stat-grid-v2 {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 12px;
-}
-
-.top-metrics {
+.top-metrics-row {
 	margin-bottom: 14px;
+
+	:deep(.el-col) {
+		margin-bottom: 12px;
+	}
 }
 
 .hero-stat {
 	padding: 12px 14px;
 	border-radius: 16px;
-	background: linear-gradient(160deg, rgba(244, 249, 255, 0.96), rgba(232, 245, 255, 0.9));
+	background: #FFF;
 	border: 1px solid rgba(154, 196, 231, 0.35);
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
+	box-shadow: 0 8px 18px rgba(70, 110, 150, 0.08);
 
 	.hero-stat-head {
 		display: flex;
@@ -1531,7 +1599,8 @@ const goBackHome = () => {
 
 		span {
 			display: block;
-			font-size: 12px;
+			font-size: 15px;
+			font-weight: 600;
 			color: #5f7892;
 			margin-bottom: 0;
 		}
@@ -1539,7 +1608,8 @@ const goBackHome = () => {
 
 	.stat-icon {
 		color: #26a69a;
-		font-size: 14px;
+		font-size: 18px;
+		font-weight: 700;
 	}
 
 	strong {
@@ -1570,7 +1640,7 @@ const goBackHome = () => {
 
 .detail-title {
 	margin: 0 0 10px;
-	font-size: 13px;
+	font-size: 17px;
 	font-weight: 800;
 	color: #2b5876;
 	letter-spacing: 0.05em;
@@ -1578,7 +1648,7 @@ const goBackHome = () => {
 
 .detail-text {
 	margin: 0;
-	font-size: 14px;
+	font-size: 15px;
 	line-height: 1.8;
 	color: #3e5e7d;
 }
@@ -1590,7 +1660,8 @@ const goBackHome = () => {
 	gap: 8px;
 
 	li {
-		font-size: 14px;
+		font-size: 15px;
+		font-weight: 500;
 		color: #3e5e7d;
 		line-height: 1.5;
 	}
@@ -1649,7 +1720,7 @@ const goBackHome = () => {
 
 .capacity-note {
 	margin: 0;
-	font-size: 14px;
+	font-size: 15px;
 	color: #3e7a47;
 }
 
@@ -1662,7 +1733,7 @@ const goBackHome = () => {
 .detail-tag {
 	padding: 6px 10px;
 	border-radius: 999px;
-	font-size: 12px;
+	font-size: 15px;
 	font-weight: 700;
 	color: #1d6b5d;
 	background: rgba(205, 245, 236, 0.78);
@@ -1687,6 +1758,12 @@ const goBackHome = () => {
 	border-color: rgba(103, 184, 129, 0.28);
 }
 
+.detail-tag.yellow {
+	color: #f5a623;
+	background: rgba(255, 245, 204, 0.84);
+	border-color: rgba(245, 190, 72, 0.28);
+}
+
 .contact-card {
 	display: grid;
 	gap: 12px;
@@ -1708,13 +1785,13 @@ const goBackHome = () => {
 	border: 1px solid rgba(161, 198, 229, 0.28);
 
 	span {
-		font-size: 12px;
+		font-size: 15px;
 		font-weight: 700;
 		color: #5d7994;
 	}
 
 	strong {
-		font-size: 13px;
+		font-size: 15px;
 		color: #1e476b;
 		text-align: right;
 	}
@@ -1760,41 +1837,86 @@ const goBackHome = () => {
 	}
 
 	.supplier-card {
-		grid-template-columns: 220px 1fr;
+		.card-left {
+			width: 170px;
+		}
+
+		.supplier-main {
+			padding: 12px 14px;
+		}
+
+		.meta-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 8px 12px;
+			min-height: auto;
+		}
 	}
 
 	.top-header-main {
 		grid-template-columns: 1fr;
 	}
-
-	.hero-stat-grid-v2 {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
 }
 
 @media (max-width: 768px) {
 	.technology-match-page {
-		padding: 16px 12px 96px;
+		padding: 18px 12px 88px;
+		min-height: auto;
+
+		&::before {
+			height: min(860px, 140vh);
+			background: url('../assets/Bg_mobile.png') center top / 100% auto no-repeat;
+			mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.45) 20%, #000 44%);
+			-webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.45) 20%, #000 44%);
+		}
+
+		&::after {
+			height: min(520px, 75vh);
+			background-size: 180% auto;
+			background-position: center bottom;
+		}
 	}
 
 	.page-header {
-		padding: 14px 16px;
-		flex-direction: column;
-		align-items: flex-start;
+		padding: 8px 8px 2px;
+
+		.header-row {
+			margin-top: 18px;
+			text-align: left;
+		}
 	}
 
 	.header-title {
-		text-align: left;
+		text-align: center;
+
+		h1 {
+			font-size: clamp(24px, 7.4vw, 34px);
+			line-height: 1.2;
+		}
+
+		p {
+			font-size: 20px;
+		}
+	}
+
+	.page-shell {
+		max-width: 100%;
+		gap: 14px;
 	}
 
 	.panel-card {
-		padding: 16px;
+		padding: 14px;
+		border-radius: 16px;
 	}
 
 	.section-header,
 	.suppliers-header {
 		flex-direction: column;
 		align-items: flex-start;
+		gap: 10px;
+	}
+
+	.summary-mode-row {
+		padding: 14px;
 	}
 
 	.summary-grid,
@@ -1803,7 +1925,10 @@ const goBackHome = () => {
 		grid-template-columns: 1fr;
 	}
 
-	.hero-stat-grid-v2,
+	.summary-item {
+		padding: 10px;
+	}
+
 	.contact-row {
 		grid-template-columns: 1fr;
 	}
@@ -1820,6 +1945,11 @@ const goBackHome = () => {
 	.mode-title-row {
 		flex-direction: column;
 		align-items: flex-start;
+		gap: 8px;
+
+		h3 {
+			font-size: 18px;
+		}
 	}
 
 	.sort-select {
@@ -1827,15 +1957,141 @@ const goBackHome = () => {
 	}
 
 	.supplier-card {
-		grid-template-columns: 1fr;
+		flex-direction: column;
+
+		.card-left {
+			width: 100%;
+			height: 180px;
+		}
+
+		.supplier-main {
+			padding: 12px;
+			gap: 10px;
+		}
+
+		.meta-grid {
+			grid-template-columns: 1fr;
+			gap: 8px;
+			min-height: auto;
+		}
+
+		.card-footer {
+			padding-top: 10px;
+
+			.footer-row {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.detail-btn {
+				width: 100%;
+				margin-left: 0;
+			}
+		}
 	}
 
 	.supplier-photo {
-		height: 200px;
+		height: 180px;
 	}
 
 	.supplier-meta {
 		grid-template-columns: 1fr;
+	}
+
+	.pagination-wrap {
+		justify-content: center;
+	}
+
+	.vendor-detail-dialog {
+		:deep(.el-dialog) {
+			width: calc(100vw - 16px) !important;
+			margin: 8px auto;
+			max-height: calc(100vh - 16px);
+		}
+
+		:deep(.el-dialog__body) {
+			max-height: calc(100vh - 112px);
+			overflow-y: auto;
+		}
+	}
+
+	.dialog-top-header {
+		padding: 14px 12px;
+
+		h3 {
+			font-size: 24px;
+			line-height: 1.3;
+		}
+	}
+
+	.top-header-main {
+		gap: 12px;
+	}
+
+	.top-right-media {
+		order: -1;
+	}
+
+	.dialog-hero-image {
+		height: 180px;
+		border-radius: 14px;
+	}
+
+	.dialog-body-v2 {
+		padding: 14px 12px 16px;
+	}
+
+	.top-metrics-row {
+		margin-bottom: 8px;
+	}
+
+	.hero-stat {
+		padding: 10px;
+		border-radius: 12px;
+
+		.hero-stat-head {
+			span {
+				font-size: 13px;
+			}
+		}
+
+		strong {
+			font-size: 14px;
+		}
+	}
+
+	.detail-card {
+		padding: 12px;
+		border-radius: 12px;
+	}
+
+	.detail-title {
+		font-size: 15px;
+	}
+
+	.detail-text,
+	.condition-list li,
+	.capacity-note,
+	.detail-tag,
+	.contact-item span,
+	.contact-item strong {
+		font-size: 13px;
+	}
+
+	.dialog-actions {
+		position: sticky;
+		bottom: 0;
+		background: rgba(255, 255, 255, 0.92);
+		backdrop-filter: blur(6px);
+		padding-top: 10px;
+		padding-bottom: 2px;
+		justify-content: stretch;
+		gap: 8px;
+
+		:deep(.el-button) {
+			flex: 1;
+			margin: 0;
+		}
 	}
 
 	.contact-item {
@@ -1848,11 +2104,13 @@ const goBackHome = () => {
 	}
 
 	.actions {
-		flex-direction: flex;
-		justify-content: space-between;
+		flex-direction: column;
+		gap: 10px;
+		justify-content: flex-start;
 
 		:deep(.el-button) {
 			width: 100%;
+			margin: 0;
 		}
 	}
 }

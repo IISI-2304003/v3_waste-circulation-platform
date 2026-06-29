@@ -197,6 +197,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .circulation-modes-grid {
 	--grid-scale: 1;
 	width: 100%;
@@ -416,7 +418,7 @@ onBeforeUnmount(() => {
 	top: 10%;
 	width: 200px;
 	min-height: 250px;
-	background: #fffff9cb;
+	background: #fffff9f6;
 	border-radius: 16px;
 	padding: 20px;
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);

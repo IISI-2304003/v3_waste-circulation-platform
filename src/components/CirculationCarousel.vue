@@ -1,32 +1,16 @@
 <template>
   <div class="circulation-carousel">
-    <swiper
-      :modules="modules"
-      :effect="'coverflow'"
-      :grabCursor="true"
-      :centeredSlides="true"
-      :slidesPerView="'auto'"
-      :coverflowEffect="{
-        rotate: 50,
-        stretch: 0,
-        depth: 100,
-        modifier: 1,
-        slideShadows: true,
-      }"
-      :autoplay="{
+    <swiper :modules="modules" :effect="'coverflow'" :grabCursor="true" :centeredSlides="true" :slidesPerView="'auto'" :coverflowEffect="{
+      rotate: 50,
+      stretch: 0,
+      depth: 100,
+      modifier: 1,
+      slideShadows: true,
+    }" :autoplay="{
         delay: 3000,
         disableOnInteraction: false,
-      }"
-      :pagination="{ clickable: true }"
-      :loop="true"
-      class="mySwiper"
-      @slideChange="onSlideChange"
-    >
-      <swiper-slide 
-        v-for="mode in modes" 
-        :key="mode.id"
-        @click="handleModeClick(mode)"
-      >
+      }" :pagination="{ clickable: true }" :loop="true" class="mySwiper" @slideChange="onSlideChange">
+      <swiper-slide v-for="mode in modes" :key="mode.id" @click="handleModeClick(mode)">
         <div class="mode-card" :style="{ borderColor: mode.color }">
           <div class="mode-icon" :style="{ color: mode.color }">
             <el-icon :size="64">
@@ -50,17 +34,17 @@ import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/effect-coverflow'
 import 'swiper/css/pagination'
-import { 
-  Operation, 
-  Connection, 
-  OfficeBuilding, 
-  Link, 
-  Share, 
-  Lightning, 
-  Coin, 
-  House, 
-  Apple, 
-  Star 
+import {
+  Operation,
+  Connection,
+  OfficeBuilding,
+  Link,
+  Share,
+  Lightning,
+  Coin,
+  House,
+  Apple,
+  Star
 } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -102,6 +86,8 @@ const onSlideChange = () => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .circulation-carousel {
   width: 100%;
   padding: 60px 0;

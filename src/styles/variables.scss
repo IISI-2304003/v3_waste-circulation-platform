@@ -57,8 +57,7 @@ $font-size-h2: 28px;
 $font-size-h3: 24px;
 $font-size-h4: 20px;
 $font-size-body: 16px;
-$font-size-small: 14px;
-$font-size-xs: 12px;
+$font-size-small: 15px;
 
 // 行距
 $line-height-tight: 1.4;
@@ -163,4 +162,20 @@ $z-tooltip: 1070;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+// 全域基礎樣式（放在變數檔底部，或獨立的 base.scss）
+body {
+    font-size: $font-size-body;
+    font-weight: 500;
+    font-family: $font-family-base;
+    line-height: $line-height-base;
+}
+
+// 防止任何元素字體低於 15px
+small,
+.text-xs,
+figcaption,
+caption {
+    font-size: 15px;
 }

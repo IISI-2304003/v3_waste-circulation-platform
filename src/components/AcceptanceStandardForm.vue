@@ -215,6 +215,8 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .acceptance-standard-form {
 	width: 100%;
 }

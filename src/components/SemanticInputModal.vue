@@ -1,5 +1,5 @@
 <template>
-	<el-dialog v-model="visible" title="語意化搜尋" width="700px" :close-on-click-modal="false" @close="handleClose">
+	<el-dialog v-model="visible" title="語意化搜尋" width="min(700px, 92vw)" class="semantic-input-dialog" :close-on-click-modal="false" @close="handleClose">
 		<div class="semantic-modal-content">
 			<!-- 說明 -->
 			<div class="modal-description">
@@ -170,6 +170,7 @@ const handleClose = () => {
 		font-family: 'Consolas', 'Monaco', monospace;
 		font-size: 14px;
 		line-height: 1.6;
+		padding-bottom: 30px;
 	}
 }
 
@@ -202,8 +203,43 @@ const handleClose = () => {
 
 /* 响应式 */
 @media (max-width: 768px) {
+	.semantic-modal-content {
+		gap: 14px;
+	}
+
 	:deep(.el-dialog) {
-		width: 95% !important;
+		width: min(700px, 94vw) !important;
+		margin: 0 auto;
+	}
+
+	:deep(.el-dialog__header) {
+		padding: 14px 14px 8px;
+		margin-right: 0;
+	}
+
+	:deep(.el-dialog__body) {
+		padding: 10px 14px 14px;
+	}
+
+	:deep(.el-dialog__footer) {
+		padding: 10px 14px 14px;
+	}
+
+	:deep(.el-alert__content p) {
+		font-size: 13px;
+	}
+
+	.semantic-input {
+		:deep(textarea) {
+			font-size: 13px;
+			min-height: 120px;
+		}
+	}
+
+	.char-count {
+		font-size: 11px;
+		right: 10px;
+		bottom: 6px;
 	}
 
 	.example-buttons {
@@ -216,6 +252,17 @@ const handleClose = () => {
 
 		button {
 			width: 100%;
+		}
+	}
+
+	.dialog-footer {
+		width: 100%;
+		flex-direction: column-reverse;
+		align-items: stretch;
+
+		:deep(.el-button) {
+			width: 100%;
+			margin-left: 0;
 		}
 	}
 }

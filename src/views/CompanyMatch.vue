@@ -99,7 +99,7 @@
       <!-- 路徑卡片 - 三格一排 -->
       <div class="path-list">
         <el-row :gutter="16">
-          <el-col v-for="path in recommendedPaths" :key="path.id" :xs="24" :md="8">
+          <el-col v-for="path in recommendedPaths" :key="path.id" :xs="24" :md="8" class="path-col">
             <div class="path-card">
               <!-- 頂部色塊區 -->
               <div class="path-header">
@@ -465,7 +465,7 @@ const baseInternalPath = {
   title: '廠內處理回原製程',
   summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。',
   gradient: 'linear-gradient(160deg,#f29f3a,#e27400)',
-   accentColor: '#2da84a',
+  accentColor: '#2da84a',
   score: 94,
   steps: [
     { label: '原料購入', icon: Goods },
@@ -497,6 +497,8 @@ const goNext = (path) => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .company-match-page {
   margin: 0 auto;
   min-height: 100vh;
@@ -1094,7 +1096,7 @@ const goNext = (path) => {
 
 @media (max-width: 768px) {
   .company-match-page {
-    padding: 24px 20px 80px 20px;
+    padding: 18px 12px 88px;
     min-height: auto;
 
     &::before {
@@ -1103,6 +1105,32 @@ const goNext = (path) => {
       mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16% #000 60%);
       -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, #000 20%);
     }
+  }
+
+  .section-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .section-title-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+
+    .section-title,
+    .section-desc {
+      white-space: nowrap;
+    }
+  }
+
+  .modes-link {
+    align-self: flex-start;
+    padding-left: 0;
+  }
+
+  .path-col {
+    margin-bottom: 12px;
   }
 }
 </style>

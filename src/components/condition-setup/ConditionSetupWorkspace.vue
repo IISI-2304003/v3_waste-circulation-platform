@@ -168,7 +168,7 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>清除量（公噸）</span>
+													<span>清除量（公噸）</span>
 												</template>
 												<el-input-number v-model="store.businessConditions.clearanceAmount" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
@@ -176,7 +176,7 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>清除費用（元/公噸）</span>
+													<span>清除費用（元/公噸）</span>
 												</template>
 												<el-input-number v-model="store.businessConditions.clearanceCost" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
@@ -184,7 +184,7 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>處理量（公噸）</span>
+													<span>處理量（公噸）</span>
 												</template>
 												<el-input-number v-model="store.businessConditions.processingAmount" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
@@ -192,7 +192,7 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>處理費用（元/公噸）</span>
+													<span>處理費用（元/公噸）</span>
 												</template>
 												<el-input-number v-model="store.businessConditions.processingCost" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
