@@ -56,20 +56,6 @@
 				</li>
 			</ul>
 
-			<!-- Help card -->
-			<div class="help-card">
-				<div class="help-icon">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="12" cy="12" r="10" />
-						<path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
-						<line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3" />
-					</svg>
-				</div>
-				<div class="help-text">
-					<p class="help-title">貼心提醒</p>
-					<p class="help-sub">各項條件設定將影響分析結果，請務必確實填寫，已獲得最佳建議循環路徑!</p>
-				</div>
-			</div>
 		</div>
 	</aside>
 </template>
@@ -170,20 +156,28 @@ const completedCount = computed(() => {
 
 .step-nav {
 	width: 100%;
-	position: sticky;
-	top: 20px;
-	align-self: flex-start;
-	max-height: calc(120vh - 40px);
+	position: static;
+	max-height: 100%;
 	overflow-y: auto;
-	scrollbar-width: none;
+	scrollbar-width: thin;
+	scrollbar-color: #b8c8d8 transparent;
 
 	&::-webkit-scrollbar {
-		display: none;
+		width: 8px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #b8c8d8;
+		border-radius: 999px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: transparent;
 	}
 
 	@media (max-width: 992px) {
-		position: static;
 		max-height: none;
+		overflow-y: visible;
 	}
 }
 
@@ -321,6 +315,7 @@ const completedCount = computed(() => {
 		.step-title {
 			color: #15803d;
 			font-weight: 700;
+
 		}
 	}
 
@@ -359,7 +354,8 @@ const completedCount = computed(() => {
 }
 
 .step-btn {
-	display: flex;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
 	align-items: center;
 	gap: 10px;
 	padding: 8px;
@@ -448,12 +444,12 @@ const completedCount = computed(() => {
 }
 
 .step-title {
-	font-size: 16px;
+	font-size: 15px;
 	font-weight: 500;
 	color: #334155;
 	line-height: 1.5;
 	transition: color 0.2s ease;
-	word-break: keep-all;
+	word-break: break-word;
 }
 
 .step-badge {
@@ -478,59 +474,6 @@ const completedCount = computed(() => {
 	&.unset {
 		background: #f1f5f9;
 		color: #94a3b8;
-	}
-}
-
-.help-card {
-	margin-top: 20px;
-	background: linear-gradient(135deg, #fdf0f0, #f8fafc);
-	border: 1px solid #f7bbbb;
-	border-radius: 16px;
-	padding: 14px 12px;
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 8px;
-
-	@media (max-width: 992px) {
-		display: none;
-	}
-}
-
-.help-icon {
-	width: 34px;
-	height: 34px;
-	border-radius: 50%;
-	background: rgba(197, 34, 34, 0.12);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-
-	svg {
-		width: 18px;
-		height: 18px;
-		stroke: #c52222;
-	}
-}
-
-.help-text {
-	flex: 1;
-	min-width: 0;
-
-	.help-title {
-		font-size: 18px;
-		font-weight: 700;
-		color: #af3737;
-		margin: 0;
-		line-height: 1.3;
-	}
-
-	.help-sub {
-		font-size: 15px;
-		color: #2e2e2e;
-		margin: 0;
-		line-height: 1.3;
 	}
 }
 </style>

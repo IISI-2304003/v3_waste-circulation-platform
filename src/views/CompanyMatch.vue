@@ -39,38 +39,32 @@
 
             </div>
           </el-col>
-          <el-col :xs="24" :md="12">
+          <el-col :xs="24" :md="11">
 
             <div class="banner-summary">
               <div class="summary-title">您本次條件分析</div>
               <div class="summary-list">
                 <div class="summary-row" v-for="item in conditionSummary" :key="item.id">
-                  <el-row :gutter="24">
-                    <el-col xs="24" :md="2">
-                      <div class="summary-icon" :style="{ color: item.color }">
-                        <el-icon>
-                          <component :is="item.icon" />
-                        </el-icon>
-                      </div>
-                    </el-col>
-                    <el-col xs="24" :md="7">
+                  <div class="summary-item-grid">
+                    <div class="summary-icon" :style="{ color: item.color }">
+                      <el-icon>
+                        <component :is="item.icon" />
+                      </el-icon>
+                    </div>
+                    <div class="summary-main">
                       <div class="summary-label">{{ item.label }}</div>
-                    </el-col>
-                    <el-col xs="24" :md="12">
                       <div class="summary-value">{{ item.value }}</div>
-                    </el-col>
-                    <el-col xs="24" :md="3">
-                      <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
-                        <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
-                        <span class="impact-label">{{ item.levelLabel }}</span>
-                      </div>
-                    </el-col>
-                  </el-row>
+                    </div>
+                    <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
+                      <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
+                      <span class="impact-label">{{ item.levelLabel }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </el-col>
-          <el-col :xs="24" :md="7">
+          <el-col :xs="24" :md="8" style="padding: 0px;">
             <div class="banner-radar">
               <v-chart :option="radarOption" autoresize class="radar-chart" />
             </div>
@@ -89,7 +83,7 @@
             <span class="section-desc">依據您的條件，為您推薦最適合的三種循環路徑</span>
           </div>
         </div>
-        <el-button text type="primary" class="modes-link">
+        <el-button text type="primary" class="modes-link" @click="openModesDialog">
           <el-icon>
             <WarningFilled />
           </el-icon>查看十大循環模式說明
@@ -145,7 +139,7 @@
                       {{ path.matchRate }} <span class="stat-unit" :style="{ color: path.accentColor }">家</span>
                     </span>
                   </div>
-                  <el-button text type="primary" class="detail-link" @click="goNext(path)">
+                  <el-button type="primary" class="detail-btn" @click="goNext(path)">
                     技術媒合推薦
                     <el-icon class="el-icon--right">
                       <ArrowRight />
@@ -158,27 +152,6 @@
           </el-col>
         </el-row>
       </div>
-
-      <!-- 媒合分析依據 -->
-      <!-- <div class="analysis-basis">
-        <div class="basis-header">
-          <div class="section-bar"></div>
-          <span class="section-title">媒合分析依據</span>
-          <span class="section-desc">系統依據您設定的條件進行綜合評估</span>
-        </div>
-        <div class="basis-grid">
-          <div v-for="item in analysisItems" :key="item.label" class="basis-card">
-            <div class="basis-icon-row">
-              <el-icon :style="{ color: item.color }">
-                <component :is="item.icon" />
-              </el-icon>
-              <span class="basis-label" :style="{ color: item.color }">{{ item.label }}</span>
-            </div>
-            <div class="basis-score" :style="{ color: item.score === '－' ? '#b0bec5' : '#1a2e2b' }">{{ item.score }}</div>
-            <p class="basis-desc">{{ item.desc }}</p>
-          </div>
-        </div>
-      </div> -->
     </div>
 
     <!-- 底部導航 -->
@@ -189,6 +162,7 @@
         </el-icon>
         上一步：條件設定
       </el-button>
+      <div class="footer-hint">請先點選上方任一推薦路徑卡片的「技術媒合推薦」，即可進入下一步。</div>
       <!-- <el-button type="primary" @click="goNext">
         下一步：技術媒合推薦
         <el-icon class="el-icon--right">
@@ -196,11 +170,58 @@
         </el-icon>
       </el-button> -->
     </div>
+
+    <el-dialog v-model="modesDialogVisible" class="top-modes-dialog" width="min(1080px, 94vw)" align-center destroy-on-close>
+      <template #header>
+        <div class="modes-dialog-header">
+          <h3>十大循環模式說明</h3>
+        </div>
+      </template>
+
+      <div class="modes-dialog-body" v-if="activeMode">
+        <aside class="modes-dialog-list">
+          <button v-for="mode in allCirculationModes" :key="mode.id" type="button" class="mode-list-item" :class="{ active: mode.id === activeModeId }" @click="activeModeId = mode.id">
+            <span class="mode-dot" :style="{ background: mode.color || '#26a69a' }"></span>
+            <span class="mode-list-name">{{ mode.name }}</span>
+          </button>
+        </aside>
+
+        <section class="modes-dialog-detail">
+          <div class="detail-title-row">
+            <span class="detail-mode-name">{{ activeMode.name }}</span>
+          </div>
+
+          <div class="detail-section">
+            <h4>模式說明</h4>
+            <p>{{ activeMode.description || '尚無說明資料。' }}</p>
+          </div>
+
+          <div class="detail-section" v-if="activeMode.flowchartUrl">
+            <h4>循環流程圖</h4>
+            <div class="flowchart-box">
+              <img :src="activeMode.flowchartUrl" :alt="activeMode.flowchartAlt || activeMode.name" />
+            </div>
+          </div>
+
+          <!-- <div class="detail-section" v-if="activeModeSteps.length">
+            <h4>流程節點</h4>
+            <div class="steps-wrap">
+              <span v-for="step in activeModeSteps" :key="step.label" class="step-tag">{{ step.label }}</span>
+            </div>
+          </div> -->
+
+          <div class="detail-section">
+            <h4>填報注意事項</h4>
+            <p class="notices-text">{{ activeMode.notices || '尚無注意事項資料。' }}</p>
+          </div>
+        </section>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { use } from 'echarts/core'
 import { RadarChart } from 'echarts/charts'
@@ -221,10 +242,18 @@ import {
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import circulationModes from '@/data/circulationModes.json'
 // import { b } from 'vue-router/dist/index-CzEDAlw7.js'
 
 const router = useRouter()
 const store = useConditionSetupStore()
+const modesDialogVisible = ref(false)
+const activeModeId = ref(1)
+const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1440)
+
+const updateViewportWidth = () => {
+  viewportWidth.value = window.innerWidth
+}
 
 const industryLabelMap = {
   semiconductor: '電子與半導體',
@@ -258,6 +287,15 @@ const getImpactLevel = (condition) => {
 }
 
 const toRadarScore = (level) => IMPACT_LEVEL_SCORE_MAP[level] || 0
+
+// 雷達圖「軸標籤文字內容」換行規則。
+// 想調整每行切幾個字，改這裡的 slice 範圍。
+const formatRadarIndicatorName = (label = '') => {
+  const text = String(label)
+  if (text.length <= 5) return text
+  if (text.length <= 10) return `${text.slice(0, 4)}\n${text.slice(4)}`
+  return `${text.slice(0, 4)}\n${text.slice(4, 8)}\n${text.slice(8)}`
+}
 
 const conditionSummary = computed(() => {
   // 計算每個條件的設定程度和評分
@@ -338,38 +376,84 @@ const conditionSummary = computed(() => {
 
 const radarSeriesValues = computed(() => conditionSummary.value.map((item) => toRadarScore(item.level)))
 
+const radarResponsiveConfig = computed(() => {
+  const width = viewportWidth.value
+
+  if (width <= 576) {
+    return {
+      centerX: '48%',
+      centerY: '54%',
+      radius: '46%',
+      nameGap: 6,
+      axisNameFontSize: 12,
+      axisNameLineHeight: 14,
+      symbolSize: { high: 7, medium: 6, low: 4 }
+    }
+  }
+
+  if (width <= 992) {
+    return {
+      centerX: '47%',
+      centerY: '53%',
+      radius: '52%',
+      nameGap: 7,
+      axisNameFontSize: 13,
+      axisNameLineHeight: 15,
+      symbolSize: { high: 9, medium: 7, low: 5 }
+    }
+  }
+
+  return {
+    centerX: '47%',
+    centerY: '52%',
+    radius: '56%',
+    nameGap: 8,
+    axisNameFontSize: 14,
+    axisNameLineHeight: 16,
+    symbolSize: { high: 10, medium: 7, low: 5 }
+  }
+})
+
 // ★ 新增：ECharts 雷達圖 option（替換原本的 radarPoints computed）
 const radarOption = computed(() => ({
-  tooltip: {
-    trigger: 'item',
-    formatter: () => {
-      return conditionSummary.value
-        .map((item) => {
-          const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${item.color};margin-right:6px;"></span>`
-          return `${dot}<span style="color:#2d554a;font-weight:600">${item.label}</span>：<span style="color:${item.color};font-weight:700">${item.levelLabel}影響</span>`
-        })
-        .join('<br/>')
-    },
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderColor: '#e4ecea',
-    borderWidth: 1,
-    textStyle: {
-      fontSize: 12,
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', sans-serif"
-    },
-    padding: [10, 14]
-  },
+  // tooltip: {
+  //   trigger: 'item',
+  //   formatter: () => {
+  //     return conditionSummary.value
+  //       .map((item) => {
+  //         const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${item.color};margin-right:6px;"></span>`
+  //         return `${dot}<span style="color:#2d554a;font-weight:600">${item.label}</span>：<span style="color:${item.color};font-weight:700">${item.levelLabel}影響</span>`
+  //       })
+  //       .join('<br/>')
+  //   },
+  //   backgroundColor: 'rgba(255,255,255,0.95)',
+  //   borderColor: '#e4ecea',
+  //   borderWidth: 1,
+  //   textStyle: {
+  //     // tooltip 內文文字大小
+  //     fontSize: 12,
+  //     fontFamily: "-apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', sans-serif"
+  //   },
+  //   padding: [10, 14]
+  // },
   radar: {
+    // indicator.name 決定雷達圖外圈標籤文字內容
     indicator: conditionSummary.value.map(item => ({
-      name: item.label,
+      name: formatRadarIndicatorName(item.label),
       max: 100
     })),
-    center: ['50%', '50%'],
-    radius: '68%',
+    center: [radarResponsiveConfig.value.centerX, radarResponsiveConfig.value.centerY],
+    // radius 控制雷達圖本體大小（越大越靠近外圈文字）
+    radius: radarResponsiveConfig.value.radius,
+    // nameGap 控制「外圈文字」與「雷達圖」的距離
+    nameGap: radarResponsiveConfig.value.nameGap,
     axisName: {
       color: '#5d7772',
-      fontSize: 11,
+      // 外圈標籤字級
+      fontSize: radarResponsiveConfig.value.axisNameFontSize,
       fontWeight: 600,
+      // 外圈標籤行距（多行文字可讀性）
+      lineHeight: radarResponsiveConfig.value.axisNameLineHeight,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', sans-serif"
     },
     splitLine: {
@@ -401,7 +485,11 @@ const radarOption = computed(() => ({
     ...conditionSummary.value.map((item, index) => {
       // 只在該頂點位置放值，其餘補 null
       const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : null)
-      const size = item.level === 'high' ? 10 : item.level === 'medium' ? 7 : 5
+      const size = item.level === 'high'
+        ? radarResponsiveConfig.value.symbolSize.high
+        : item.level === 'medium'
+          ? radarResponsiveConfig.value.symbolSize.medium
+          : radarResponsiveConfig.value.symbolSize.low
       return {
         type: 'radar',
         data: [{
@@ -485,6 +573,27 @@ const recommendedPaths = computed(() => {
   return withRank(baseExternalPaths)
 })
 
+const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
+
+const allCirculationModes = computed(() => circulationModes)
+
+const preferredModeId = computed(() => {
+  const currentModeName = normalizeModeName(recommendedPaths.value?.[0]?.modeName)
+  const matched = allCirculationModes.value.find((mode) => normalizeModeName(mode.name) === currentModeName)
+  return matched?.id || allCirculationModes.value?.[0]?.id || 1
+})
+
+const activeMode = computed(() => {
+  return allCirculationModes.value.find((mode) => mode.id === activeModeId.value) || allCirculationModes.value[0] || null
+})
+
+const activeModeSteps = computed(() => activeMode.value?.steps || activeMode.value?.step || [])
+
+const openModesDialog = () => {
+  activeModeId.value = preferredModeId.value
+  modesDialogVisible.value = true
+}
+
 const goPrevious = () => router.push('/standard-input')
 const goBackHome = () => {
   store.resetAll()
@@ -494,6 +603,14 @@ const goNext = (path) => {
   store.setSelectedRecommendedPath(path)
   router.push('/technology-match')
 }
+
+onMounted(() => {
+  window.addEventListener('resize', updateViewportWidth)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateViewportWidth)
+})
 </script>
 
 <style scoped lang="scss">
@@ -549,8 +666,7 @@ const goNext = (path) => {
   padding: 24px 24px;
 
   .header-row {
-    text-align: center;
-    margin-top: 50px;
+    text-align: left;
 
     h1 {
       margin: 0;
@@ -571,6 +687,10 @@ const goNext = (path) => {
 .back-btn {
   color: #5d7772;
   font-size: 14px;
+}
+
+.header-title {
+  text-align: left;
 }
 
 /* ─── Analysis Banner ─── */
@@ -712,6 +832,20 @@ const goNext = (path) => {
     align-items: center;
     gap: 10px;
 
+    .summary-item-grid {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .summary-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
     .summary-icon {
       width: 26px;
       height: 26px;
@@ -726,13 +860,13 @@ const goNext = (path) => {
 
 
     .summary-label {
-      font-size: clamp(14px, 0.898rem + 0.49vw, 16px);
+      font-size: clamp(15px, 0.898rem + 0.49vw, 16px);
       color: #1a2e2b;
       font-weight: 700;
     }
 
     .summary-value {
-      font-size: clamp(12px, 0.898rem + 0.49vw, 14px);
+      font-size: clamp(15px, 0.898rem + 0.49vw, 16px);
       color: #4caf50;
       font-weight: 600;
 
@@ -774,11 +908,13 @@ const goNext = (path) => {
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-width: 0;
+  padding: 0 clamp(10px, 1.6vw, 22px);
 
   .radar-chart {
     width: 100%;
-    height: 280px;
-    max-width: 320px;
+    height: clamp(320px, 36vw, 520px);
+    overflow: visible;
   }
 }
 
@@ -843,12 +979,21 @@ const goNext = (path) => {
 
 .path-list {
   width: 100%;
+
+  :deep(.el-row) {
+    align-items: stretch;
+  }
+}
+
+.path-col {
+  display: flex;
 }
 
 .path-card {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -878,6 +1023,7 @@ const goNext = (path) => {
   background: #fff;
   display: flex;
   flex-direction: column;
+  flex: 1;
 
   .path-intro {
     min-height: 50px;
@@ -971,6 +1117,7 @@ const goNext = (path) => {
 .path-stats {
   display: flex;
   gap: 0;
+  margin-top: auto;
   border-top: 1px solid #f0f0f0;
   padding-top: 12px;
   margin-bottom: 12px;
@@ -1000,10 +1147,20 @@ const goNext = (path) => {
   }
 }
 
-.detail-link {
+.detail-btn {
   align-self: flex-end;
   margin-top: auto;
   font-size: 15px;
+  font-weight: 700;
+  border: none;
+  background: linear-gradient(135deg, #4caf50, #26a69a);
+  color: #fff;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, #58b85c, #30b3a8);
+    color: #fff;
+  }
 }
 
 /* ─── Analysis Basis ─── */
@@ -1064,8 +1221,9 @@ const goNext = (path) => {
   margin: 20px 18px 0;
   padding: 12px 16px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
+  gap: 16px;
   position: sticky;
   bottom: 14px;
   z-index: 9;
@@ -1076,10 +1234,180 @@ const goNext = (path) => {
   border-radius: 20px;
 }
 
+.footer-hint {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3f5f59;
+  line-height: 1.5;
+  margin-left: auto;
+  text-align: right;
+}
+
 .footer-prev-btn {
   color: #4a6a65;
   border-color: #c8d8d5;
   font-weight: 600;
+}
+
+.top-modes-dialog {
+  :deep(.el-dialog) {
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(239, 248, 255, 0.9));
+    box-shadow: 0 20px 52px rgba(53, 93, 83, 0.2);
+  }
+
+  :deep(.el-dialog__header) {
+    margin: 0;
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid rgba(193, 214, 210, 0.5);
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px;
+  }
+}
+
+.modes-dialog-header {
+  h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #214a43;
+  }
+
+  p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #5e7a75;
+  }
+}
+
+.modes-dialog-body {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 62vh;
+}
+
+.modes-dialog-list {
+  border: 1px solid rgba(194, 216, 212, 0.6);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px;
+  overflow: auto;
+}
+
+.mode-list-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #2b4e47;
+  font-size: 15px;
+  font-weight: 600;
+
+  &:hover {
+    background: rgba(76, 175, 80, 0.1);
+  }
+
+  &.active {
+    background: rgba(76, 175, 80, 0.14);
+    color: #1f6e46;
+  }
+}
+
+.mode-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.modes-dialog-detail {
+  border: 1px solid rgba(194, 216, 212, 0.6);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.84);
+  padding: 14px 16px;
+  overflow: auto;
+}
+
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.detail-mode-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f4f49;
+}
+
+.detail-mode-chip {
+  border: 1px solid;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detail-section {
+  margin-top: 12px;
+
+  h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: #2a5a52;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3f625d;
+  }
+}
+
+.flowchart-box {
+  border-radius: 12px;
+  border: 1px dashed rgba(168, 200, 192, 0.8);
+  background: #fff;
+  padding: 10px;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.steps-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.step-tag {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d655d;
+  border: 1px solid rgba(102, 169, 155, 0.4);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(213, 244, 236, 0.65);
+}
+
+.notices-text {
+  white-space: pre-line;
 }
 
 .footer-next-btn {
@@ -1107,6 +1435,73 @@ const goNext = (path) => {
     }
   }
 
+  .header-title {
+    text-align: center;
+  }
+
+  .analysis-banner {
+    padding: 14px 12px;
+  }
+
+  .banner-summary {
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid #e4ecea;
+    border-bottom: 1px solid #e4ecea;
+    margin-top: 8px;
+    padding: 12px 0;
+
+    .summary-title {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .summary-list {
+      gap: 10px;
+    }
+
+    .summary-row {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(217, 231, 227, 0.9);
+
+      .summary-item-grid {
+        grid-template-columns: 22px minmax(0, 1fr) auto;
+        gap: 8px;
+      }
+
+      .summary-main {
+        gap: 4px;
+      }
+
+      .summary-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+      }
+
+      .summary-label {
+        font-size: 13px;
+      }
+
+      .summary-value {
+        font-size: 14px;
+        line-height: 1.35;
+      }
+
+      .summary-impact-tag {
+        grid-column: auto;
+        justify-self: end;
+        align-self: center;
+        margin-left: 4px;
+        margin-top: 0;
+        font-size: 11px;
+        padding: 3px 9px;
+      }
+    }
+  }
+
   .section-header-row {
     flex-direction: column;
     align-items: flex-start;
@@ -1131,6 +1526,40 @@ const goNext = (path) => {
 
   .path-col {
     margin-bottom: 12px;
+  }
+
+  .page-footer-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .footer-hint {
+    font-size: 13px;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .footer-prev-btn {
+    width: 100%;
+  }
+
+  .modes-dialog-body {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .modes-dialog-list {
+    max-height: 220px;
+  }
+
+  .detail-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detail-mode-name {
+    font-size: 20px;
   }
 }
 </style>

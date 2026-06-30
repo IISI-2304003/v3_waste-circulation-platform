@@ -94,7 +94,7 @@ const nodeClass = (id) => ({
 .node-label {
 	margin: 0;
 	text-align: center;
-	font-size: clamp(0.938rem, 0.874rem + 0.3vw, 1.25rem);
+	font-size: clamp(1rem, 0.949rem + 0.24vw, 1.25rem);
 	color: #6d7e7b;
 	letter-spacing: 0.2px;
 	line-height: 1.4;
@@ -145,23 +145,67 @@ const nodeClass = (id) => ({
 
 @media (max-width: 1100px) {
 	.flow-step-progress {
-		grid-template-columns: 1fr;
-		gap: 14px;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 10px;
+		padding: 14px 12px;
 	}
 
 	.flow-node-wrap {
-		flex-direction: row;
-		justify-content: flex-start;
-		gap: 12px;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
 	}
 
 	.flow-link {
-		display: none;
+		display: block;
+		top: 20px;
+		right: -12px;
+		width: 24px;
 	}
 
 	.node-label {
-		text-align: left;
+		text-align: center;
 		font-size: 13px;
+		line-height: 1.3;
+		font-weight: 600;
+	}
+}
+
+@media (max-width: 768px) {
+	.flow-step-progress {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+		padding: 12px 10px;
+	}
+
+	.flow-node-wrap {
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.flow-node {
+		width: 38px;
+		height: 38px;
+		font-size: 14px;
+
+		&.active {
+			transform: scale(1.06);
+		}
+	}
+
+	.flow-link {
+		display: block;
+		top: 18px;
+		right: -12px;
+		width: 24px;
+	}
+
+	.node-label {
+		text-align: center;
+		font-size: 12px;
+		line-height: 1.25;
+		font-weight: 600;
 	}
 }
 </style>

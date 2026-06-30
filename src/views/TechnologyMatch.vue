@@ -56,7 +56,7 @@
 								<Orange />
 							</el-icon></div>
 						<h2>推薦循環模式</h2>
-						<a class="mode-explain-link">查看模式說明 ›</a>
+						<a class="mode-explain-link" @click.prevent="openModeExplainDialog">查看模式說明 ›</a>
 					</div>
 					<div class="mode-title-row">
 						<span class="mode-badge">{{ selectedMode.modeName }}</span>
@@ -115,7 +115,7 @@
 
 				<div class="supplier-list">
 					<el-row :gutter="16">
-						<el-col v-for="(vendor, index) in pagedVendors" :key="vendor.id" :span="12" style="margin-bottom: 16px" :xs="24" :sm="12">
+						<el-col v-for="(vendor, index) in pagedVendors" :key="vendor.id" style="margin-bottom: 16px" :xs="24" :sm="24">
 							<article class="supplier-card" role="button" tabindex="0">
 								<!-- 左側：排名 + 圖片 -->
 								<div class="card-left">
@@ -201,6 +201,24 @@
 													<span class="capacity-text">{{ vendor.capacityLevelText }}</span>
 												</div>
 
+											</div>
+										</div>
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Box />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">事業管制編號</p>
+												<p class="meta-text">{{ vendor.controlNo }}</p>
+											</div>
+										</div>
+										<div class="meta-item">
+											<span class="meta-icon"><el-icon>
+													<Box />
+												</el-icon></span>
+											<div>
+												<p class="meta-title">有效許可期限</p>
+												<p class="meta-text">{{ vendor.validityPeriod }}</p>
 											</div>
 										</div>
 									</div>
@@ -412,13 +430,15 @@
 					上一步 : 循環路徑推薦
 				</el-button>
 				<!-- //下載完整報告 -->
-				<el-button size="large" type="primary" @click="exportFullReportPdf">
+				<el-button size="large" type="primary" class="detail-btn" @click="exportFullReportPdf">
 					<el-icon class="el-icon--left">
 						<Download />
 					</el-icon>
 					下載完整報告
 				</el-button>
 			</div>
+
+			<CirculationModal v-model="modeDialogVisible" :mode="selectedModeDetail" />
 		</div>
 	</div>
 </template>
@@ -427,6 +447,8 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import CirculationModal from '@/components/CirculationModal.vue'
+import circulationModesData from '@/data/circulationModes.json'
 import {
 	ArrowLeft, ArrowRight, Monitor,
 	Connection, DataAnalysis, Files, Finished,
@@ -443,6 +465,7 @@ const currentPage = ref(1)
 const pageSize = 4
 const detailDialogVisible = ref(false)
 const activeVendor = ref(null)
+const modeDialogVisible = ref(false)
 
 const industryLabelMap = {
 	semiconductor: '電子與半導體',
@@ -547,6 +570,17 @@ const selectedMode = computed(() => {
 	}
 })
 
+const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
+
+const selectedModeDetail = computed(() => {
+	const targetModeName = normalizeModeName(selectedMode.value?.modeName)
+	return circulationModesData.find((mode) => normalizeModeName(mode.name) === targetModeName) || null
+})
+
+const openModeExplainDialog = () => {
+	modeDialogVisible.value = true
+}
+
 // 根據等級與點的索引，返回對應的 CSS 類別
 const getDotClass = (level, dotIndex) => {
 	if (dotIndex > level) return 'inactive'
@@ -568,7 +602,7 @@ const vendors = [
 	{ id: 1, name: '鴻成科技有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 12, product: '稀硫酸(65%以下)', capacity: 3200, score: 95, controlNo: 'D2876543', location: '桃園市', reuseTech: '酸洗廢液純化、濃縮再製與循環回用', acceptanceStandards: ['pH 2.0 - 6.0', '含固量 < 15%', '金屬雜質符合批次規範'], processUnits: ['前處理槽', '蒸餾純化單元', '濃縮再製單元'], qualityStandards: ['批次檢驗報告', '出貨前抽驗', 'ISO 14001 流程管理'], salesTargetIndustries: ['化工原料', '電子材料', '金屬表面處理'], contactPhone: '03-1234-5678', factoryAddress: '桃園市觀音區工業路 88 號', image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=960&q=80', previousMonthReceived: 3000, validityPeriod: '2026-12-31', reasons: ['允收條件符合', '距離最近', '具再利用機構資格'], reasonText: '本公司具備高純化能力與穩定出貨紀錄，適合依現有允收條件直接導入。', capacityLevel: 1, capacityLevelText: '低' },
 	{ id: 2, name: '盈昌科技工業股份有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 18, product: '工業用稀硫酸(50~60%)', capacity: 2400, score: 91, controlNo: 'D3209843', location: '台南市', reuseTech: '稀硫酸回收、再生濃縮與品質調整', acceptanceStandards: ['酸鹼值符合回收規格', '含水率 < 20%', '雜質含量低於上限'], processUnits: ['收料暫存槽', '再生處理單元', '品質調整單元'], qualityStandards: ['批次分析報告', '檢驗留樣制度', '製程參數紀錄'], salesTargetIndustries: ['化工原料', '電鍍材料', '工業清洗'], contactPhone: '06-2345-6789', factoryAddress: '台南市永康區環工路 12 號', image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '具備穩定批次控制能力，適合需要持續供應與快速補貨的情境。', previousMonthReceived: 2000, validityPeriod: '2028-06-30', capacityLevel: 2, capacityLevelText: '中' },
 	{ id: 3, name: '貝民股份有限公司台中港廠', category: '化學材料製造業', wasteReuse: 'C-0202', isReuseOrg: true, distance: 26, product: '電子級硫酸', capacity: 3200, score: 93, controlNo: 'D3209843', location: '台中市', reuseTech: '高純度硫酸再生、分級純化與電子級製程支援', acceptanceStandards: ['低金屬離子含量', '純度符合電子級需求', '批次波動控制'], processUnits: ['精餾單元', '分子篩純化單元', '終端過濾單元'], qualityStandards: ['電子級檢測報告', '進料與出貨雙向查核', '製程 SOP 管控'], salesTargetIndustries: ['半導體', '電子材料', '精密化工'], contactPhone: '04-2468-1357', factoryAddress: '台中市梧棲區港埠路 101 號', image: 'https://images.unsplash.com/photo-1513828742140-ccaa28f3eda0?auto=format&fit=crop&w=960&q=80', reasons: ['最大再利用量', '距離最近'], reasonText: '能承接較大量且高純度需求，適合對電子級品質要求較高的製程。', previousMonthReceived: 2500, validityPeriod: '2027-03-31', capacityLevel: 1, capacityLevelText: '低' },
-	{ id: 4, name: '光宇應用材料股份有限公司', category: '化學品再生', wasteReuse: 'C-0202', isReuseOrg: false, distance: 34, product: '稀硫酸', capacity: 2200, score: 86, controlNo: 'D9202688', location: '高雄市', reuseTech: '稀硫酸回收與濃度微調再製', acceptanceStandards: ['濃度落在再利用範圍', '酸鹼值符合入料規格', '懸浮物低於管制值'], processUnits: ['前處理區', '濃縮回收區', '成品調整區'], qualityStandards: ['化驗報告追蹤', '批次標示管理', '出貨前複檢'], salesTargetIndustries: ['化工原料', '工業清洗', '表面處理'], contactPhone: '07-3698-2584', factoryAddress: '高雄市小港區海工一路 36 號', image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '可作為中距離備援供應來源，適合兼顧成本與供應穩定性。', previousMonthReceived: 1800, validityPeriod: '2028-11-30', capacityLevel: 2, capacityLevelText: '中' },
+	{ id: 4, name: '光宇應用材料股份有限公司', category: '公民營廢棄物處理及清理機構', wasteReuse: 'C-0202', isReuseOrg: false, distance: 34, product: '稀硫酸', capacity: 2200, score: 86, controlNo: 'D9202688', location: '高雄市', reuseTech: '稀硫酸回收與濃度微調再製', acceptanceStandards: ['濃度落在再利用範圍', '酸鹼值符合入料規格', '懸浮物低於管制值'], processUnits: ['前處理區', '濃縮回收區', '成品調整區'], qualityStandards: ['化驗報告追蹤', '批次標示管理', '出貨前複檢'], salesTargetIndustries: ['化工原料', '工業清洗', '表面處理'], contactPhone: '07-3698-2584', factoryAddress: '高雄市小港區海工一路 36 號', image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '可作為中距離備援供應來源，適合兼顧成本與供應穩定性。', previousMonthReceived: 1800, validityPeriod: '2028-11-30', capacityLevel: 2, capacityLevelText: '中' },
 	{ id: 5, name: '遠見循環科技有限公司', category: '材料再製', wasteReuse: 'C-0202', isReuseOrg: true, distance: 42, product: '再生鹽類原料', capacity: 700, score: 80, controlNo: 'D8801122', location: '高雄市', reuseTech: '再生鹽類回收、濃縮與再製供應', acceptanceStandards: ['鹽類純度符合再製門檻', '含水率 < 10%', '雜質需低於批次上限'], processUnits: ['蒸發濃縮單元', '結晶分離單元', '乾燥包裝單元'], qualityStandards: ['批次純度檢驗', '留樣保存制度', '出貨文件齊備'], salesTargetIndustries: ['化工原料', '電池材料', '工業製程'], contactPhone: '07-7788-9900', factoryAddress: '高雄市大社區再生路 18 號', image: 'https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合'], reasonText: '適合中長距離供應與多樣化客戶銷售配置，具備擴量潛力。', previousMonthReceived: 600, validityPeriod: '2029-05-31', capacityLevel: 3, capacityLevelText: '高' }
 ]
 
@@ -739,8 +773,7 @@ const goBackHome = () => {
 	padding: 24px 24px;
 
 	.header-row {
-		text-align: center;
-		margin-top: 50px;
+		text-align: left;
 
 		h1 {
 			margin: 0;
@@ -764,8 +797,7 @@ const goBackHome = () => {
 }
 
 .header-title {
-	flex: 1;
-	text-align: center;
+	text-align: left;
 
 	h1 {
 		margin: 0;
@@ -831,18 +863,12 @@ const goBackHome = () => {
 }
 
 .mode-panel-inner {
-	.section-header {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		margin-bottom: 14px;
-
-		h2 {
-			flex: 1;
-		}
-	}
-
 	.mode-explain-link {
+		margin-left: auto;
+		align-self: center;
+		display: inline-flex;
+		margin-top: 0;
+		margin-bottom: 0;
 		font-size: 16px;
 		color: #3a8fd8;
 		cursor: pointer;
@@ -1272,7 +1298,7 @@ const goBackHome = () => {
 	// Meta 資訊 3欄
 	.meta-grid {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(4, 1fr);
 		gap: 0px 20px;
 		min-height: 130px;
 
@@ -1392,7 +1418,7 @@ const goBackHome = () => {
 
 		.detail-btn {
 			flex-shrink: 0;
-			padding: 8px 10px;
+			padding: 4px 10px;
 			border: 1.5px solid #1a73e8;
 			border-radius: 8px;
 			background: #fff;
@@ -1731,7 +1757,7 @@ const goBackHome = () => {
 }
 
 .detail-tag {
-	padding: 6px 10px;
+	padding: 2px 10px;
 	border-radius: 999px;
 	font-size: 15px;
 	font-weight: 700;
@@ -1823,6 +1849,22 @@ const goBackHome = () => {
 	justify-content: space-between;
 }
 
+.detail-btn {
+	align-self: flex-end;
+	margin-top: auto;
+	font-size: 15px;
+	font-weight: 700;
+	border: none;
+	background: linear-gradient(135deg, #4caf50, #26a69a);
+	color: #fff;
+
+	&:hover,
+	&:focus {
+		background: linear-gradient(135deg, #58b85c, #30b3a8);
+		color: #fff;
+	}
+}
+
 @media (max-width: 1200px) {
 	.summary-grid {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1832,9 +1874,9 @@ const goBackHome = () => {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	.flow-arrow {
-		display: none;
-	}
+	// .flow-arrow {
+	// 	display: none;
+	// }
 
 	.supplier-card {
 		.card-left {
@@ -1846,7 +1888,7 @@ const goBackHome = () => {
 		}
 
 		.meta-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 			gap: 8px 12px;
 			min-height: auto;
 		}
@@ -1911,8 +1953,16 @@ const goBackHome = () => {
 	.section-header,
 	.suppliers-header {
 		flex-direction: column;
-		align-items: flex-start;
-		gap: 10px;
+	}
+
+	.section-header {
+		flex-direction: row;
+		align-items: center;
+		gap: 12px;
+
+		h2 {
+			white-space: nowrap;
+		}
 	}
 
 	.summary-mode-row {

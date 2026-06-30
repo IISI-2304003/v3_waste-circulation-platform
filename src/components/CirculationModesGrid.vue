@@ -86,8 +86,12 @@ const gridMetrics = ref({
 
 let gridResizeObserver = null
 
-const BASE_GRID_SIZE = 500
+// 基準畫布尺寸（所有縮放的基準值）。
+// 想讓整體更大/更小可先調這個數字，再搭配 gridScale 的上下限微調。
+const BASE_GRID_SIZE = 700
 
+// 取得容器寬度與 viewport 尺寸。
+// 這些數值會影響：整體縮放比例、最小高度、圓周半徑。
 const updateGridMetrics = () => {
 	gridMetrics.value = {
 		width: gridRef.value?.clientWidth || 0,
@@ -96,6 +100,12 @@ const updateGridMetrics = () => {
 	}
 }
 
+// 控制「十大循環圖整體大小」的核心函式。
+// 可調整重點：
+// 1) horizontalReserve / verticalReserve：預留空間（避免被頁面上下左右擠壓）
+// 2) widthScale / heightScale 下限 0.56：最小縮放
+// 3) laptopBoost：不同螢幕額外放大倍率
+// 4) 最後回傳的上限 1.42：最大縮放
 const gridScale = computed(() => {
 	const availableWidth = gridMetrics.value.width || 720
 	const viewportWidth = gridMetrics.value.viewportWidth || 1366
@@ -104,14 +114,26 @@ const gridScale = computed(() => {
 	const verticalReserve = availableWidth < 969 ? 250 : 210
 	const widthScale = Math.max((availableWidth - horizontalReserve) / BASE_GRID_SIZE, 0.56)
 	const heightScale = Math.max((viewportHeight - verticalReserve) / BASE_GRID_SIZE, 0.56)
-	const laptopBoost = viewportWidth >= 1800 ? 0.03 : viewportWidth >= 1200 && viewportWidth < 1800 ? 0.2 : viewportWidth >= 992 ? 0.06 : 0.2
+	const laptopBoost = viewportWidth >= 1800 ? 0.03 : viewportWidth >= 1200 && viewportWidth < 1800 ? 0.2 : viewportWidth >= 992 ? 0.08 : 0.2
 	return Math.min(Math.max(Math.min(widthScale, heightScale) + laptopBoost, 0.56), 1.42)
 })
 
+// 將縮放結果寫入 CSS 變數，並同步控制區塊最小高度。
+// minHeight 的 56 / 380 可用來調整下方留白與最小可視高度。
 const gridStyle = computed(() => ({
 	'--grid-scale': gridScale.value.toFixed(3),
 	minHeight: `${Math.max(Math.round(BASE_GRID_SIZE * gridScale.value) + 56, 380)}px`
 }))
+
+// 控制「外圈模式點離中心多遠」：數值越大越發散。
+// 若要調整十大模式的圓周擴散程度，改這裡最直接。
+const orbitRadius = computed(() => {
+	const viewportWidth = gridMetrics.value.viewportWidth || 1366
+	if (viewportWidth <= 576) return 200
+	if (viewportWidth <= 968) return 215
+	if (viewportWidth >= 1600) return 250
+	return 225
+})
 
 // 圖標映射
 const iconMap = {
@@ -151,8 +173,8 @@ const getShortName = (name) => {
 // 計算圓形位置（10個點均勻分布在圓周上）
 const getModePosition = (index) => {
 	const totalModes = 10
-	const angle = (index * 360 / totalModes) - 90 // -90度使第一個圖標在頂部
-	const radius = 190 // 圓形半徑（像素）
+	const angle = (index * 360 / totalModes) - 90 // -90 度：第一個模式顯示在正上方
+	const radius = orbitRadius.value // 半徑來源：orbitRadius（控制發散距離）
 
 	const radian = (angle * Math.PI) / 180
 	const x = radius * Math.cos(radian)
@@ -201,6 +223,8 @@ onBeforeUnmount(() => {
 
 .circulation-modes-grid {
 	--grid-scale: 1;
+	/* 控制整個圓圖左右位移：負值往左，正值往右 */
+	--grid-offset-x: -70px;
 	width: 100%;
 	padding: 0;
 	position: relative;
@@ -217,7 +241,7 @@ onBeforeUnmount(() => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transform: scale(var(--grid-scale));
+	transform: translateX(var(--grid-offset-x)) scale(var(--grid-scale));
 	transform-origin: center center;
 
 	/* 中央地球循環圖 */
@@ -382,7 +406,8 @@ onBeforeUnmount(() => {
 }
 
 .mode-name {
-	font-size: clamp(12px, 0.75vw, 16px);
+	/* 桌面版模式名稱字級：想放大/縮小標籤文字改這裡 */
+	font-size: clamp(20px, 0.75vw, 18px);
 	color: #2C3E50;
 	font-weight: 600;
 	text-align: center;
@@ -414,8 +439,8 @@ onBeforeUnmount(() => {
 /* 卡片區塊內容 */
 .mode-detail-card {
 	position: absolute;
-	right: -40px;
-	top: 10%;
+	right: -120px;
+	top: 20%;
 	width: 200px;
 	min-height: 250px;
 	background: #fffff9f6;
@@ -438,7 +463,7 @@ onBeforeUnmount(() => {
 		color: #333;
 		line-height: 1.6;
 		flex: 1;
-		font-size: 14px;
+		font-size: 18px;
 	}
 
 	.explore-btn {
@@ -568,6 +593,8 @@ onBeforeUnmount(() => {
 		width: 100%;
 		margin: 0 auto;
 		--grid-scale: 1.1;
+		/* 平板/手機位移校正：避免整體偏右 */
+		--grid-offset-x: -12px;
 	}
 
 	.circle-container {
@@ -612,7 +639,8 @@ onBeforeUnmount(() => {
 
 
 	.mode-name {
-		font-size: 13px;
+		/* <=968px 時的模式名稱字級 */
+		font-size: clamp(16px, 0.75vw, 18px);
 		padding: 6px 10px;
 	}
 
@@ -629,7 +657,7 @@ onBeforeUnmount(() => {
 		position: absolute;
 		right: auto;
 		top: auto;
-		bottom: -320px;
+		bottom: -220px;
 		left: 50%;
 		transform: translateX(-50%);
 		min-width: 0%;
@@ -640,12 +668,12 @@ onBeforeUnmount(() => {
 		font-size: 16px;
 
 		h3 {
-			font-size: 18px;
+			font-size: 20px;
 			margin-bottom: 8px;
 		}
 
 		p {
-			font-size: 14px;
+			font-size: 18px;
 			margin-bottom: 12px;
 		}
 	}
@@ -669,19 +697,24 @@ onBeforeUnmount(() => {
 	}
 
 	.mode-detail-card {
-		right: -30px;
-		width: 180px;
+		right: -120px;
+		width: 200px;
 		min-height: 220px;
 		padding: 16px;
 
 		h3 {
-			font-size: 15px;
+			font-size: 22px;
 		}
 
 		p {
-			font-size: 13px;
+			font-size: 20px;
+		}
+
+		.explore-btn {
+			font-size: 18px;
 		}
 	}
+
 }
 
 @media (min-width: 1600px) {
@@ -696,6 +729,7 @@ onBeforeUnmount(() => {
 		padding: 30px 12px 20px 12px;
 		width: 100%;
 		margin: 0 auto;
+		/* <=576px 時整體縮放（避免圖超出畫面） */
 		--grid-scale: 0.95;
 	}
 
@@ -735,7 +769,7 @@ onBeforeUnmount(() => {
 		}
 
 		.explore-btn {
-			font-size: 14px;
+			font-size: 16px;
 		}
 	}
 }

@@ -21,17 +21,27 @@
           </div>
 
           <div class="hero-bottom-left">
-            <div class="insight-process-board" aria-label="循環媒合流程">
-              <div v-for="(step, index) in footerProcessSteps" :key="step.title" class="process-step-item">
-                <article class="process-step-card">
-                  <div class="process-step-icon" :style="{ color: step.color, background: `${step.color}14` }">
-                    <span v-html="step.icon"></span>
+            <div class="insight-process-board" aria-label="循環媒合流程" :style="{ '--process-active-index': activeProcessStep }">
+              <button class="process-nav process-nav--prev" type="button" aria-label="上一個流程步驟" :disabled="activeProcessStep === 0" @click="prevProcessStep">‹</button>
+              <div class="process-carousel-viewport">
+                <div class="process-carousel-track">
+                  <div v-for="(step, index) in footerProcessSteps" :key="step.title" class="process-step-item">
+                    <article class="process-step-card">
+                      <span class="process-step-index">STEP {{ index + 1 }}</span>
+                      <div class="process-step-icon" :style="{ color: step.color, background: `${step.color}14` }">
+                        <span v-html="step.icon"></span>
+                      </div>
+                      <div class="process-step-copy">
+                        <h4 class="process-step-title" :style="{ color: step.color }">{{ step.title }}</h4>
+                        <p class="process-step-subtitle">{{ step.subtitle }}</p>
+                      </div>
+                    </article>
                   </div>
-                  <div class="process-step-copy">
-                    <h4 class="process-step-title" :style="{ color: step.color }">{{ step.title }}</h4>
-                    <p class="process-step-subtitle">{{ step.subtitle }}</p>
-                  </div>
-                </article>
+                </div>
+              </div>
+              <button class="process-nav process-nav--next" type="button" aria-label="下一個流程步驟" :disabled="activeProcessStep === footerProcessSteps.length - 1" @click="nextProcessStep">›</button>
+              <div class="process-carousel-dots" role="tablist" aria-label="流程步驟選擇">
+                <button v-for="(step, index) in footerProcessSteps" :key="`dot-${step.title}`" type="button" class="process-dot" :class="{ 'is-active': activeProcessStep === index }" :aria-label="`切換到${step.title}`" @click="goProcessStep(index)"></button>
               </div>
             </div>
           </div>
@@ -45,19 +55,28 @@
 
     <section ref="footerInsightsRef" class="home-footer-insights" aria-label="平台效益摘要">
       <div class="container">
-        <div class="insight-card-board">
-          <article v-for="item in footerStatsForInsightCards" :key="item.title" class="insight-card insight-card--metric">
-            <div class="insight-icon" :style="{ color: item.color, background: `${item.color}15` }">
-              <span v-html="item.icon"></span>
+        <div class="insight-card-board" :style="{ '--insight-active-index': activeInsightCard }">
+          <button class="insight-nav insight-nav--prev" type="button" aria-label="上一張平台效益卡" :disabled="activeInsightCard === 0" @click="prevInsightCard">‹</button>
+          <div class="insight-carousel-viewport">
+            <div class="insight-carousel-track">
+              <article v-for="item in footerStatsForInsightCards" :key="item.title" class="insight-card insight-card--metric">
+                <div class="insight-icon" :style="{ color: item.color, background: `${item.color}15` }">
+                  <span v-html="item.icon"></span>
+                </div>
+                <div class="insight-metric-copy">
+                  <p class="insight-metric-label">{{ item.title }}</p>
+                  <p class="insight-metric-value" :style="{ color: item.color }">
+                    <span>{{ item.value }}</span>
+                    <small>{{ item.unit }}</small>
+                  </p>
+                </div>
+              </article>
             </div>
-            <div class="insight-metric-copy">
-              <p class="insight-metric-label">{{ item.title }}</p>
-              <p class="insight-metric-value" :style="{ color: item.color }">
-                <span>{{ item.value }}</span>
-                <small>{{ item.unit }}</small>
-              </p>
-            </div>
-          </article>
+          </div>
+          <button class="insight-nav insight-nav--next" type="button" aria-label="下一張平台效益卡" :disabled="activeInsightCard === footerStatsForInsightCards.length - 1" @click="nextInsightCard">›</button>
+          <div class="insight-carousel-dots" role="tablist" aria-label="平台效益卡選擇">
+            <button v-for="(item, index) in footerStatsForInsightCards" :key="`insight-dot-${item.title}`" type="button" class="insight-dot" :class="{ 'is-active': activeInsightCard === index }" :aria-label="`切換到${item.title}`" @click="goInsightCard(index)"></button>
+          </div>
         </div>
 
 
@@ -235,6 +254,8 @@ const speciesPageSize = 10
 const footerInsightsRef = ref(null)
 const hasFooterStatsAnimated = ref(false)
 const animatedFooterStatValues = ref([])
+const activeProcessStep = ref(0)
+const activeInsightCard = ref(0)
 let footerStatsObserver = null
 let footerStatsAnimationFrame = null
 
@@ -539,6 +560,34 @@ const showModeDetail = (mode) => {
   dialogVisible.value = true
 }
 
+const prevProcessStep = () => {
+  if (activeProcessStep.value <= 0) return
+  activeProcessStep.value -= 1
+}
+
+const nextProcessStep = () => {
+  if (activeProcessStep.value >= footerProcessSteps.length - 1) return
+  activeProcessStep.value += 1
+}
+
+const goProcessStep = (index) => {
+  activeProcessStep.value = index
+}
+
+const prevInsightCard = () => {
+  if (activeInsightCard.value <= 0) return
+  activeInsightCard.value -= 1
+}
+
+const nextInsightCard = () => {
+  if (activeInsightCard.value >= footerStatsForInsightCards.value.length - 1) return
+  activeInsightCard.value += 1
+}
+
+const goInsightCard = (index) => {
+  activeInsightCard.value = index
+}
+
 const handleModeSearch = () => {
   scrollToSearch()
 }
@@ -725,7 +774,7 @@ onBeforeUnmount(() => {
   flex: 1;
   text-align: left;
   max-width: 620px;
-  margin-top: 100px;
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
   gap: 0px;
@@ -869,14 +918,31 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: 30px;
   box-shadow: 0 16px 36px rgba(16, 24, 40, 0.1);
-  padding: 20px 20px;
+  padding: 10px 20px;
+  position: relative;
   display: flex;
-  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 0;
+}
+
+.process-carousel-viewport {
+  width: 100%;
+}
+
+.process-carousel-track {
+  display: flex;
   flex-wrap: nowrap;
   align-items: flex-end;
   justify-content: center;
   gap: 30px;
-  margin-bottom: 0;
+  width: 100%;
+}
+
+.process-nav,
+.process-carousel-dots {
+  display: none;
 }
 
 .process-title {
@@ -926,9 +992,20 @@ onBeforeUnmount(() => {
   padding: 0;
 }
 
+.process-step-index {
+  display: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #4b6b8f;
+  background: rgba(226, 236, 248, 0.95);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
 .process-step-icon {
-  width: 64px;
-  height: 64px;
+  width: 55px;
+  height: 55px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -957,7 +1034,7 @@ onBeforeUnmount(() => {
 
 .process-step-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
@@ -1000,6 +1077,16 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 2;
   margin-bottom: 30px;
+}
+
+.insight-carousel-viewport,
+.insight-carousel-track {
+  display: contents;
+}
+
+.insight-nav,
+.insight-carousel-dots {
+  display: none;
 }
 
 .insight-card {
@@ -2190,7 +2277,13 @@ onBeforeUnmount(() => {
 
 @media (max-width: 576px) {
   .home-page {
-    --footer-art-height: clamp(130px, 36vw, 180px) min-height: 100svh;
+    --footer-art-height: clamp(130px, 36vw, 180px);
+    min-height: 100svh;
+    padding-bottom: 0;
+  }
+
+  .home-page::after {
+    content: none;
   }
 
   .hero-section {
@@ -2239,18 +2332,71 @@ onBeforeUnmount(() => {
     justify-content: center;
   }
 
-  .process-step-card {
-    display: flex;
-    flex-direction: row;
-    margin: 0 auto;
-
+  .insight-process-board {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    align-items: center;
+    border-radius: 20px;
+    padding: 10px;
+    gap: 8px;
+    justify-content: initial;
   }
 
-  .insight-process-board {
-    flex-direction: column;
-    border-radius: 22px;
-    padding: 12px;
-    gap: 12px;
+  .process-carousel-viewport {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+
+  .process-carousel-track {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0;
+    transform: translateX(calc(var(--process-active-index, 0) * -100%));
+    transition: transform 0.32s ease;
+  }
+
+  .process-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(155, 176, 208, 0.8);
+    background: rgba(255, 255, 255, 0.94);
+    color: #486a93;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+
+    &:disabled {
+      opacity: 0.35;
+    }
+  }
+
+  .process-carousel-dots {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .process-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    border: 0;
+    background: rgba(126, 151, 183, 0.4);
+    padding: 0;
+
+    &.is-active {
+      width: 16px;
+      background: #4f8fdf;
+    }
   }
 
   .process-title {
@@ -2260,7 +2406,12 @@ onBeforeUnmount(() => {
   }
 
   .process-step-item {
-    width: 100%;
+    width: auto;
+    min-width: 100%;
+    min-height: 116px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .process-step-item::after {
@@ -2272,31 +2423,79 @@ onBeforeUnmount(() => {
   }
 
   .process-step-card {
-    gap: 8px;
+    width: min(300px, 100%);
+    min-height: 100%;
+    display: grid;
+    grid-template-columns: 48px auto;
+    grid-template-rows: auto 1fr;
+    column-gap: 12px;
+    row-gap: 6px;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 6px 0;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    align-content: center;
+    margin: 0 auto;
+  }
+
+  .process-step-index {
+    display: inline-flex;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: center;
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: #5f7694;
+    background: transparent;
+    border-radius: 0;
     padding: 0;
   }
 
   .process-step-icon {
-    width: 56px;
-    height: 56px;
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+    width: 48px;
+    height: 48px;
 
     span {
-      width: 26px;
-      height: 26px;
+      width: 22px;
+      height: 22px;
     }
 
     :deep(svg) {
-      width: 26px;
-      height: 26px;
+      width: 22px;
+      height: 22px;
     }
   }
 
+  .process-step-copy {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 4px;
+    justify-content: center;
+    min-height: 0;
+    width: fit-content;
+    max-width: 210px;
+  }
+
   .process-step-title {
-    font-size: 15px;
+    font-size: 16px;
+    white-space: normal;
   }
 
   .process-step-subtitle {
-    font-size: 15px;
+    font-size: 14px;
+    white-space: normal;
   }
 
   .home-footer-insights {
@@ -2344,7 +2543,7 @@ onBeforeUnmount(() => {
       }
 
       .hot-tags-label {
-        font-size: 13px;
+        font-size: 14px;
       }
 
       .hot-tags-list {
@@ -2352,7 +2551,7 @@ onBeforeUnmount(() => {
       }
 
       .hot-tag-item {
-        font-size: 13px;
+        font-size: 14px;
         padding: 4px 12px;
       }
     }
@@ -2393,16 +2592,95 @@ onBeforeUnmount(() => {
 
   .home-footer-stats {
     margin-top: auto;
-    padding-bottom: max(22px, calc(var(--footer-art-height) * 0.68));
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home-footer-stats::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: calc(var(--footer-art-height) * 1.25);
+    background: url('../assets/Footer_v3.png') center bottom / cover no-repeat;
   }
 
   .insight-card-board {
-    grid-template-columns: 1fr;
-    gap: 4px;
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 8px;
     padding: 12px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+  }
+
+  .insight-carousel-viewport {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .insight-carousel-track {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    width: 100%;
+    transform: translateX(calc(var(--insight-active-index, 0) * -100%));
+    transition: transform 0.32s ease;
+  }
+
+  .insight-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(155, 176, 208, 0.8);
+    background: rgba(255, 255, 255, 0.94);
+    color: #486a93;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+
+    &:disabled {
+      opacity: 0.35;
+    }
+  }
+
+  .insight-carousel-dots {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .insight-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    border: 0;
+    background: rgba(126, 151, 183, 0.4);
+    padding: 0;
+
+    &.is-active {
+      width: 16px;
+      background: #4f8fdf;
+    }
   }
 
   .insight-card {
+    width: 100%;
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 6px;
 
     &:not(:last-child)::after {
@@ -2411,8 +2689,16 @@ onBeforeUnmount(() => {
   }
 
   .insight-card--metric {
+    width: min(300px, 100%);
     gap: 14px;
     padding: 12px 10px;
+    margin: 0 auto;
+    justify-content: center;
+  }
+
+  .insight-metric-copy {
+    width: fit-content;
+    max-width: 210px;
   }
 
   .insight-metric-label {

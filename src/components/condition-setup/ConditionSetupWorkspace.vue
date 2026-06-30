@@ -34,6 +34,7 @@
 											<el-form-item>
 												<template #label>
 													<div class="label-with-icon">
+														<span class="required-mark">*</span>
 														<el-icon>
 															<Location />
 														</el-icon>
@@ -246,12 +247,28 @@
 		</div>
 
 		<div class="floating-actions glass-panel">
-			<el-button @click="resetAll">重設條件</el-button>
-			<el-button type="primary" @click="$emit('next')">下一步 : 媒合分析
-				<el-icon class="el-icon--right">
-					<ArrowRight />
-				</el-icon>
-			</el-button>
+			<!-- Help card -->
+			<div class="help-card">
+				<div class="help-icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="10" />
+						<path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+						<line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3" />
+					</svg>
+				</div>
+				<div class="help-text">
+					<p class="help-title">貼心提醒</p>
+					<p class="help-sub">各項條件設定將影響分析結果，請務必確實填寫，已獲得最佳建議循環路徑!</p>
+				</div>
+			</div>
+			<div class="action-buttons">
+				<el-button @click="resetAll">重設條件</el-button>
+				<el-button type="primary" @click="$emit('next')" class="detail-btn">下一步 : 媒合分析
+					<el-icon class="el-icon--right">
+						<ArrowRight />
+					</el-icon>
+				</el-button>
+			</div>
 		</div>
 
 		<SemanticInputModal v-model="showSemanticModal" @confirm="handleSemanticConfirm" />
@@ -601,10 +618,13 @@ defineExpose({
 	display: flex;
 	flex-direction: column;
 	position: sticky;
-	top: 10px;
+	top: 12px;
+	align-self: flex-start;
+	max-height: calc(100vh - 24px);
 
 	:deep(.step-nav) {
 		width: 100%;
+		max-height: 100%;
 	}
 }
 
@@ -616,6 +636,60 @@ defineExpose({
 		inset 0 1px 0 rgba(255, 255, 255, 0.78);
 	backdrop-filter: blur(16px);
 	border-radius: 20px;
+}
+
+.help-card {
+	// margin-top: 20px;
+	background: linear-gradient(135deg, #fdf0f0, #f8fafc);
+	border: 1px solid #f7bbbb;
+	border-radius: 16px;
+	padding: 10px 12px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-right: auto;
+
+	@media (max-width: 992px) {
+		display: none;
+	}
+}
+
+.help-icon {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: rgba(197, 34, 34, 0.12);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+
+	svg {
+		width: 18px;
+		height: 18px;
+		stroke: #c52222;
+	}
+}
+
+.help-text {
+	flex: 1;
+	min-width: 0;
+
+	.help-title {
+		font-size: 16px;
+		font-weight: 700;
+		color: #af3737;
+		margin: 0;
+		line-height: 1.3;
+	}
+
+	.help-sub {
+		font-size: 15px;
+		color: #2e2e2e;
+		margin: 0;
+		line-height: 1.3;
+	}
 }
 
 .content-panel {
@@ -799,10 +873,19 @@ defineExpose({
 		height: auto;
 		margin-right: 0;
 		white-space: normal;
+		display: flex;
 		align-items: flex-start;
+		gap: 8px;
+	}
+
+	:deep(.el-checkbox__input) {
+		margin-top: 2px;
+		line-height: 1;
 	}
 
 	:deep(.el-checkbox__label) {
+		display: block;
+		padding-left: 0;
 		line-height: 1.5;
 		white-space: normal;
 		word-break: break-word;
@@ -851,8 +934,35 @@ defineExpose({
 	margin: 20px 18px 0;
 	padding: 12px 16px;
 	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.action-buttons {
+	display: flex;
+	align-items: center;
 	justify-content: flex-end;
 	gap: 12px;
+	margin-left: 12px;
+	flex-shrink: 0;
+
+}
+
+.detail-btn {
+	align-self: flex-end;
+	margin-top: auto;
+	font-size: 15px;
+	font-weight: 700;
+	border: none;
+	background: linear-gradient(135deg, #4caf50, #26a69a);
+	color: #fff;
+
+	&:hover,
+	&:focus {
+		background: linear-gradient(135deg, #58b85c, #30b3a8);
+		color: #fff;
+	}
 }
 
 @keyframes drift {
@@ -868,6 +978,8 @@ defineExpose({
 @media (max-width: 992px) {
 	.nav-col {
 		position: static;
+		top: auto;
+		max-height: none;
 		margin-bottom: 16px;
 	}
 
@@ -952,7 +1064,12 @@ defineExpose({
 		justify-content: stretch;
 		gap: 10px;
 
-		:deep(.el-button) {
+		.action-buttons {
+			width: 100%;
+			margin-left: 0;
+		}
+
+		.action-buttons :deep(.el-button) {
 			flex: 1;
 		}
 	}
@@ -983,7 +1100,13 @@ defineExpose({
 	.floating-actions {
 		flex-direction: column;
 
-		:deep(.el-button) {
+		.action-buttons {
+			width: 100%;
+			flex-direction: column;
+			justify-content: stretch;
+		}
+
+		.action-buttons :deep(.el-button) {
 			width: 100%;
 			margin-left: 0;
 		}

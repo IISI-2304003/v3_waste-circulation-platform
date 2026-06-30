@@ -96,8 +96,8 @@ const goBackHome = () => {
 
 
   .header-row {
-    text-align: center;
-    margin-top: 50px;
+    text-align: left;
+    margin-top: 0px;
 
 
     h1 {
@@ -116,6 +116,10 @@ const goBackHome = () => {
   }
 }
 
+.header-title {
+  text-align: left;
+}
+
 @media (max-width: 768px) {
   .standard-input-page {
     padding: 18px 12px 88px;
@@ -128,6 +132,10 @@ const goBackHome = () => {
       mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16% #000 60%);
       -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.35) 16%, #000 20%);
     }
+  }
+
+  .header-title {
+    text-align: center;
   }
 }
 
