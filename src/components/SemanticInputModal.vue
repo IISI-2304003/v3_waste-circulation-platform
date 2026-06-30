@@ -81,11 +81,13 @@ const examples = [
 ]
 
 // 帶入範例
+// 說明：封裝「fill Example」商業邏輯，供目前流程重複使用。
 const fillExample = (text) => {
 	inputText.value = text
 }
 
 // 確認填入
+// 說明：由使用者互動觸發；執行「handle Confirm」流程並同步更新相關狀態。
 const handleConfirm = () => {
 	if (!inputText.value.trim()) {
 		ElMessage.warning('請先輸入內容')
@@ -112,6 +114,7 @@ const handleConfirm = () => {
 	}
 
 	// 過濾未識別的項目
+	// 說明：封裝「valid Items」商業邏輯，供目前流程重複使用。
 	const validItems = parsedResult.filter(item => !item.isText)
 
 	if (validItems.length === 0) {
@@ -133,6 +136,7 @@ const handleConfirm = () => {
 }
 
 // 關閉彈窗
+// 說明：由使用者互動觸發；執行「handle Close」流程並同步更新相關狀態。
 const handleClose = () => {
 	inputText.value = ''
 	visible.value = false

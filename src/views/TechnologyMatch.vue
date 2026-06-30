@@ -474,6 +474,7 @@ const industryLabelMap = {
 	food: '食品加工'
 }
 
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 const extractCountyCity = (address = '') => {
 	const text = String(address || '')
 	if (!text) return ''
@@ -481,6 +482,7 @@ const extractCountyCity = (address = '') => {
 	return match ? match[1] : text
 }
 
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 const formatAcceptanceCondition = (condition) => {
 	if (!condition?.parameter) return ''
 	if (condition.operator === '範圍' && condition.valueMin != null && condition.valueMax != null) {
@@ -492,6 +494,7 @@ const formatAcceptanceCondition = (condition) => {
 	return `${condition.parameter} ${condition.operator} ${condition.value}${unit}`
 }
 
+// 說明：依目前條件即時計算「demand Summary」內容，提供畫面顯示與決策判斷使用。
 const demandSummary = computed(() => {
 	const { sourceConditions, siteConditions, businessConditions, acceptanceConditions, uploadedReports } = conditionStore
 
@@ -528,8 +531,10 @@ const demandSummary = computed(() => {
 	]
 })
 
+// 說明：依目前條件即時計算「visible Demand Summary」內容，提供畫面顯示與決策判斷使用。
 const visibleDemandSummary = computed(() => demandSummary.value.filter((item) => item.value && item.value !== '未設定'))
 
+// 說明：依目前條件即時計算「selected Mode」內容，提供畫面顯示與決策判斷使用。
 const selectedMode = computed(() => {
 	const hasStoredMode = conditionStore.selectedRecommendedPath?.modeName && conditionStore.selectedRecommendedPath?.title
 	if (hasStoredMode) {
@@ -570,18 +575,22 @@ const selectedMode = computed(() => {
 	}
 })
 
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
 
+// 說明：依目前條件即時計算「selected Mode Detail」內容，提供畫面顯示與決策判斷使用。
 const selectedModeDetail = computed(() => {
 	const targetModeName = normalizeModeName(selectedMode.value?.modeName)
 	return circulationModesData.find((mode) => normalizeModeName(mode.name) === targetModeName) || null
 })
 
+// 說明：由模式說明入口觸發；開啟模式解說彈窗供使用者查看細節。
 const openModeExplainDialog = () => {
 	modeDialogVisible.value = true
 }
 
 // 根據等級與點的索引，返回對應的 CSS 類別
+// 說明：回傳「get Dot Class」資料供畫面渲染或後續商業規則使用。
 const getDotClass = (level, dotIndex) => {
 	if (dotIndex > level) return 'inactive'
 	if (level === 1) return 'active green'
@@ -596,8 +605,6 @@ const modeFlow = [
 	{ icon: 'Van', title: '返回原製程', sub: '需求端' }
 ]
 
-const modeTags = ['模式成熟度高', '材料價值最大化', '降低原料採購需求', '穩定供應鏈']
-
 const vendors = [
 	{ id: 1, name: '鴻成科技有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 12, product: '稀硫酸(65%以下)', capacity: 3200, score: 95, controlNo: 'D2876543', location: '桃園市', reuseTech: '酸洗廢液純化、濃縮再製與循環回用', acceptanceStandards: ['pH 2.0 - 6.0', '含固量 < 15%', '金屬雜質符合批次規範'], processUnits: ['前處理槽', '蒸餾純化單元', '濃縮再製單元'], qualityStandards: ['批次檢驗報告', '出貨前抽驗', 'ISO 14001 流程管理'], salesTargetIndustries: ['化工原料', '電子材料', '金屬表面處理'], contactPhone: '03-1234-5678', factoryAddress: '桃園市觀音區工業路 88 號', image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=960&q=80', previousMonthReceived: 3000, validityPeriod: '2026-12-31', reasons: ['允收條件符合', '距離最近', '具再利用機構資格'], reasonText: '本公司具備高純化能力與穩定出貨紀錄，適合依現有允收條件直接導入。', capacityLevel: 1, capacityLevelText: '低' },
 	{ id: 2, name: '盈昌科技工業股份有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 18, product: '工業用稀硫酸(50~60%)', capacity: 2400, score: 91, controlNo: 'D3209843', location: '台南市', reuseTech: '稀硫酸回收、再生濃縮與品質調整', acceptanceStandards: ['酸鹼值符合回收規格', '含水率 < 20%', '雜質含量低於上限'], processUnits: ['收料暫存槽', '再生處理單元', '品質調整單元'], qualityStandards: ['批次分析報告', '檢驗留樣制度', '製程參數紀錄'], salesTargetIndustries: ['化工原料', '電鍍材料', '工業清洗'], contactPhone: '06-2345-6789', factoryAddress: '台南市永康區環工路 12 號', image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '具備穩定批次控制能力，適合需要持續供應與快速補貨的情境。', previousMonthReceived: 2000, validityPeriod: '2028-06-30', capacityLevel: 2, capacityLevelText: '中' },
@@ -606,6 +613,7 @@ const vendors = [
 	{ id: 5, name: '遠見循環科技有限公司', category: '材料再製', wasteReuse: 'C-0202', isReuseOrg: true, distance: 42, product: '再生鹽類原料', capacity: 700, score: 80, controlNo: 'D8801122', location: '高雄市', reuseTech: '再生鹽類回收、濃縮與再製供應', acceptanceStandards: ['鹽類純度符合再製門檻', '含水率 < 10%', '雜質需低於批次上限'], processUnits: ['蒸發濃縮單元', '結晶分離單元', '乾燥包裝單元'], qualityStandards: ['批次純度檢驗', '留樣保存制度', '出貨文件齊備'], salesTargetIndustries: ['化工原料', '電池材料', '工業製程'], contactPhone: '07-7788-9900', factoryAddress: '高雄市大社區再生路 18 號', image: 'https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合'], reasonText: '適合中長距離供應與多樣化客戶銷售配置，具備擴量潛力。', previousMonthReceived: 600, validityPeriod: '2029-05-31', capacityLevel: 3, capacityLevelText: '高' }
 ]
 
+// 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
 	const result = [...vendors]
 	if (sortType.value === 'distance') return result.sort((a, b) => a.distance - b.distance)
@@ -613,7 +621,9 @@ const sortedVendors = computed(() => {
 	return result.sort((a, b) => b.score - a.score)
 })
 
+// 說明：依目前條件即時計算「total Pages」內容，提供畫面顯示與決策判斷使用。
 const totalPages = computed(() => Math.ceil(sortedVendors.value.length / pageSize))
+// 說明：依目前條件即時計算「paged Vendors」內容，提供畫面顯示與決策判斷使用。
 const pagedVendors = computed(() => sortedVendors.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize))
 
 watch(sortType, () => {
@@ -624,20 +634,24 @@ watch(detailDialogVisible, (value) => {
 	if (!value) activeVendor.value = null
 })
 
+// 說明：由廠商卡片點擊觸發；設定 activeVendor 並開啟廠商詳情視窗。
 const openVendorDetail = (vendor) => {
 	activeVendor.value = vendor
 	detailDialogVisible.value = true
 }
 
+// 說明：由詳情視窗關閉操作觸發；關閉視窗並結束目前詳情檢視。
 const closeVendorDetail = () => {
 	detailDialogVisible.value = false
 }
 
+// 說明：由「聯絡廠商」操作觸發；提示目前廠商聯絡資訊。
 const contactVendor = () => {
 	if (!activeVendor.value) return
 	ElMessage.info(`請洽 ${activeVendor.value.contactPhone} 進一步聯絡合作細節`)
 }
 
+// 說明：封裝「escape Html」商業邏輯，供目前流程重複使用。
 const escapeHtml = (value) => String(value ?? '')
 	.replace(/&/g, '&amp;')
 	.replace(/</g, '&lt;')
@@ -645,6 +659,7 @@ const escapeHtml = (value) => String(value ?? '')
 	.replace(/"/g, '&quot;')
 	.replace(/'/g, '&#39;')
 
+// 說明：由匯出操作觸發；將目前廠商詳情整理為可列印 PDF 視窗內容。
 const exportVendorPdf = () => {
 	if (!activeVendor.value) return
 
@@ -655,6 +670,7 @@ const exportVendorPdf = () => {
 		return
 	}
 
+	// 說明：封裝「tags」商業邏輯，供目前流程重複使用。
 	const tags = (arr = []) => arr.map((item) => `<span style="display:inline-block;margin:0 6px 6px 0;padding:4px 10px;border-radius:999px;background:#ecf5ff;color:#2b5876;font-size:12px;">${escapeHtml(item)}</span>`).join('')
 
 	printWindow.document.write(`
@@ -717,9 +733,11 @@ const exportVendorPdf = () => {
 	}, 200)
 }
 
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goPrevious = () => {
 	router.push('/company-match')
 }
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goBackHome = () => {
 	conditionStore.resetAll()
 	router.push('/')

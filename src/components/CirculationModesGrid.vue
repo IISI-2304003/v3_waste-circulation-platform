@@ -86,10 +86,13 @@ const gridMetrics = ref({
 
 let gridResizeObserver = null
 
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 const normalizeModeName = (name = '') => String(name).replace(/\s+/g, '').trim()
 
+// 說明：初始化模式卡片時優先選擇「廠內模式1」，若不存在則退回第一筆模式。
 const getDefaultMode = (modes = []) => {
 	const targetName = normalizeModeName('廠內模式1')
+	// 說明：封裝「matched Mode」商業邏輯，供目前流程重複使用。
 	const matchedMode = modes.find((mode) => normalizeModeName(mode?.name) === targetName)
 	return matchedMode || modes[0] || null
 }
@@ -100,6 +103,7 @@ const BASE_GRID_SIZE = 700
 
 // 取得容器寬度與 viewport 尺寸。
 // 這些數值會影響：整體縮放比例、最小高度、圓周半徑。
+// 說明：在尺寸或資料變動時觸發；更新畫面計算所需的 state。
 const updateGridMetrics = () => {
 	gridMetrics.value = {
 		width: gridRef.value?.clientWidth || 0,
@@ -114,6 +118,7 @@ const updateGridMetrics = () => {
 // 2) widthScale / heightScale 下限 0.56：最小縮放
 // 3) laptopBoost：不同螢幕額外放大倍率
 // 4) 最後回傳的上限 1.42：最大縮放
+// 說明：依目前條件即時計算「grid Scale」內容，提供畫面顯示與決策判斷使用。
 const gridScale = computed(() => {
 	const availableWidth = gridMetrics.value.width || 720
 	const viewportWidth = gridMetrics.value.viewportWidth || 1366
@@ -128,6 +133,7 @@ const gridScale = computed(() => {
 
 // 將縮放結果寫入 CSS 變數，並同步控制區塊最小高度。
 // minHeight 的 56 / 380 可用來調整下方留白與最小可視高度。
+// 說明：依目前條件即時計算「grid Style」內容，提供畫面顯示與決策判斷使用。
 const gridStyle = computed(() => ({
 	'--grid-scale': gridScale.value.toFixed(3),
 	minHeight: `${Math.max(Math.round(BASE_GRID_SIZE * gridScale.value) + 56, 380)}px`
@@ -135,6 +141,7 @@ const gridStyle = computed(() => ({
 
 // 控制「外圈模式點離中心多遠」：數值越大越發散。
 // 若要調整十大模式的圓周擴散程度，改這裡最直接。
+// 說明：依目前條件即時計算「orbit Radius」內容，提供畫面顯示與決策判斷使用。
 const orbitRadius = computed(() => {
 	const viewportWidth = gridMetrics.value.viewportWidth || 1366
 	if (viewportWidth <= 576) return 200
@@ -157,11 +164,13 @@ const iconMap = {
 	'cycle-innovation': Star
 }
 
+// 說明：回傳「get Icon」資料供畫面渲染或後續商業規則使用。
 const getIcon = (iconName) => {
 	return iconMap[iconName] || Operation
 }
 
 // 縮短名稱顯示
+// 說明：回傳「get Short Name」資料供畫面渲染或後續商業規則使用。
 const getShortName = (name) => {
 	const shortNames = {
 		'內部循環利用': '內循環',
@@ -179,6 +188,7 @@ const getShortName = (name) => {
 }
 
 // 計算圓形位置（10個點均勻分布在圓周上）
+// 說明：回傳「get Mode Position」資料供畫面渲染或後續商業規則使用。
 const getModePosition = (index) => {
 	const totalModes = 10
 	const angle = (index * 360 / totalModes) - 90 // -90 度：第一個模式顯示在正上方
@@ -196,10 +206,12 @@ const getModePosition = (index) => {
 	}
 }
 
+// 說明：由圓環模式節點點擊觸發；更新 selectedMode 顯示對應模式卡片。
 const handleModeClick = (mode) => {
 	selectedMode.value = mode
 }
 
+// 說明：由「探索此模式」按鈕觸發；送出 mode-click 事件給父層進行後續流程。
 const handleExploreMode = () => {
 	if (!selectedMode.value) return
 	emit('mode-click', selectedMode.value)

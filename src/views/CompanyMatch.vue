@@ -251,6 +251,7 @@ const modesDialogVisible = ref(false)
 const activeModeId = ref(1)
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1440)
 
+// 說明：由視窗 resize 事件觸發；更新 viewportWidth 供雷達圖響應式參數重算。
 const updateViewportWidth = () => {
   viewportWidth.value = window.innerWidth
 }
@@ -262,6 +263,7 @@ const industryLabelMap = {
   food: '食品加工'
 }
 
+// 說明：封裝「yes No Text」商業邏輯，供目前流程重複使用。
 const yesNoText = (value) => {
   if (value === true) return '有'
   if (value === false) return '無'
@@ -275,6 +277,7 @@ const IMPACT_LEVEL_SCORE_MAP = {
 }
 
 // 計算條件的影響度級別
+// 說明：回傳「get Impact Level」資料供畫面渲染或後續商業規則使用。
 const getImpactLevel = (condition) => {
   // 根據條件的設定情況評估影響度
   // 高(high): 完整設定，100-75 分
@@ -286,10 +289,12 @@ const getImpactLevel = (condition) => {
   return { level: 'low', color: '#ef4444', levelLabel: '低' }
 }
 
+// 說明：封裝「to Radar Score」商業邏輯，供目前流程重複使用。
 const toRadarScore = (level) => IMPACT_LEVEL_SCORE_MAP[level] || 0
 
 // 雷達圖「軸標籤文字內容」換行規則。
 // 想調整每行切幾個字，改這裡的 slice 範圍。
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 const formatRadarIndicatorName = (label = '') => {
   const text = String(label)
   if (text.length <= 5) return text
@@ -297,6 +302,7 @@ const formatRadarIndicatorName = (label = '') => {
   return `${text.slice(0, 4)}\n${text.slice(4, 8)}\n${text.slice(8)}`
 }
 
+// 說明：依目前條件即時計算「condition Summary」內容，提供畫面顯示與決策判斷使用。
 const conditionSummary = computed(() => {
   // 計算每個條件的設定程度和評分
   const acceptanceCount = Array.isArray(store.acceptanceConditions) ? store.acceptanceConditions.length : 0
@@ -374,8 +380,10 @@ const conditionSummary = computed(() => {
   ]
 })
 
+// 說明：依目前條件即時計算「radar Series Values」內容，提供畫面顯示與決策判斷使用。
 const radarSeriesValues = computed(() => conditionSummary.value.map((item) => toRadarScore(item.level)))
 
+// 說明：依目前條件即時計算「radar Responsive Config」內容，提供畫面顯示與決策判斷使用。
 const radarResponsiveConfig = computed(() => {
   const width = viewportWidth.value
 
@@ -415,6 +423,7 @@ const radarResponsiveConfig = computed(() => {
 })
 
 // ★ 新增：ECharts 雷達圖 option（替換原本的 radarPoints computed）
+// 說明：依目前條件即時計算「radar Option」內容，提供畫面顯示與決策判斷使用。
 const radarOption = computed(() => ({
   // tooltip: {
   //   trigger: 'item',
@@ -484,6 +493,7 @@ const radarOption = computed(() => ({
     // ★ 每個頂點獨立一個 series，各自設定顏色與大小
     ...conditionSummary.value.map((item, index) => {
       // 只在該頂點位置放值，其餘補 null
+      // 說明：封裝「value」商業邏輯，供目前流程重複使用。
       const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : null)
       const size = item.level === 'high'
         ? radarResponsiveConfig.value.symbolSize.high
@@ -563,8 +573,10 @@ const baseInternalPath = {
   ]
 }
 
+// 說明：封裝「with Rank」商業邏輯，供目前流程重複使用。
 const withRank = (paths) => paths.map((path, index) => ({ ...path, id: `r${index + 1}`, rank: index + 1 }))
 
+// 說明：依目前條件即時計算「recommended Paths」內容，提供畫面顯示與決策判斷使用。
 const recommendedPaths = computed(() => {
   const hasReuseSpace = store.siteConditions.hasReuseSpace === true
   if (hasReuseSpace) {
@@ -573,32 +585,42 @@ const recommendedPaths = computed(() => {
   return withRank(baseExternalPaths)
 })
 
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
 
+// 說明：依目前條件即時計算「all Circulation Modes」內容，提供畫面顯示與決策判斷使用。
 const allCirculationModes = computed(() => circulationModes)
 
+// 說明：依目前條件即時計算「preferred Mode Id」內容，提供畫面顯示與決策判斷使用。
 const preferredModeId = computed(() => {
   const currentModeName = normalizeModeName(recommendedPaths.value?.[0]?.modeName)
+  // 說明：封裝「matched」商業邏輯，供目前流程重複使用。
   const matched = allCirculationModes.value.find((mode) => normalizeModeName(mode.name) === currentModeName)
   return matched?.id || allCirculationModes.value?.[0]?.id || 1
 })
 
+// 說明：依目前條件即時計算「active Mode」內容，提供畫面顯示與決策判斷使用。
 const activeMode = computed(() => {
   return allCirculationModes.value.find((mode) => mode.id === activeModeId.value) || allCirculationModes.value[0] || null
 })
 
+// 說明：依目前條件即時計算「active Mode Steps」內容，提供畫面顯示與決策判斷使用。
 const activeModeSteps = computed(() => activeMode.value?.steps || activeMode.value?.step || [])
 
+// 說明：由「查看十大循環模式說明」按鈕觸發；切換對話框為開啟狀態。
 const openModesDialog = () => {
   activeModeId.value = preferredModeId.value
   modesDialogVisible.value = true
 }
 
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goPrevious = () => router.push('/standard-input')
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goBackHome = () => {
   store.resetAll()
   router.push('/')
 }
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goNext = (path) => {
   store.setSelectedRecommendedPath(path)
   router.push('/technology-match')

@@ -25,6 +25,7 @@ const steps = [
 	// { id: 4, label: '決策建議' },
 ]
 
+// 說明：封裝「node Class」商業邏輯，供目前流程重複使用。
 const nodeClass = (id) => ({
 	active: props.activeStep === id,
 	completed: props.activeStep > id

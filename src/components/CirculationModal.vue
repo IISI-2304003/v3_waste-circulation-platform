@@ -66,12 +66,7 @@ import { ref, watch } from 'vue'
 import {
   Reading,
   Document,
-  TrendCharts,
-  Picture,
-  Position,
-  Setting,
-  Box,
-  Right
+  TrendCharts
 } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -88,7 +83,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'search'])
 
 const visible = ref(props.modelValue)
-const activeNotices = ref(0)
 
 watch(() => props.modelValue, (newVal) => {
   visible.value = newVal
@@ -98,10 +92,6 @@ watch(visible, (newVal) => {
   emit('update:modelValue', newVal)
 })
 
-const handleSearch = () => {
-  emit('search', props.mode)
-  visible.value = false
-}
 </script>
 
 <style scoped lang="scss">

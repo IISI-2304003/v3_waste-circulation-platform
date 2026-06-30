@@ -89,6 +89,7 @@ const currentCodeInfo = ref(null)
 const loading = ref(false)
 
 // 快速存取代碼
+// 說明：依目前條件即時計算「quick Access Codes」內容，提供畫面顯示與決策判斷使用。
 const quickAccessCodes = computed(() => {
 	if (categories.value.length === 0) return []
 
@@ -117,9 +118,11 @@ onMounted(async () => {
 })
 
 // 載入代碼詳細資訊
+// 說明：封裝「load Code Info」商業邏輯，供目前流程重複使用。
 const loadCodeInfo = async (code) => {
 	try {
 		const detail = await getWasteCodeDetail(code)
+		// 說明：封裝「category」商業邏輯，供目前流程重複使用。
 		const category = categories.value.find(cat => cat.id === detail.categoryId)
 
 		currentCodeInfo.value = {
@@ -133,6 +136,7 @@ const loadCodeInfo = async (code) => {
 }
 
 // 選擇代碼後的處理
+// 說明：由使用者互動觸發；執行「handle Code Select」流程並同步更新相關狀態。
 const handleCodeSelect = async (code) => {
 	if (!code) {
 		currentCodeInfo.value = null
@@ -143,6 +147,7 @@ const handleCodeSelect = async (code) => {
 }
 
 // 前往詳情頁
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goToDetail = () => {
 	if (selectedCode.value) {
 		router.push(`/waste/${selectedCode.value}`)
@@ -150,6 +155,7 @@ const goToDetail = () => {
 }
 
 // 點擊快速卡片
+// 說明：由使用者互動觸發；執行「handle Quick Access」流程並同步更新相關狀態。
 const handleQuickAccess = (code) => {
 	router.push(`/waste/${code}`)
 }

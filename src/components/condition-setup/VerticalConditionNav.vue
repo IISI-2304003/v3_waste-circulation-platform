@@ -140,12 +140,14 @@ const items = [
 	{ id: 'demand', label: '再生產品使用者需求', svgIcon: IconUsers },
 ]
 
+// 說明：回傳「get Step Status」資料供畫面渲染或後續商業規則使用。
 const getStepStatus = (id) => {
 	if (props.activeSection === id) return 'configuring'
 	if (props.configuredSections.includes(id)) return 'configured'
 	return 'unset'
 }
 
+// 說明：依目前條件即時計算「completed Count」內容，提供畫面顯示與決策判斷使用。
 const completedCount = computed(() => {
 	return items.filter(item => getStepStatus(item.id) === 'configured').length
 })

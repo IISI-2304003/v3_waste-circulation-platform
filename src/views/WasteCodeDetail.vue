@@ -289,12 +289,14 @@ const standardFormRef = ref(null)
 const currentStep = ref(1) // 當前步驟：1=允收條件, 2=允收標準查詢, 3=適用循環模式
 
 // 計算屬性
+// 說明：依目前條件即時計算「category Color」內容，提供畫面顯示與決策判斷使用。
 const categoryColor = computed(() => {
 	if (!wasteCode.value) return '#FFF'
 	const category = getCategoryById(wasteCode.value.categoryId)
 	return category?.color || '#FFF'
 })
 
+// 說明：依目前條件即時計算「available Modes」內容，提供畫面顯示與決策判斷使用。
 const availableModes = computed(() => {
 	if (!wasteCode.value?.circulationModes) return []
 	return circulationModes.filter(mode =>
@@ -302,11 +304,13 @@ const availableModes = computed(() => {
 	)
 })
 
+// 說明：依目前條件即時計算「current Date Time」內容，提供畫面顯示與決策判斷使用。
 const currentDateTime = computed(() => {
 	const now = new Date()
 	return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
 })
 
+// 說明：依目前條件即時計算「progress Percentage」內容，提供畫面顯示與決策判斷使用。
 const progressPercentage = computed(() => {
 	return ((currentStep.value - 1) / 2) * 100 // 3步驟：0%, 50%, 100%
 })
@@ -320,6 +324,7 @@ onMounted(async () => {
 })
 
 // 載入廢棄物代碼詳情
+// 說明：封裝「load Waste Code」商業邏輯，供目前流程重複使用。
 const loadWasteCode = async () => {
 	const code = route.params.code
 	console.log('準備加載代碼:', code)
@@ -345,6 +350,7 @@ const loadWasteCode = async () => {
 }
 
 // 步驟切換
+// 說明：封裝「next Step」商業邏輯，供目前流程重複使用。
 const nextStep = () => {
 	if (currentStep.value < 3) {
 		currentStep.value++
@@ -352,6 +358,7 @@ const nextStep = () => {
 	}
 }
 
+// 說明：封裝「prev Step」商業邏輯，供目前流程重複使用。
 const prevStep = () => {
 	if (currentStep.value > 1) {
 		currentStep.value--
@@ -359,12 +366,14 @@ const prevStep = () => {
 	}
 }
 
+// 說明：由使用者互動觸發；執行「handle Complete」流程並同步更新相關狀態。
 const handleComplete = () => {
 	ElMessage.success('查詢完成！')
 	// 可以在這裡加入完成後的邏輯，例如返回首頁或顯示摘要
 }
 
 // 返回搜尋頁
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goBack = () => {
 	if (route.query.from === 'home') {
 		router.push({
@@ -380,16 +389,19 @@ const goBack = () => {
 }
 
 // 開啟溶出試驗標準彈窗
+// 說明：由操作按鈕觸發；開啟對應視窗或區塊並更新顯示狀態。
 const openLeachingDialog = () => {
 	showLeachingDialog.value = true
 }
 
 // 列印功能
+// 說明：由使用者互動觸發；執行「handle Print」流程並同步更新相關狀態。
 const handlePrint = () => {
 	window.print()
 }
 
 // 匯出 PDF 功能
+// 說明：由使用者互動觸發；執行「handle Export」流程並同步更新相關狀態。
 const handleExport = () => {
 	ElMessage.info('匯出 PDF 功能開發中')
 	// 未來可整合 jsPDF 或 html2pdf 套件

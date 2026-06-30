@@ -82,18 +82,22 @@ export const wasteCategories = [
     },
 ];
 
+// 說明：回傳「get Category By Id」資料供畫面渲染或後續商業規則使用。
 export function getCategoryById(categoryId) {
     return wasteCategories.find((cat) => cat.id === categoryId);
 }
 
+// 說明：回傳「get Category By Code」資料供畫面渲染或後續商業規則使用。
 export function getCategoryByCode(code) {
     return wasteCategories.find((cat) => cat.pattern && cat.pattern.test(code));
 }
 
+// 說明：回傳「get All Waste Codes」資料供畫面渲染或後續商業規則使用。
 export function getAllWasteCodes() {
     return wasteCategories.flatMap((cat) => cat.codes);
 }
 
+// 說明：依條件執行搜尋/篩選，回傳符合的目標資料。
 export function searchWasteCodes(keyword) {
     if (!keyword) return [];
 

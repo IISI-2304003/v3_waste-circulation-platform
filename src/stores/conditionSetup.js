@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+// 說明：封裝「default Source」商業邏輯，供目前流程重複使用。
 const defaultSource = () => ({
     industry: '',
     process: '',
@@ -7,12 +8,14 @@ const defaultSource = () => ({
     outputFrequency: '',
 });
 
+// 說明：封裝「default Site」商業邏輯，供目前流程重複使用。
 const defaultSite = () => ({
     region: [],
     hasReuseSpace: null,
     hasSecondaryWaste: null,
 });
 
+// 說明：封裝「default Business」商業邏輯，供目前流程重複使用。
 const defaultBusiness = () => ({
     businessName: '',
     businessAddress: '',
@@ -22,6 +25,7 @@ const defaultBusiness = () => ({
     recycledProductDemand: '',
 });
 
+// 說明：封裝「default Selected Path」商業邏輯，供目前流程重複使用。
 const defaultSelectedPath = () => ({
     modeName: '',
     title: '',

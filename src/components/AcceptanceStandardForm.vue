@@ -108,11 +108,13 @@ const emit = defineEmits(['change'])
 
 // 產生唯一 ID
 let idCounter = 0
+// 說明：建立初始化資料或執行初始化流程，供後續操作使用。
 function generateId() {
 	return `std-${Date.now()}-${idCounter++}`
 }
 
 // 建立空白標準列
+// 說明：建立初始化資料或執行初始化流程，供後續操作使用。
 function createEmptyStandard() {
 	return {
 		id: generateId(),
@@ -131,7 +133,6 @@ const standards = ref([
 	createEmptyStandard()
 ])
 const searchResults = ref([])
-const searching = ref(false)
 const hasSearched = ref(false)
 
 // 選項資料
@@ -139,6 +140,7 @@ const parameterOptions = Array.from(new Set([...getParameterOptions(), '外觀']
 const operatorOptions = getOperatorOptions()
 const unitOptions = getUnitOptions()
 
+// 說明：由使用者互動觸發；執行「handle Parameter Change」流程並同步更新相關狀態。
 const handleParameterChange = (standard) => {
 	if (standard.parameter === '外觀') {
 		standard.operator = '等於'
@@ -167,11 +169,13 @@ watch(() => props.initialStandards, (newVal) => {
 }, { immediate: true })
 
 // 新增標準列
+// 說明：封裝「add Standard」商業邏輯，供目前流程重複使用。
 const addStandard = () => {
 	standards.value.push(createEmptyStandard())
 }
 
 // 刪除標準列
+// 說明：封裝「remove Standard」商業邏輯，供目前流程重複使用。
 const removeStandard = (index) => {
 	if (standards.value.length > 1) {
 		standards.value.splice(index, 1)
@@ -179,6 +183,7 @@ const removeStandard = (index) => {
 }
 
 // 重設表單
+// 說明：重置該模組資料回預設值，避免前次輸入影響新流程。
 const resetForm = () => {
 	standards.value = [createEmptyStandard()]
 	searchResults.value = []
@@ -187,11 +192,13 @@ const resetForm = () => {
 
 
 // 查看詳情
+// 說明：封裝「view Detail」商業邏輯，供目前流程重複使用。
 const viewDetail = (code) => {
 	router.push(`/waste/${code}`)
 }
 
 // 設定標準（供語意化搜尋使用）
+// 說明：寫入「set Standards」到狀態管理，讓後續流程可直接取用。
 const setStandards = (parsedStandards) => {
 	if (parsedStandards && parsedStandards.length > 0) {
 		standards.value = parsedStandards.map(std => ({
@@ -204,6 +211,7 @@ const setStandards = (parsedStandards) => {
 }
 
 watch(standards, (value) => {
+	// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 	const normalized = value.map(({ id, ...rest }) => ({ ...rest }))
 	emit('change', normalized)
 }, { deep: true, immediate: true })

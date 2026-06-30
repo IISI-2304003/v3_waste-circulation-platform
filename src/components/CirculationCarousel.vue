@@ -7,9 +7,9 @@
       modifier: 1,
       slideShadows: true,
     }" :autoplay="{
-        delay: 3000,
-        disableOnInteraction: false,
-      }" :pagination="{ clickable: true }" :loop="true" class="mySwiper" @slideChange="onSlideChange">
+      delay: 3000,
+      disableOnInteraction: false,
+    }" :pagination="{ clickable: true }" :loop="true" class="mySwiper" @slideChange="onSlideChange">
       <swiper-slide v-for="mode in modes" :key="mode.id" @click="handleModeClick(mode)">
         <div class="mode-card" :style="{ borderColor: mode.color }">
           <div class="mode-icon" :style="{ color: mode.color }">
@@ -47,7 +47,7 @@ import {
   Star
 } from '@element-plus/icons-vue'
 
-const props = defineProps({
+defineProps({
   modes: {
     type: Array,
     required: true
@@ -72,14 +72,17 @@ const iconMap = {
   'cycle-innovation': Star
 }
 
+// 說明：回傳「get Icon」資料供畫面渲染或後續商業規則使用。
 const getIcon = (iconName) => {
   return iconMap[iconName] || Operation
 }
 
+// 說明：由圓環模式節點點擊觸發；更新 selectedMode 顯示對應模式卡片。
 const handleModeClick = (mode) => {
   emit('mode-click', mode)
 }
 
+// 說明：封裝「on Slide Change」商業邏輯，供目前流程重複使用。
 const onSlideChange = () => {
   // 可在此處添加滑動切換時的邏輯
 }

@@ -224,8 +224,8 @@ import { useCirculationModes } from '../composables/useCirculationModes'
 import ParticleBackground from '../components/ParticleBackground.vue'
 import CirculationModesGrid from '../components/CirculationModesGrid.vue'
 import CirculationModal from '../components/CirculationModal.vue'
-import { wasteCategories, getCategoryById, getCategoryByCode, getAllWasteCodes } from '@/data/wasteCategories'
-import { getWasteSpeciesCardsLocal, buildSpeciesFallbackImage } from '@/data/wasteSpecies'
+import { wasteCategories, getCategoryById, getAllWasteCodes } from '@/data/wasteCategories'
+import { getWasteSpeciesCardsLocal } from '@/data/wasteSpecies'
 
 const router = useRouter()
 const route = useRoute()
@@ -386,6 +386,7 @@ const footerStats = [
   }
 ]
 
+// 說明：封裝「footer Stats Animation Meta」商業邏輯，供目前流程重複使用。
 const footerStatsAnimationMeta = footerStats.map((item) => {
   const raw = String(item.value)
   const hasPlus = raw.includes('+')
@@ -404,6 +405,7 @@ const footerStatsAnimationMeta = footerStats.map((item) => {
 
 const footerStatsCardColors = ['#57B9E8', '#22c55e', '#22c55e', '#57B9E8']
 
+// 說明：依目前條件即時計算「footer Stats For Insight Cards」內容，提供畫面顯示與決策判斷使用。
 const footerStatsForInsightCards = computed(() => footerStats.map((item, index) => ({
   title: item.label,
   value: animatedFooterStatValues.value[index] || item.value,
@@ -412,6 +414,7 @@ const footerStatsForInsightCards = computed(() => footerStats.map((item, index) 
   icon: item.icon
 })))
 
+// 說明：封裝「footer Highlights For Stats Bar」商業邏輯，供目前流程重複使用。
 const footerHighlightsForStatsBar = footerHighlights.map((item) => ({
   label: item.subtitle,
   value: item.title,
@@ -420,33 +423,17 @@ const footerHighlightsForStatsBar = footerHighlights.map((item) => ({
 }))
 
 const wasteSpeciesCards = getWasteSpeciesCardsLocal()
-const fallbackSpeciesImage = buildSpeciesFallbackImage()
 
-const handleSpeciesImageError = (event) => {
-  const target = event?.target
-  if (!target || target.dataset.fallbackApplied === 'true') return
-  target.dataset.fallbackApplied = 'true'
-  target.src = fallbackSpeciesImage
-}
-
-const handleSpeciesClick = (species) => {
-  router.push({
-    path: `/waste-species/${species.id}`,
-    query: {
-      from: 'home',
-      tab: 'wasteSpeciesRef'
-    }
-  })
-}
-
+// 說明：依目前條件即時計算「current Category」內容，提供畫面顯示與決策判斷使用。
 const currentCategory = computed(() => getCategoryById(selectedCategory.value) || wasteCategories[0])
+// 說明：依目前條件即時計算「current Category Codes」內容，提供畫面顯示與決策判斷使用。
 const currentCategoryCodes = computed(() => {
   if (selectedCategory.value === 'ALL') {
     return getAllWasteCodes()
   }
   return currentCategory.value?.codes || []
 })
-const allWasteCodes = computed(() => getAllWasteCodes())
+// 說明：依目前條件即時計算「filtered Category Codes」內容，提供畫面顯示與決策判斷使用。
 const filteredCategoryCodes = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
   if (!keyword) return currentCategoryCodes.value
@@ -456,12 +443,15 @@ const filteredCategoryCodes = computed(() => {
     return targetText.includes(keyword)
   })
 })
+// 說明：依目前條件即時計算「display Codes」內容，提供畫面顯示與決策判斷使用。
 const displayCodes = computed(() => filteredCategoryCodes.value)
+// 說明：依目前條件即時計算「current Page Codes」內容，提供畫面顯示與決策判斷使用。
 const currentPageCodes = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
   return displayCodes.value.slice(start, end)
 })
+// 說明：依目前條件即時計算「species Display Cards」內容，提供畫面顯示與決策判斷使用。
 const speciesDisplayCards = computed(() => {
   const keyword = speciesSearchKeyword.value.trim().toLowerCase()
   if (!keyword) return wasteSpeciesCards
@@ -471,21 +461,20 @@ const speciesDisplayCards = computed(() => {
     return targetText.includes(keyword)
   })
 })
-const speciesCurrentPageCards = computed(() => {
-  const start = (speciesCurrentPage.value - 1) * speciesPageSize
-  const end = start + speciesPageSize
-  return speciesDisplayCards.value.slice(start, end)
-})
-
+// 說明：回傳「get Category Short Name」資料供畫面渲染或後續商業規則使用。
 const getCategoryShortName = (category) => category?.name?.split(' - ')[1] || category?.name || ''
 
+// 說明：回傳「get Category Color」資料供畫面渲染或後續商業規則使用。
 const getCategoryColor = (category) => {
+  // 說明：封裝「category Info」商業邏輯，供目前流程重複使用。
   const categoryInfo = categoriesDisplay.value.find(c => c.id === category?.id)
   return categoryInfo?.color || '#64748B'
 }
 
+// 說明：回傳「get Category Code Count」資料供畫面渲染或後續商業規則使用。
 const getCategoryCodeCount = (categoryId) => getCategoryById(categoryId)?.codes?.length || 0
 
+// 說明：回傳「get Category Card Style」資料供畫面渲染或後續商業規則使用。
 const getCategoryCardStyle = (catInfo) => {
   const isActive = selectedCategory.value === catInfo.id
   if (!isActive) return {}
@@ -496,34 +485,40 @@ const getCategoryCardStyle = (catInfo) => {
   }
 }
 
+// 說明：回傳「get Category Icon Wrap Style」資料供畫面渲染或後續商業規則使用。
 const getCategoryIconWrapStyle = (catInfo) => {
   const isActive = selectedCategory.value === catInfo.id
 
   return { background: `${catInfo.color}14`, border: `1px solid ${catInfo.color}28`, color: catInfo.color }
 }
 
+// 說明：回傳「get Category Count Style」資料供畫面渲染或後續商業規則使用。
 const getCategoryCountStyle = (catInfo) => {
   const isActive = selectedCategory.value === catInfo.id
   if (isActive) return { color: catInfo.color, background: `${catInfo.color}18`, border: `1px solid ${catInfo.color}36` }
   return { color: '#94a3b8', background: '#f1f5f9' }
 }
 
+// 說明：回傳「get Code Card Top Icon」資料供畫面渲染或後續商業規則使用。
 const getCodeCardTopIcon = (categoryId, cardIndex) => {
   const pool = codeCardTopIconPools[categoryId] || codeCardTopIconPools.C
   return pool[cardIndex % pool.length]
 }
 
+// 說明：封裝「apply Tag」商業邏輯，供目前流程重複使用。
 const applyTag = (tag) => {
   searchKeyword.value = tag
   currentPage.value = 1
 }
 
+// 說明：封裝「select Category」商業邏輯，供目前流程重複使用。
 const selectCategory = (categoryId) => {
   selectedCategory.value = categoryId
   selectedCode.value = defaultCodeMap[categoryId] || getCategoryById(categoryId)?.codes?.[0]?.code || ''
   currentPage.value = 1
 }
 
+// 說明：由使用者互動觸發；執行「handle Card Click」流程並同步更新相關狀態。
 const handleCardClick = (code) => {
   router.push({
     path: '/standard-input',
@@ -537,16 +532,6 @@ const handleCardClick = (code) => {
   })
 }
 
-const handleCodeSelect = (code) => {
-  if (!code) return
-
-  const category = getCategoryByCode(code)
-  if (category) {
-    selectedCategory.value = category.id
-  }
-  selectedCode.value = code
-}
-
 watch([activeTab, selectedCategory, searchKeyword], () => {
   currentPage.value = 1
 })
@@ -555,43 +540,52 @@ watch([activeTab, speciesSearchKeyword], () => {
   speciesCurrentPage.value = 1
 })
 
+// 說明：封裝「show Mode Detail」商業邏輯，供目前流程重複使用。
 const showModeDetail = (mode) => {
   selectedMode.value = mode
   dialogVisible.value = true
 }
 
+// 說明：封裝「prev Process Step」商業邏輯，供目前流程重複使用。
 const prevProcessStep = () => {
   if (activeProcessStep.value <= 0) return
   activeProcessStep.value -= 1
 }
 
+// 說明：封裝「next Process Step」商業邏輯，供目前流程重複使用。
 const nextProcessStep = () => {
   if (activeProcessStep.value >= footerProcessSteps.length - 1) return
   activeProcessStep.value += 1
 }
 
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goProcessStep = (index) => {
   activeProcessStep.value = index
 }
 
+// 說明：封裝「prev Insight Card」商業邏輯，供目前流程重複使用。
 const prevInsightCard = () => {
   if (activeInsightCard.value <= 0) return
   activeInsightCard.value -= 1
 }
 
+// 說明：封裝「next Insight Card」商業邏輯，供目前流程重複使用。
 const nextInsightCard = () => {
   if (activeInsightCard.value >= footerStatsForInsightCards.value.length - 1) return
   activeInsightCard.value += 1
 }
 
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goInsightCard = (index) => {
   activeInsightCard.value = index
 }
 
+// 說明：由使用者互動觸發；執行「handle Mode Search」流程並同步更新相關狀態。
 const handleModeSearch = () => {
   scrollToSearch()
 }
 
+// 說明：封裝「scroll To Search」商業邏輯，供目前流程重複使用。
 const scrollToSearch = () => {
   document.getElementById('search-section')?.scrollIntoView({
     behavior: 'smooth',
@@ -599,17 +593,20 @@ const scrollToSearch = () => {
   })
 }
 
+// 說明：在動畫循環中逐步更新數值與畫面，呈現動態效果。
 const animateFooterStats = () => {
   if (hasFooterStatsAnimated.value) return
   hasFooterStatsAnimated.value = true
 
   const duration = 1400
   const startTime = performance.now()
+  // 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
   const formatters = footerStatsAnimationMeta.map((meta) => new Intl.NumberFormat('zh-TW', {
     minimumFractionDigits: meta.decimals,
     maximumFractionDigits: meta.decimals
   }))
 
+  // 說明：封裝「step」商業邏輯，供目前流程重複使用。
   const step = (currentTime) => {
     const elapsed = currentTime - startTime
     const progress = Math.min(elapsed / duration, 1)

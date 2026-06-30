@@ -5,6 +5,7 @@ import circulationModesData from '../data/circulationModes.json';
 /**
  * 循環模式相關邏輯封裝
  */
+// 說明：封裝「use Circulation Modes」商業邏輯，供目前流程重複使用。
 export function useCirculationModes() {
     const modes = ref([...circulationModesData]);
     const loading = ref(false);
@@ -13,6 +14,7 @@ export function useCirculationModes() {
     /**
      * 取得所有循環模式
      */
+    // 說明：封裝「fetch Modes」商業邏輯，供目前流程重複使用。
     const fetchModes = async () => {
         loading.value = true;
         error.value = null;
@@ -33,6 +35,7 @@ export function useCirculationModes() {
     /**
      * 根據 ID 取得單一模式
      */
+    // 說明：回傳「get Mode By Id」資料供畫面渲染或後續商業規則使用。
     const getModeById = async (id) => {
         loading.value = true;
         error.value = null;

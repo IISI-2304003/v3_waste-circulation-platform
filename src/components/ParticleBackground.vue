@@ -43,6 +43,7 @@ class Particle {
 }
 
 // 初始化畫布
+// 說明：建立初始化資料或執行初始化流程，供後續操作使用。
 const initCanvas = () => {
   canvas = document.createElement('canvas')
   canvas.width = window.innerWidth
@@ -52,6 +53,7 @@ const initCanvas = () => {
 }
 
 // 創建粒子
+// 說明：建立初始化資料或執行初始化流程，供後續操作使用。
 const createParticles = () => {
   const particleCount = window.innerWidth < 768 ? 30 : 60
   particles = []
@@ -65,6 +67,7 @@ const createParticles = () => {
 }
 
 // 動畫循環
+// 說明：在動畫循環中逐步更新數值與畫面，呈現動態效果。
 const animate = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   
@@ -94,6 +97,7 @@ const animate = () => {
 }
 
 // 視窗大小調整
+// 說明：由使用者互動觸發；執行「handle Resize」流程並同步更新相關狀態。
 const handleResize = () => {
   if (canvas) {
     canvas.width = window.innerWidth

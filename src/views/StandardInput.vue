@@ -32,13 +32,12 @@ import { useConditionSetupStore } from '@/stores/conditionSetup'
 const router = useRouter()
 const conditionStore = useConditionSetupStore()
 
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goCompanyMatch = () => {
   router.push('/company-match')
 }
 
-const goBack = () => {
-  router.back()
-}
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goBackHome = () => {
   conditionStore.resetAll()
   router.push('/')

@@ -278,8 +278,7 @@
 <script setup>
 import { computed, nextTick, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { UploadFilled, Search, Location, House } from '@element-plus/icons-vue'
-import { storeToRefs } from 'pinia'
+import { Search, Location, House } from '@element-plus/icons-vue'
 import AcceptanceStandardForm from '@/components/AcceptanceStandardForm.vue'
 import SemanticInputModal from '@/components/SemanticInputModal.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
@@ -305,7 +304,6 @@ const props = defineProps({
 const emits = defineEmits(['next'])
 
 const store = useConditionSetupStore()
-const { uploadedReports } = storeToRefs(store)
 const showSemanticModal = ref(false)
 
 const acceptanceRef = ref(null)
@@ -339,47 +337,6 @@ const expandedMap = reactive({
 	technology: true,
 	demand: true
 })
-
-const regionOptions = [
-	{
-		value: 'north',
-		label: '北部',
-		children: [
-			{ value: 'taipei', label: '台北市' },
-			{ value: 'new-taipei', label: '新北市' },
-			{ value: 'taoyuan', label: '桃園市' }
-		]
-	},
-	{
-		value: 'center',
-		label: '中部',
-		children: [
-			{ value: 'taichung', label: '台中市' },
-			{ value: 'changhua', label: '彰化縣' },
-			{ value: 'nantou', label: '南投縣' }
-		]
-	},
-	{
-		value: 'south',
-		label: '南部',
-		children: [
-			{ value: 'tainan', label: '台南市' },
-			{ value: 'kaohsiung', label: '高雄市' },
-			{ value: 'pingtung', label: '屏東縣' }
-		]
-	}
-]
-
-const cascaderProps = {
-	expandTrigger: 'hover',
-	checkStrictly: true
-}
-
-const maturityMarks = {
-	1: 'TRL1',
-	5: 'TRL5',
-	9: 'TRL9'
-}
 
 const sourceProcessOptions = [
 	{ value: '260001', label: '260001 積體電路製造程序' },
@@ -421,6 +378,7 @@ const technologySelections = ref([])
 const demandSelections = ref([])
 
 // 各區塊「已設定」狀態判斷：不以必填為標準，而是公瓡輸入就計入
+// 說明：依目前條件即時計算「configured Sections」內容，提供畫面顯示與決策判斷使用。
 const configuredSections = computed(() => {
 	const result = []
 	const src = store.sourceConditions
@@ -471,7 +429,6 @@ const demandOptions = [
 	{ value: 'external-sale', label: '再生產品對外販售' }
 ]
 
-const uploadFiles = uploadedReports
 const hasValidationAttempted = ref(false)
 
 const sectionRefMap = {
@@ -484,10 +441,12 @@ const sectionRefMap = {
 	demand: demandRef
 }
 
+// 說明：由切換操作觸發；更新展開/收合或開關狀態。
 const toggleSection = (sectionId) => {
 	expandedMap[sectionId] = !expandedMap[sectionId]
 }
 
+// 說明：由左側步驟導覽點擊觸發；更新 activeSection、展開該區塊並自動捲動到定位位置。
 const handleSectionSelect = async (sectionId) => {
 	store.setActiveSection(sectionId)
 	expandedMap[sectionId] = true
@@ -499,19 +458,13 @@ const handleSectionSelect = async (sectionId) => {
 	}
 }
 
-const onFileChange = (_, files) => {
-	store.setUploadedReports(files)
-}
-
-const onFileRemove = (_, files) => {
-	store.setUploadedReports(files)
-}
-
+// 說明：由「重設條件」按鈕觸發；清空 store 條件並重置表單驗證狀態。
 const resetAll = () => {
 	store.resetAll()
 	hasValidationAttempted.value = false
 }
 
+// 說明：彙整目前尚未填寫的必填欄位，提供下一步卡控與提示訊息使用。
 const getMissingRequiredFields = () => {
 	const missingFields = []
 
@@ -538,6 +491,7 @@ const getMissingRequiredFields = () => {
 	return missingFields
 }
 
+// 說明：由「下一步：媒合分析」按鈕觸發；先檢查必填欄位，通過後觸發 next 事件進入下一步。
 const handleNext = async () => {
 	const missingFields = getMissingRequiredFields()
 	if (missingFields.length === 0) {
@@ -556,6 +510,7 @@ const handleNext = async () => {
 	ElMessage.warning(`請先填寫必填欄位：${missingFields.map((item) => item.label).join('、')}`)
 }
 
+// 說明：依驗證是否已觸發與欄位內容判斷紅框狀態，回傳給表單元件套用樣式。
 const shouldMarkInvalid = (fieldKey) => {
 	if (!hasValidationAttempted.value) return false
 
@@ -570,10 +525,12 @@ const shouldMarkInvalid = (fieldKey) => {
 	return fieldCheckMap[fieldKey]?.() || false
 }
 
+// 說明：由「語意化搜尋」按鈕觸發；開啟語意輸入對話框。
 const openSemanticModal = () => {
 	showSemanticModal.value = true
 }
 
+// 說明：接收語意解析結果後回填允收條件表單，並同步提示使用者。
 const handleSemanticConfirm = (parsedData) => {
 	if (acceptanceRef.value) {
 		acceptanceRef.value.setStandards(parsedData)
@@ -581,10 +538,12 @@ const handleSemanticConfirm = (parsedData) => {
 	}
 }
 
+// 說明：由使用者互動觸發；執行「handle Standards Change」流程並同步更新相關狀態。
 const handleStandardsChange = (standards) => {
 	store.setAcceptanceConditions(standards)
 }
 
+// 說明：由「定位」按鈕觸發；取得瀏覽器座標並回填事業地址欄位。
 const getGeolocation = () => {
 	if (!navigator.geolocation) {
 		ElMessage.error('瀏覽器不支援地理位置定位')
@@ -633,6 +592,7 @@ const getGeolocation = () => {
 	)
 }
 
+// 說明：寫入「set Standards」到狀態管理，讓後續流程可直接取用。
 const setStandards = (parsedStandards) => {
 	acceptanceRef.value?.setStandards(parsedStandards)
 }
@@ -822,30 +782,6 @@ defineExpose({
 	&:hover {
 		color: #ffffff;
 		background: linear-gradient(135deg, rgb(98, 95, 122), rgb(54, 33, 129));
-	}
-}
-
-.report-upload {
-	margin-top: 18px;
-	padding: 16px;
-	border-radius: 14px;
-	border: 1px dashed rgba(76, 175, 80, 0.35);
-	background: rgba(238, 253, 244, 0.66);
-
-	h4 {
-		margin: 0 0 12px;
-		color: #305a4f;
-		font-size: 16px;
-	}
-
-	:deep(.el-upload-dragger) {
-		border-color: rgba(52, 157, 96, 0.38);
-		background: rgba(255, 255, 255, 0.84);
-	}
-
-	.upload-icon {
-		color: #26a69a;
-		font-size: 30px;
 	}
 }
 

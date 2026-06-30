@@ -64,6 +64,7 @@ import { Menu, HomeFilled, InfoFilled, Reading, Message } from '@element-plus/ic
 const router = useRouter()
 const drawerVisible = ref(false)
 
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goHome = () => {
 	router.push('/')
 }

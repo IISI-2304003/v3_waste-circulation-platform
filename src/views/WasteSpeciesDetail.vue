@@ -95,6 +95,7 @@ const fallbackImage = ref('')
 
 // 預留 API 資料來源；目前使用本地資料，未來可直接替換為 API 回傳。
 const apiSpecies = ref([])
+// 說明：依目前條件即時計算「all Species」內容，提供畫面顯示與決策判斷使用。
 const allSpecies = computed(() => {
 	if (apiSpecies.value.length > 0) {
 		return normalizeWasteSpeciesList(apiSpecies.value)
@@ -102,6 +103,7 @@ const allSpecies = computed(() => {
 	return getWasteSpeciesCardsLocal()
 })
 
+// 說明：依目前條件即時計算「species Items Map」內容，提供畫面顯示與決策判斷使用。
 const speciesItemsMap = computed(() => {
 	return allSpecies.value.reduce((acc, item) => {
 		acc[item.id] = item.representativeItems || []
@@ -110,8 +112,10 @@ const speciesItemsMap = computed(() => {
 })
 
 // 分類文本生成
+// 說明：依目前條件即時計算「classification Text」內容，提供畫面顯示與決策判斷使用。
 const classificationText = computed(() => {
 	if (!species.value) return ''
+	// 說明：封裝「species Data」商業邏輯，供目前流程重複使用。
 	const speciesData = allSpecies.value.find(s => s.id === species.value.id)
 	return speciesData?.description || ''
 })
@@ -139,6 +143,7 @@ onMounted(() => {
 })
 
 // 返回搜尋頁
+// 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goBack = () => {
 	router.push({
 		path: '/',
@@ -150,6 +155,7 @@ const goBack = () => {
 }
 
 // 圖像加載錯誤
+// 說明：由使用者互動觸發；執行「handle Image Error」流程並同步更新相關狀態。
 const handleImageError = (event) => {
 	const target = event?.target
 	if (!target || target.dataset.fallbackApplied === 'true') return
@@ -158,6 +164,7 @@ const handleImageError = (event) => {
 }
 
 // 下一步
+// 說明：由使用者互動觸發；執行「handle Next Step」流程並同步更新相關狀態。
 const handleNextStep = () => {
 	ElMessage.success(`已選擇 ${species.value.name}，即將進行條件設定`)
 	router.push({

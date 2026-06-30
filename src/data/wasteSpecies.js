@@ -31,13 +31,16 @@ const BASE_WASTE_SPECIES = [
     { id: '30', name: '廢資訊物品類', imageLabel: '資訊設備', representativeItems: ['電腦主機', '螢幕', '印表機'], description: '廢棄資訊及電腦設備' },
 ];
 
+// 說明：建立初始化資料或執行初始化流程，供後續操作使用。
 export const buildSpeciesImage = (seed) => {
     const safeSeed = String(Number(seed) || 1).padStart(2, '0');
     return `/species/${safeSeed}.jpg`;
 };
 
+// 說明：建立初始化資料或執行初始化流程，供後續操作使用。
 export const buildSpeciesFallbackImage = () => '/species/fallback.jpg';
 
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 export const normalizeWasteSpecies = (rawItem, index = 0) => {
     const rawId = rawItem?.id ?? rawItem?.speciesId ?? `${index + 1}`;
     const id = String(rawId).padStart(2, '0');
@@ -53,13 +56,16 @@ export const normalizeWasteSpecies = (rawItem, index = 0) => {
     };
 };
 
+// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 export const normalizeWasteSpeciesList = (rawList = []) => {
     if (!Array.isArray(rawList)) return [];
     return rawList.map((item, index) => normalizeWasteSpecies(item, index));
 };
 
+// 說明：回傳「get Waste Species Cards Local」資料供畫面渲染或後續商業規則使用。
 export const getWasteSpeciesCardsLocal = () => normalizeWasteSpeciesList(BASE_WASTE_SPECIES);
 
+// 說明：回傳「get Waste Species By Id」資料供畫面渲染或後續商業規則使用。
 export const getWasteSpeciesById = (id, sourceList = BASE_WASTE_SPECIES) => {
     const normalized = normalizeWasteSpeciesList(sourceList);
     return normalized.find((item) => item.id === String(id).padStart(2, '0')) || null;
