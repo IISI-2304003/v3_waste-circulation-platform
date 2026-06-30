@@ -43,7 +43,7 @@
 												</template>
 
 												<div class="address-input-row">
-													<el-input v-model="businessAddress" placeholder="輸入地址或點擊按鈕自動定位" />
+													<el-input v-model="businessAddress" :class="{ 'is-invalid': shouldMarkInvalid('businessAddress') }" placeholder="輸入地址或點擊按鈕自動定位" />
 													<el-button :icon="Location" @click="getGeolocation" :loading="geoLoading">
 														定位
 													</el-button>
@@ -89,7 +89,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>來源產業</span>
 												</template>
-												<el-select v-model="store.sourceConditions.industry" placeholder="選擇來源產業">
+												<el-select v-model="store.sourceConditions.industry" :class="{ 'is-invalid': shouldMarkInvalid('sourceIndustry') }" placeholder="選擇來源產業">
 													<el-option label="電子與半導體" value="semiconductor" />
 													<el-option label="鋼鐵冶金" value="steel" />
 													<el-option label="化工製程" value="chemical" />
@@ -103,7 +103,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>廢棄物來源製程</span>
 												</template>
-												<el-select v-model="store.sourceConditions.process" placeholder="選擇來源製程" filterable>
+												<el-select v-model="store.sourceConditions.process" :class="{ 'is-invalid': shouldMarkInvalid('sourceProcess') }" placeholder="選擇來源製程" filterable>
 													<el-option v-for="item in sourceProcessOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -151,7 +151,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>資本額(元)</span>
 												</template>
-												<el-select v-model="store.businessConditions.capitalAmount" placeholder="選擇資本額">
+												<el-select v-model="store.businessConditions.capitalAmount" :class="{ 'is-invalid': shouldMarkInvalid('capitalAmount') }" placeholder="選擇資本額">
 													<el-option v-for="item in capitalAmountOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -161,7 +161,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>清除頻率</span>
 												</template>
-												<el-select v-model="store.businessConditions.clearanceFrequency" placeholder="選擇清除頻率">
+												<el-select v-model="store.businessConditions.clearanceFrequency" :class="{ 'is-invalid': shouldMarkInvalid('clearanceFrequency') }" placeholder="選擇清除頻率">
 													<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -263,7 +263,7 @@
 			</div>
 			<div class="action-buttons">
 				<el-button @click="resetAll">重設條件</el-button>
-				<el-button type="primary" @click="$emit('next')" class="detail-btn">下一步 : 媒合分析
+				<el-button type="primary" @click="handleNext" class="detail-btn">下一步 : 媒合分析
 					<el-icon class="el-icon--right">
 						<ArrowRight />
 					</el-icon>
@@ -302,7 +302,7 @@ const props = defineProps({
 	}
 })
 
-defineEmits(['next'])
+const emits = defineEmits(['next'])
 
 const store = useConditionSetupStore()
 const { uploadedReports } = storeToRefs(store)
@@ -472,6 +472,7 @@ const demandOptions = [
 ]
 
 const uploadFiles = uploadedReports
+const hasValidationAttempted = ref(false)
 
 const sectionRefMap = {
 	physical: physicalRef,
@@ -508,6 +509,65 @@ const onFileRemove = (_, files) => {
 
 const resetAll = () => {
 	store.resetAll()
+	hasValidationAttempted.value = false
+}
+
+const getMissingRequiredFields = () => {
+	const missingFields = []
+
+	if (!String(store.businessConditions.businessAddress || '').trim()) {
+		missingFields.push({ sectionId: 'physical', label: '事業地址' })
+	}
+
+	if (!store.sourceConditions.industry) {
+		missingFields.push({ sectionId: 'source', label: '來源產業' })
+	}
+
+	if (!store.sourceConditions.process) {
+		missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
+	}
+
+	if (!store.businessConditions.capitalAmount) {
+		missingFields.push({ sectionId: 'business', label: '資本額(元)' })
+	}
+
+	if (!store.businessConditions.clearanceFrequency) {
+		missingFields.push({ sectionId: 'business', label: '清除頻率' })
+	}
+
+	return missingFields
+}
+
+const handleNext = async () => {
+	const missingFields = getMissingRequiredFields()
+	if (missingFields.length === 0) {
+		hasValidationAttempted.value = false
+		emits('next')
+		return
+	}
+
+	hasValidationAttempted.value = true
+
+	const firstMissing = missingFields[0]
+	if (firstMissing?.sectionId) {
+		await handleSectionSelect(firstMissing.sectionId)
+	}
+
+	ElMessage.warning(`請先填寫必填欄位：${missingFields.map((item) => item.label).join('、')}`)
+}
+
+const shouldMarkInvalid = (fieldKey) => {
+	if (!hasValidationAttempted.value) return false
+
+	const fieldCheckMap = {
+		businessAddress: () => !String(store.businessConditions.businessAddress || '').trim(),
+		sourceIndustry: () => !store.sourceConditions.industry,
+		sourceProcess: () => !store.sourceConditions.process,
+		capitalAmount: () => !store.businessConditions.capitalAmount,
+		clearanceFrequency: () => !store.businessConditions.clearanceFrequency
+	}
+
+	return fieldCheckMap[fieldKey]?.() || false
 }
 
 const openSemanticModal = () => {
@@ -793,6 +853,17 @@ defineExpose({
 	margin-right: 4px;
 	color: #f56c6c;
 	font-weight: 700;
+}
+
+:deep(.is-invalid .el-input__wrapper),
+:deep(.is-invalid .el-select__wrapper) {
+	box-shadow: 0 0 0 1px #f56c6c inset !important;
+	border-color: #f56c6c !important;
+}
+
+:deep(.is-invalid .el-input__wrapper:hover),
+:deep(.is-invalid .el-select__wrapper:hover) {
+	box-shadow: 0 0 0 1px #f56c6c inset !important;
 }
 
 /* Element Plus Row / Col 表單 Layout */
