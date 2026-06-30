@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
 	Operation,
 	Connection,
@@ -85,6 +85,14 @@ const gridMetrics = ref({
 })
 
 let gridResizeObserver = null
+
+const normalizeModeName = (name = '') => String(name).replace(/\s+/g, '').trim()
+
+const getDefaultMode = (modes = []) => {
+	const targetName = normalizeModeName('廠內模式1')
+	const matchedMode = modes.find((mode) => normalizeModeName(mode?.name) === targetName)
+	return matchedMode || modes[0] || null
+}
 
 // 基準畫布尺寸（所有縮放的基準值）。
 // 想讓整體更大/更小可先調這個數字，再搭配 gridScale 的上下限微調。
@@ -196,6 +204,16 @@ const handleExploreMode = () => {
 	if (!selectedMode.value) return
 	emit('mode-click', selectedMode.value)
 }
+
+watch(
+	() => props.modes,
+	(modes) => {
+		if (!Array.isArray(modes) || modes.length === 0) return
+		if (selectedMode.value) return
+		selectedMode.value = getDefaultMode(modes)
+	},
+	{ immediate: true }
+)
 
 onMounted(() => {
 	updateGridMetrics()
