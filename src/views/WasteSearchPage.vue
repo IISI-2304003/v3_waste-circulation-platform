@@ -162,13 +162,15 @@ const handleQuickAccess = (code) => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .waste-search-page {
 	max-width: 1200px;
 	margin: 0 auto;
 	padding: 24px 20px 96px;
 	min-height: 80vh;
-	background: linear-gradient(180deg, rgba(236, 246, 239, 0.72), rgba(255, 255, 255, 0.98));
-	border-radius: 32px;
+	background: linear-gradient(180deg, rgba($primary-green, 0.08), rgba($bg-primary, 0.98));
+	border-radius: $card-radius;
 }
 
 .page-header {
@@ -178,14 +180,14 @@ const handleQuickAccess = (code) => {
 
 .page-title {
 	font-size: 36px;
-	font-weight: bold;
-	color: #2C3E50;
+	font-weight: $font-weight-bold;
+	color: $text-primary;
 	margin-bottom: 16px;
 }
 
 .page-description {
 	font-size: 16px;
-	color: #607D8B;
+	color: $text-secondary;
 	max-width: 600px;
 	margin: 0 auto;
 }
@@ -198,11 +200,11 @@ const handleQuickAccess = (code) => {
 	gap: 16px;
 	align-items: center;
 	padding: 18px;
-	background: rgba(255, 255, 255, 0.76);
-	border: 1px solid rgba(112, 154, 131, 0.16);
-	border-radius: 24px;
+	background: rgba($bg-primary, 0.86);
+	border: 1px solid $border-color;
+	border-radius: $card-radius;
 	backdrop-filter: blur(10px);
-	box-shadow: 0 20px 50px rgba(77, 120, 96, 0.1);
+	box-shadow: $shadow-card;
 }
 
 .waste-selector {
@@ -229,7 +231,7 @@ const handleQuickAccess = (code) => {
 
 		.code-name {
 			flex: 1;
-			color: #606266;
+			color: $text-secondary;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
@@ -242,10 +244,10 @@ const handleQuickAccess = (code) => {
 	max-width: 800px;
 	margin: 0 auto 40px;
 	padding: 24px;
-	background: linear-gradient(145deg, rgba(232, 245, 233, 0.96), rgba(244, 249, 247, 0.98));
-	border-radius: 24px;
-	border: 1px solid rgba(76, 175, 80, 0.22);
-	box-shadow: 0 18px 42px rgba(76, 133, 96, 0.12);
+	background: linear-gradient(145deg, rgba($primary-green, 0.12), rgba($bg-section, 0.98));
+	border-radius: $card-radius;
+	border: 1px solid rgba($primary-green, 0.22);
+	box-shadow: $shadow-card;
 	animation: fadeIn 0.3s ease-out;
 }
 
@@ -257,14 +259,14 @@ const handleQuickAccess = (code) => {
 
 	h3 {
 		font-size: 20px;
-		font-weight: 600;
-		color: #2C3E50;
+		font-weight: $font-weight-semibold;
+		color: $text-primary;
 		margin: 0;
 	}
 }
 
 .info-description {
-	color: #607D8B;
+	color: $text-secondary;
 	line-height: 1.6;
 	margin-bottom: 16px;
 }
@@ -282,8 +284,8 @@ const handleQuickAccess = (code) => {
 
 .section-title {
 	font-size: 24px;
-	font-weight: 600;
-	color: #2C3E50;
+	font-weight: $font-weight-semibold;
+	color: $text-primary;
 	margin-bottom: 24px;
 	text-align: center;
 }
@@ -295,7 +297,7 @@ const handleQuickAccess = (code) => {
 
 	&:hover {
 		transform: translateY(-4px);
-		box-shadow: 0 8px 24px rgba(76, 175, 80, 0.2);
+		box-shadow: $shadow-hover;
 	}
 }
 
@@ -306,15 +308,15 @@ const handleQuickAccess = (code) => {
 .card-content {
 	h4 {
 		font-size: 16px;
-		font-weight: 600;
-		color: #2C3E50;
+		font-weight: $font-weight-semibold;
+		color: $text-primary;
 		margin-bottom: 8px;
 	}
 }
 
 .card-description {
 	font-size: 14px;
-	color: #607D8B;
+	color: $text-secondary;
 	line-height: 1.5;
 	display: -webkit-box;
 	line-clamp: 2;
@@ -330,7 +332,7 @@ const handleQuickAccess = (code) => {
 	align-items: center;
 	justify-content: center;
 	padding: 60px 0;
-	color: #909399;
+	color: $text-tertiary;
 
 	.el-icon {
 		font-size: 48px;

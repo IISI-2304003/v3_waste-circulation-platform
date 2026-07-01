@@ -71,9 +71,11 @@ const goHome = () => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/variables.scss" as *;
+
 .app-header {
-	background: #FFFFFF;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	background: $bg-card;
+	box-shadow: $shadow-small;
 	position: sticky;
 	top: 0;
 	z-index: 1000;
@@ -117,17 +119,17 @@ const goHome = () => {
 
 .site-title {
 	font-size: 18px;
-	font-weight: 600;
-	color: #2C3E50;
+	font-weight: $font-weight-semibold;
+	color: $text-primary;
 	margin: 0;
 	line-height: 1.4;
 }
 
 .site-subtitle {
 	font-size: 13px;
-	color: #4CAF50;
+	color: $primary-green;
 	margin: 0;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 /* 導航選單 */
@@ -139,18 +141,18 @@ const goHome = () => {
 
 .nav-item {
 	font-size: 16px;
-	color: #2C3E50;
+	color: $text-primary;
 	text-decoration: none;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	transition: color 0.3s;
 	position: relative;
 
 	&:hover {
-		color: #4CAF50;
+		color: $primary-green;
 	}
 
 	&.router-link-active {
-		color: #4CAF50;
+		color: $primary-green;
 
 		&::after {
 			content: '';
@@ -159,7 +161,7 @@ const goHome = () => {
 			left: 0;
 			right: 0;
 			height: 2px;
-			background: #4CAF50;
+			background: $primary-green;
 		}
 	}
 }
@@ -181,21 +183,21 @@ const goHome = () => {
 	align-items: center;
 	gap: 12px;
 	padding: 16px;
-	color: #2C3E50;
+	color: $text-primary;
 	text-decoration: none;
 	font-size: 16px;
-	font-weight: 500;
-	border-radius: 8px;
+	font-weight: $font-weight-medium;
+	border-radius: $radius-input;
 	transition: all 0.3s;
 
 	&:hover {
-		background: #F9FAFB;
-		color: #4CAF50;
+		background: $bg-section;
+		color: $primary-green;
 	}
 
 	&.router-link-active {
-		background: #E8F5E9;
-		color: #4CAF50;
+		background: rgba($primary-green, 0.12);
+		color: $primary-green;
 	}
 
 	.el-icon {

@@ -1,102 +1,106 @@
-// ==================== 色彩變數 ====================
+// ==================== Design System Tokens ====================
 
-// 主色調 - 清新綠
+// Brand colors
 $primary-green: #4caf50;
 $primary-green-light: #66bb6a;
 $primary-green-dark: #388e3c;
 
-// 輔助色 - 藍綠
 $secondary-teal: #26a69a;
 $secondary-cyan: #00bcd4;
+$secondary-cyan-dark: #0288d1;
 
-// 強調色 - 橘褐
-$accent-brown: #a0522d;
 $accent-orange: #ff9800;
+$accent-orange-dark: #f57c00;
+$accent-brown: #a0522d;
+$error: #ef5350;
 
-// 背景色 - 強調留白
+// Surface colors
 $bg-primary: #ffffff;
-$bg-gradient: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 50%, #ffffff 100%);
 $bg-card: #ffffff;
-$bg-section: #f9fafb;
+$bg-section: #f8fafc;
+$bg-gradient: radial-gradient(circle at 10% 20%, #8fb2e01a, #0000 50%), radial-gradient(circle at 70% 20%, #2196f333, #0000 40%), radial-gradient(circle at 10% 100%, #8fb2e04d, #0000 50%);
 
-// 中性色
+// Text colors
 $text-primary: #2c3e50;
 $text-secondary: #607d8b;
 $text-tertiary: #90a4ae;
-$border-color: #e0e0e0;
-$border-light: #f0f0f0;
 
-// ==================== 間距變數 ====================
+// Border colors
+$border-color: #e2e8f0;
+$border-light: #f1f5f9;
+$input-border: #dde5ec;
 
-// 區塊間距
-$spacing-section-desktop: 120px;
-$spacing-section-tablet: 80px;
-$spacing-section-mobile: 60px;
-
-// 卡片內距
-$spacing-card-large: 32px;
-$spacing-card-medium: 24px;
-$spacing-card-small: 16px;
-
-// 一般間距
-$spacing-xl: 48px;
-$spacing-lg: 32px;
-$spacing-md: 24px;
-$spacing-sm: 16px;
-$spacing-xs: 8px;
-
-// ==================== 字體變數 ====================
-
+// Typography
 $font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif;
 $font-family-code: 'Courier New', Courier, monospace;
 
-// 字體大小
-$font-size-hero: 48px;
-$font-size-h1: 36px;
-$font-size-h2: 28px;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$font-size-hero: 56px;
+$font-size-h1: 40px;
+$font-size-h2: 32px;
 $font-size-h3: 24px;
 $font-size-h4: 20px;
 $font-size-body: 16px;
 $font-size-small: 15px;
 
-// 行距
-$line-height-tight: 1.4;
+$line-height-tight: 1.2;
 $line-height-base: 1.6;
 $line-height-loose: 1.8;
 
-// ==================== 陰影變數 ====================
+// Spacing
+$spacing-2xs: 4px;
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 40px;
+$spacing-2xl: 64px;
 
-$shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.05);
-$shadow-md: 0 2px 12px rgba(0, 0, 0, 0.08);
-$shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.12);
-$shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.16);
+$spacing-card-gap: 24px;
+$spacing-card-padding: 24px;
+$spacing-section-gap: 40px;
+$spacing-page-gap: 64px;
 
-// 懸停陰影
-$shadow-hover: 0 6px 24px rgba(76, 175, 80, 0.2);
+// Radius
+$radius-input: 8px;
+$radius-button: 12px;
+$radius-card: 16px;
+$radius-dialog: 20px;
+$radius-tag: 9999px;
 
-// ==================== 圓角變數 ====================
+$input-radius: $radius-input;
+$button-radius: $radius-button;
+$card-radius: $radius-card;
+$dialog-radius: $radius-dialog;
+$tag-radius: $radius-tag;
 
-$radius-sm: 4px;
-$radius-md: 8px;
-$radius-lg: 12px;
-$radius-xl: 16px;
-$radius-full: 9999px;
+// Shadow
+$shadow-small: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-card: 0 8px 24px rgba(0, 0, 0, 0.06);
+$shadow-hover: 0 12px 30px rgba(76, 175, 80, 0.15);
 
-// ==================== 轉場時間 ====================
+$shadow-sm: $shadow-small;
+$shadow-md: $shadow-card;
 
-$transition-fast: 0.15s;
+// Transition
 $transition-base: 0.3s;
-$transition-slow: 0.5s;
 
-// ==================== 斷點變數 ====================
+// Icon sizes
+$icon-size-default: 20px;
+$icon-size-section: 40px;
+$icon-size-step: 48px;
 
+// Breakpoints
 $breakpoint-mobile: 768px;
 $breakpoint-tablet: 1024px;
 $breakpoint-desktop: 1200px;
 $breakpoint-wide: 1440px;
 
-// ==================== Z-index 層級 ====================
-
+// Z-index layers
 $z-dropdown: 1000;
 $z-sticky: 1020;
 $z-fixed: 1030;
@@ -105,9 +109,410 @@ $z-modal: 1050;
 $z-popover: 1060;
 $z-tooltip: 1070;
 
-// ==================== Mixin ====================
+:root {
+    --ds-primary-green: #{$primary-green};
+    --ds-primary-green-light: #{$primary-green-light};
+    --ds-primary-green-dark: #{$primary-green-dark};
+    --ds-secondary-teal: #{$secondary-teal};
+    --ds-secondary-cyan: #{$secondary-cyan};
+    --ds-secondary-cyan-dark: #{$secondary-cyan-dark};
+    --ds-accent-orange: #{$accent-orange};
+    --ds-accent-orange-dark: #{$accent-orange-dark};
+    --ds-accent-brown: #{$accent-brown};
+    --ds-error: #{$error};
+    --ds-bg-primary: #{$bg-primary};
+    --ds-bg-card: #{$bg-card};
+    --ds-bg-section: #{$bg-section};
+    --ds-bg-gradient: #{$bg-gradient};
+    --ds-text-primary: #{$text-primary};
+    --ds-text-secondary: #{$text-secondary};
+    --ds-text-tertiary: #{$text-tertiary};
+    --ds-border-color: #{$border-color};
+    --ds-border-light: #{$border-light};
+    --ds-input-border: #{$input-border};
+    --ds-font-family-base: #{$font-family-base};
+    --ds-font-size-body: #{$font-size-body};
+    --ds-font-size-small: #{$font-size-small};
+    --ds-font-weight-regular: #{$font-weight-regular};
+    --ds-font-weight-medium: #{$font-weight-medium};
+    --ds-font-weight-semibold: #{$font-weight-semibold};
+    --ds-font-weight-bold: #{$font-weight-bold};
+    --ds-radius-input: #{$radius-input};
+    --ds-radius-button: #{$radius-button};
+    --ds-radius-card: #{$radius-card};
+    --ds-radius-dialog: #{$radius-dialog};
+    --ds-radius-tag: #{$radius-tag};
+    --ds-shadow-small: #{$shadow-small};
+    --ds-shadow-card: #{$shadow-card};
+    --ds-shadow-hover: #{$shadow-hover};
+    --ds-transition-base: #{$transition-base};
+    --ds-icon-size-default: #{$icon-size-default};
+    --ds-icon-size-section: #{$icon-size-section};
+    --ds-icon-size-step: #{$icon-size-step};
 
-// 響應式斷點
+    --el-color-primary: #{$primary-green};
+    --el-color-primary-light-3: #{$primary-green-light};
+    --el-color-primary-light-5: #8bc34a;
+    --el-color-primary-light-7: #c8e6c9;
+    --el-color-primary-light-8: #e8f5e9;
+    --el-color-primary-light-9: #f1f8f4;
+    --el-color-primary-dark-2: #{$primary-green-dark};
+    --el-color-success: #{$primary-green};
+    --el-color-warning: #{$accent-orange};
+    --el-color-danger: #{$error};
+    --el-color-info: #{$secondary-teal};
+    --el-bg-color: #{$bg-primary};
+    --el-bg-color-page: #{$bg-section};
+    --el-bg-color-overlay: #ffffff;
+    --el-text-color-primary: #{$text-primary};
+    --el-text-color-regular: #{$text-primary};
+    --el-text-color-secondary: #{$text-secondary};
+    --el-text-color-placeholder: #{$text-tertiary};
+    --el-border-color: #{$border-color};
+    --el-border-color-light: #{$border-light};
+    --el-border-color-lighter: #edf2f7;
+    --el-border-color-extra-light: #f8fafc;
+    --el-fill-color-blank: #{$bg-primary};
+    --el-fill-color-light: #f8fafc;
+    --el-fill-color-lighter: #f1f5f9;
+    --el-fill-color-dark: #e2e8f0;
+    --el-border-radius-base: #{$radius-button};
+    --el-border-radius-small: #{$radius-input};
+    --el-border-radius-round: #{$radius-tag};
+    --el-button-border-radius: #{$radius-button};
+    --el-component-size: 44px;
+    --el-font-size-base: #{$font-size-body};
+    --el-font-weight-primary: #{$font-weight-regular};
+    --el-box-shadow: #{$shadow-card};
+    --el-box-shadow-light: #{$shadow-small};
+    --el-box-shadow-dark: #{$shadow-hover};
+    --el-checkbox-border-radius: 4px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    color-scheme: light;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: $bg-primary;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    font-family: $font-family-base;
+    font-size: $font-size-body;
+    font-weight: $font-weight-regular;
+    line-height: $line-height-base;
+    color: $text-primary;
+    background: $bg-gradient;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+    font-family: $font-family-base;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    color: $text-primary;
+    line-height: $line-height-tight;
+    font-weight: $font-weight-semibold;
+}
+
+h1,
+.h1 {
+    font-size: $font-size-h1;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.02em;
+}
+
+h2,
+.h2 {
+    font-size: $font-size-h2;
+    font-weight: $font-weight-semibold;
+}
+
+h3,
+.h3 {
+    font-size: $font-size-h3;
+    font-weight: $font-weight-semibold;
+}
+
+h4,
+.h4 {
+    font-size: $font-size-h4;
+    font-weight: $font-weight-semibold;
+}
+
+.hero-title,
+.page-hero__title,
+.section-hero__title {
+    font-size: $font-size-hero;
+    font-weight: $font-weight-bold;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+}
+
+p,
+li {
+    font-size: $font-size-body;
+}
+
+small,
+.text-xs,
+figcaption,
+caption {
+    font-size: $font-size-small !important;
+    line-height: 1.5;
+}
+
+a {
+    color: $primary-green-dark;
+    text-decoration: none;
+    transition: color $transition-base ease;
+}
+
+a:hover {
+    color: $primary-green;
+}
+
+button,
+[role='button'] {
+    transition:
+        background-color $transition-base ease,
+        color $transition-base ease,
+        border-color $transition-base ease,
+        box-shadow $transition-base ease,
+        transform $transition-base ease;
+}
+
+.el-button {
+    min-height: 44px;
+    border-radius: $radius-button !important;
+    font-size: $font-size-body !important;
+    font-weight: $font-weight-medium;
+    line-height: 1.2;
+    box-shadow: none;
+}
+
+.el-button:hover {
+    transform: translateY(-1px);
+}
+
+.el-button:focus-visible {
+    outline: 2px solid rgba(76, 175, 80, 0.18);
+    outline-offset: 2px;
+}
+
+.el-button > span {
+    font-weight: inherit;
+}
+
+.el-button.is-circle {
+    border-radius: $radius-button !important;
+}
+
+.el-button--primary {
+    background-color: $primary-green;
+    border-color: $primary-green;
+    color: #ffffff;
+    box-shadow: $shadow-small;
+}
+
+.el-button--primary:hover,
+.el-button--primary:focus,
+.el-button--primary:active {
+    background-color: $primary-green-dark;
+    border-color: $primary-green-dark;
+    color: #ffffff;
+    box-shadow: $shadow-hover;
+}
+
+.el-button--primary.is-plain {
+    background-color: #ffffff;
+    border-color: $primary-green;
+    color: $primary-green;
+    box-shadow: none;
+}
+
+.el-button--primary.is-plain:hover,
+.el-button--primary.is-plain:focus,
+.el-button--primary.is-plain:active {
+    background-color: $bg-section;
+    border-color: $primary-green-dark;
+    color: $primary-green-dark;
+}
+
+.el-button.is-text,
+.el-button.is-link {
+    background: transparent;
+    border-color: transparent;
+    color: $primary-green;
+    box-shadow: none;
+}
+
+.el-button.is-text:hover,
+.el-button.is-link:hover {
+    color: $primary-green-dark;
+    background: rgba(76, 175, 80, 0.08);
+}
+
+.el-button--danger,
+.el-button--danger.is-plain {
+    background-color: $error;
+    border-color: $error;
+    color: #ffffff;
+}
+
+.el-button--danger:hover,
+.el-button--danger:focus,
+.el-button--danger:active,
+.el-button--danger.is-plain:hover,
+.el-button--danger.is-plain:focus,
+.el-button--danger.is-plain:active {
+    background-color: #e53935;
+    border-color: #e53935;
+    color: #ffffff;
+    box-shadow: 0 12px 30px rgba(239, 83, 80, 0.16);
+}
+
+.el-checkbox__inner {
+    border-radius: 4px !important;
+}
+
+.el-input,
+.el-input-number,
+.el-select,
+.el-textarea {
+    --el-input-height: 44px;
+}
+
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner,
+.el-input-number .el-input__wrapper {
+    min-height: 44px !important;
+    border-radius: $radius-input !important;
+    border: 1px solid $input-border !important;
+    box-shadow: none !important;
+    transition:
+        border-color $transition-base ease,
+        box-shadow $transition-base ease,
+        transform $transition-base ease;
+    font-size: $font-size-body !important;
+    color: $text-primary !important;
+    background-color: #ffffff !important;
+}
+
+.el-textarea__inner {
+    padding-top: 11px !important;
+    padding-bottom: 11px !important;
+}
+
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused,
+.el-input-number.is-focus .el-input__wrapper,
+.el-input:focus-within .el-input__wrapper,
+.el-textarea:focus-within .el-textarea__inner,
+.el-select:focus-within .el-select__wrapper,
+.el-input-number:focus-within .el-input__wrapper {
+    border-color: $primary-green !important;
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.12) !important;
+}
+
+.el-input__inner,
+.el-textarea__inner,
+.el-select__selected-item,
+.el-select__placeholder,
+.el-input-number .el-input__inner {
+    font-size: $font-size-body !important;
+    color: $text-primary !important;
+}
+
+.el-tag {
+    border-radius: $radius-tag !important;
+    padding: 6px 12px;
+    font-size: $font-size-small !important;
+    font-weight: $font-weight-medium;
+    line-height: 1.2;
+}
+
+.el-card,
+.panel-card {
+    background: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-card !important;
+    box-shadow: $shadow-card;
+    transition:
+        transform $transition-base ease,
+        box-shadow $transition-base ease;
+}
+
+.el-card:hover,
+.panel-card:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+}
+
+.el-dialog {
+    border-radius: $radius-dialog !important;
+    box-shadow: $shadow-card;
+    overflow: hidden;
+}
+
+.el-dialog__header {
+    padding: 24px 24px 16px;
+}
+
+.el-dialog__body {
+    padding: 0 24px 24px;
+}
+
+.el-dialog__footer {
+    padding: 0 24px 24px;
+}
+
+.el-drawer {
+    border-radius: $radius-dialog 0 0 $radius-dialog;
+    box-shadow: $shadow-card;
+}
+
+.icon-container,
+.section-icon,
+.icon-section,
+.step-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-card;
+}
+
+.section-icon,
+.icon-section {
+    width: $icon-size-section;
+    height: $icon-size-section;
+}
+
+.step-icon {
+    width: $icon-size-step;
+    height: $icon-size-step;
+}
+
 @mixin mobile {
     @media (max-width: #{$breakpoint-mobile - 1px}) {
         @content;
@@ -126,7 +531,6 @@ $z-tooltip: 1070;
     }
 }
 
-// 文字省略
 @mixin text-ellipsis($lines: 1) {
     @if $lines == 1 {
         overflow: hidden;
@@ -140,7 +544,6 @@ $z-tooltip: 1070;
     }
 }
 
-// 清除浮動
 @mixin clearfix {
     &::after {
         content: '';
@@ -149,7 +552,6 @@ $z-tooltip: 1070;
     }
 }
 
-// 絕對置中
 @mixin absolute-center {
     position: absolute;
     top: 50%;
@@ -157,25 +559,8 @@ $z-tooltip: 1070;
     transform: translate(-50%, -50%);
 }
 
-// Flexbox 置中
 @mixin flex-center {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-// 全域基礎樣式（放在變數檔底部，或獨立的 base.scss）
-body {
-    font-size: $font-size-body;
-    font-weight: 500;
-    font-family: $font-family-base;
-    line-height: $line-height-base;
-}
-
-// 防止任何元素字體低於 15px
-small,
-.text-xs,
-figcaption,
-caption {
-    font-size: 15px;
 }

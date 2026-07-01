@@ -20,6 +20,7 @@
 											<el-form-item>
 												<template #label>
 													<div class="label-with-icon">
+														<span class="required-mark">*</span>
 														<el-icon>
 															<House />
 														</el-icon>
@@ -110,13 +111,19 @@
 										</el-col>
 
 										<el-col :xs="24" :sm="24" :md="12">
-											<el-form-item label="月產出量 (公噸)">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>月產出量 (公噸)</span>
+												</template>
 												<el-input-number v-model="store.sourceConditions.outputAmount" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
 										</el-col>
 
 										<el-col :xs="24" :sm="24" :md="12">
-											<el-form-item label="產出頻率">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>產出頻率</span>
+												</template>
 												<el-select v-model="store.sourceConditions.frequency" placeholder="選擇產出頻率" filterable>
 													<el-option v-for="item in sourceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
@@ -128,18 +135,36 @@
 
 							<ConditionAccordionSection id="site" ref="siteRef" title="場地配置" theme="violet" :expanded="expandedMap.site" @toggle="toggleSection">
 								<el-form label-position="top" class="form-grid">
-									<el-form-item label="是否有再利用空間">
-										<el-switch v-model="store.siteConditions.hasReuseSpace" active-text="有" inactive-text="無" inline-prompt />
-									</el-form-item>
+									<el-row :gutter="24" class="form-row">
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>是否有再利用空間</span>
+												</template>
+												<el-select v-model="store.siteConditions.hasReuseSpace" placeholder="選擇是否有再利用空間" filterable>
+													<el-option v-for="item in reuseSpaceOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+									</el-row>
 								</el-form>
 
 							</ConditionAccordionSection>
 
 							<ConditionAccordionSection id="environment" ref="environmentRef" title="環境影響" theme="orange" :expanded="expandedMap.environment" @toggle="toggleSection">
 								<el-form label-position="top" class="form-grid">
-									<el-form-item label="是否有產生衍生廢棄物">
-										<el-switch v-model="store.siteConditions.hasSecondaryWaste" active-text="有" inactive-text="無" inline-prompt />
-									</el-form-item>
+									<el-row :gutter="24" class="form-row">
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>是否有產生衍生廢棄物</span>
+												</template>
+												<el-select v-model="store.siteConditions.hasSecondaryWaste" placeholder="選擇是否有產生衍生廢棄物" filterable>
+													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+									</el-row>
 								</el-form>
 							</ConditionAccordionSection>
 
@@ -162,7 +187,7 @@
 													<span><span class="required-mark">*</span>清除頻率</span>
 												</template>
 												<el-select v-model="store.businessConditions.clearanceFrequency" :class="{ 'is-invalid': shouldMarkInvalid('clearanceFrequency') }" placeholder="選擇清除頻率">
-													<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
+													<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.label" />
 												</el-select>
 											</el-form-item>
 										</el-col>
@@ -314,6 +339,14 @@ const businessRef = ref(null)
 const environmentRef = ref(null)
 const technologyRef = ref(null)
 const demandRef = ref(null)
+const reuseSpaceOptions = [
+	{ value: true, label: '有' },
+	{ value: false, label: '無' }
+]
+const secondaryWasteOptions = [
+	{ value: true, label: '有' },
+	{ value: false, label: '無' }
+]
 const businessName = computed({
 	get: () => store.businessConditions.businessName || '',
 	set: (value) => {

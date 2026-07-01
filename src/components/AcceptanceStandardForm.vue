@@ -232,12 +232,12 @@ defineExpose({
 .form-description {
 	margin-bottom: 20px;
 	padding: 16px;
-	background: linear-gradient(135deg, rgba(234, 245, 237, 0.86), rgba(244, 249, 247, 0.94));
-	border-radius: 8px;
+	background: linear-gradient(135deg, rgba($primary-green, 0.12), rgba($bg-section, 0.96));
+	border-radius: $input-radius;
 
 	p {
 		margin: 0;
-		color: #606266;
+		color: $text-secondary;
 		line-height: 1.6;
 	}
 }
@@ -254,14 +254,15 @@ defineExpose({
 	align-items: center;
 	gap: 12px;
 	padding: 16px;
-	background: white;
-	border: 1px solid rgba(109, 154, 128, 0.2);
-	border-radius: 8px;
+	background: $bg-card;
+	border: 1px solid $border-color;
+	border-radius: $card-radius;
+	box-shadow: $shadow-card;
 	transition: all 0.3s ease;
 
 	&:hover {
-		border-color: #5c9b77;
-		box-shadow: 0 8px 22px rgba(74, 128, 96, 0.12);
+		border-color: $primary-green-light;
+		box-shadow: $shadow-hover;
 	}
 }
 
@@ -289,8 +290,8 @@ defineExpose({
 }
 
 .range-separator {
-	color: #909399;
-	font-weight: bold;
+	color: $text-tertiary;
+	font-weight: $font-weight-bold;
 	padding: 0 4px;
 }
 
@@ -312,8 +313,8 @@ defineExpose({
 
 	h3 {
 		font-size: 20px;
-		font-weight: 600;
-		color: #2C3E50;
+		font-weight: $font-weight-semibold;
+		color: $text-primary;
 		margin-bottom: 16px;
 	}
 }
@@ -321,6 +322,27 @@ defineExpose({
 .no-results {
 	margin-top: 32px;
 	padding: 40px 0;
+}
+
+// 按鈕
+.detail-btn {
+	flex-shrink: 0;
+	padding: 4px 12px;
+	border: 1.5px solid $primary-green;
+	border-radius: $button-radius;
+	background: $bg-primary;
+	color: $primary-green;
+	font-size: 15px;
+	font-weight: $font-weight-medium;
+	cursor: pointer;
+	transition: background 0.2s, color 0.2s;
+	margin-left: auto;
+
+	&:hover {
+		background: $primary-green-dark;
+		border-color: $primary-green-dark;
+		color: $bg-primary;
+	}
 }
 
 /* 响应式 */

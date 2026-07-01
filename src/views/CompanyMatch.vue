@@ -13,7 +13,7 @@
         </el-col>
         <el-col :xs="24" :md="18">
           <div class="header-title">
-            <h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
+            <h1 class="hero-title">產業廢棄物循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
             <p>路徑推薦</p>
           </div>
         </el-col>
@@ -30,10 +30,12 @@
               <div class="banner-title-row">
                 <div class="ai-icon"><el-icon>
                     <Monitor />
-                  </el-icon></div>
+                  </el-icon>
+                </div>
                 <div>
                   <h2>媒合分析結果</h2>
                   <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
+                  <p class="reminder-text">貼心提醒: 本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
                 </div>
               </div>
 
@@ -98,10 +100,7 @@
               <!-- 頂部色塊區 -->
               <div class="path-header">
                 <span class="path-rank-badge" :style="{ background: path.gradient }">推薦路徑{{ path.rank }}</span>
-
-
               </div>
-
               <!-- 流程圖區 -->
               <div class="path-body">
                 <div class="path-intro">
@@ -270,6 +269,19 @@ const yesNoText = (value) => {
   return '未設定'
 }
 
+const clearanceFrequencyLabelMap = {
+  daily: '每日',
+  weekly: '每週',
+  monthly: '每月',
+  quarterly: '每季',
+  yearly: '每年'
+}
+
+const toClearanceFrequencyLabel = (value) => {
+  if (!value) return '未設定'
+  return clearanceFrequencyLabelMap[value] || value
+}
+
 const IMPACT_LEVEL_SCORE_MAP = {
   high: 100,
   medium: 65,
@@ -284,9 +296,9 @@ const getImpactLevel = (condition) => {
   // 中(medium): 部分設定，74-50 分
   // 低(low): 未設定或最少設定，49-0 分
   const score = condition.score || 0
-  if (score >= 75) return { level: 'high', color: '#22c55e', levelLabel: '高' }
-  if (score >= 50) return { level: 'medium', color: '#eab308', levelLabel: '中' }
-  return { level: 'low', color: '#ef4444', levelLabel: '低' }
+  if (score >= 75) return { level: 'high', color: 'var(--ds-primary-green)', levelLabel: '高' }
+  if (score >= 50) return { level: 'medium', color: 'var(--ds-accent-orange)', levelLabel: '中' }
+  return { level: 'low', color: 'var(--ds-error)', levelLabel: '低' }
 }
 
 // 說明：封裝「to Radar Score」商業邏輯，供目前流程重複使用。
@@ -319,6 +331,7 @@ const conditionSummary = computed(() => {
   const technologyScore = 50 // 默認中等影響度
 
   const demandScore = 50 // 默認中等影響度
+  console.log("store.businessConditions", store.businessConditions);
 
   return [
     {
@@ -356,7 +369,7 @@ const conditionSummary = computed(() => {
     {
       id: 'business',
       label: '經濟效益',
-      value: store.businessConditions.clearanceFrequency ? `${store.businessConditions.clearanceFrequency}` : '未設定',
+      value: toClearanceFrequencyLabel(store.businessConditions.clearanceFrequency),
       score: businessScore,
       icon: Money,
       ...getImpactLevel({ score: businessScore })
@@ -707,7 +720,7 @@ onBeforeUnmount(() => {
 }
 
 .back-btn {
-  color: #5d7772;
+  color: $text-secondary;
   font-size: 14px;
 }
 
@@ -720,23 +733,72 @@ onBeforeUnmount(() => {
   // max-width: 1360px;
   // margin: 24px 18px;
   padding: 28px 32px;
-  background: #ffffff80;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow: 0 14px 34px rgba(53, 93, 83, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  background: rgba($bg-primary, 0.8);
+  border-radius: $card-radius;
+  border: 1px solid rgba($bg-primary, 0.82);
+  box-shadow: $shadow-card, inset 0 1px 0 rgba($bg-primary, 0.78);
   backdrop-filter: blur(16px);
   // display: grid;
   // grid-template-columns: 300px 1fr 220px;
   gap: 24px;
   align-items: start;
+
+  .banner-row {
+    display: flex;
+    align-items: flex-start;
+
+    .banner-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      .banner-title-row {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        margin-bottom: 18px;
+        font-weight: 600;
+
+        .hero-title-accent {
+          color: $primary-green;
+        }
+
+        .hero-title-accent-secondary {
+          color: $secondary-cyan;
+        }
+
+        h2 {
+          margin: 0 0 5px;
+          font-size: 21px;
+          font-weight: 700;
+          color: $text-primary;
+        }
+
+        p {
+          margin: 0;
+          font-size: 15px;
+          line-height: 1.6;
+          color: $text-secondary;
+
+          &.reminder-text {
+            font-size: 15px;
+            color: $error;
+            line-height: 1.4;
+            margin-top: 10px;
+          }
+        }
+
+      }
+
+    }
+  }
+
+
 }
 
-.banner-title-row {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-bottom: 18px;
-}
+
+
 
 .ai-icon {
   width: 40px;
@@ -751,31 +813,7 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
 }
 
-.banner-row {
-  display: flex;
-  align-items: flex-start;
 
-  .banner-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-
-    h2 {
-      margin: 0 0 5px;
-      font-size: 21px;
-      font-weight: 700;
-      color: #2d554a;
-    }
-
-    p {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.6;
-      color: #7a9490;
-    }
-  }
-}
 
 .score-card {
   background: linear-gradient(145deg, #f4fbf7, #edf7f3);
@@ -1074,6 +1112,7 @@ onBeforeUnmount(() => {
     max-height: 7.2em;
     overflow: hidden;
     display: -webkit-box;
+    line-clamp: 4;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
   }

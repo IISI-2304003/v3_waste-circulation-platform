@@ -8,7 +8,7 @@
             <img src="../assets/logo.png" alt="環境部資源循環署" class="hero-logo" />
           </div>
 
-          <h1 class="hero-title">產業資源循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
+          <h1 class="hero-title">產業資源循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
           <p class="hero-description">連結資源循環供需，推動產業共生，實現永續循環經濟</p>
 
           <div class="hero-actions">
@@ -141,7 +141,7 @@
               <span v-html="categoryIcons[catInfo.id]" class="category-svg-icon"></span>
             </div>
             <div class="category-card-label" :style="{ color: selectedCategory === catInfo.id ? catInfo.color : catInfo.color }">{{ catInfo.id }}類</div>
-            <div class="category-card-name" :style="{ color: '#1a365d' }">{{ catInfo.displayName }}</div>
+            <div class="category-card-name">{{ catInfo.displayName }}</div>
             <div class="category-card-count" :style="getCategoryCountStyle(catInfo)">{{ getCategoryCodeCount(catInfo.id) }} 項</div>
           </button>
         </div>
@@ -378,12 +378,12 @@ const footerStats = [
     unit: '萬噸',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h4l-1.5-2.5"/><path d="M7 7l2.5 4.5"/><path d="M17 7l-2.5-4.5"/><path d="M17 7h-4"/><path d="M17 17h-4l1.5 2.5"/><path d="M17 17l-2.5-4.5"/><path d="M7 17l2.5 4.5"/><path d="M7 17h4"/></svg>'
   },
-  {
-    label: '減碳效益',
-    value: '12.6',
-    unit: '萬噸 CO₂e',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.5A4.5 4.5 0 1 1 12 9a4.2 4.2 0 0 1 6.7 3.4A3.6 3.6 0 1 1 18 19H8.8"/><path d="M9 21h6"/><path d="M10 18h4"/></svg>'
-  }
+  // {
+  //   label: '減碳效益',
+  //   value: '12.6',
+  //   unit: '萬噸 CO₂e',
+  //   icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.5A4.5 4.5 0 1 1 12 9a4.2 4.2 0 0 1 6.7 3.4A3.6 3.6 0 1 1 18 19H8.8"/><path d="M9 21h6"/><path d="M10 18h4"/></svg>'
+  // }
 ]
 
 // 說明：封裝「footer Stats Animation Meta」商業邏輯，供目前流程重複使用。
@@ -438,9 +438,13 @@ const filteredCategoryCodes = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
   if (!keyword) return currentCategoryCodes.value
 
+  // 移除連字號，讓 C-0202 與 C0202 都能比對到
+  const normalizedKeyword = keyword.replace(/-/g, '')
+
   return currentCategoryCodes.value.filter((code) => {
     const targetText = `${code.code} ${code.name} ${code.description || ''}`.toLowerCase()
-    return targetText.includes(keyword)
+    const normalizedTargetText = targetText.replace(/-/g, '')
+    return targetText.includes(keyword) || normalizedTargetText.includes(normalizedKeyword)
   })
 })
 // 說明：依目前條件即時計算「display Codes」內容，提供畫面顯示與決策判斷使用。
@@ -689,10 +693,8 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   padding-bottom: 0;
-  background:
-    radial-gradient(circle at 10% 20%, rgba(143, 178, 224, 0.1), transparent 50%),
-    radial-gradient(circle at 70% 20%, rgba(33, 150, 243, 0.2), transparent 40%),
-    radial-gradient(circle at 10% 100%, rgba(143, 178, 224, 0.3), transparent 50%);
+  // background:
+  //   radial-gradient(circle at 10% 20%, #8fb2e01a, #0000 50%), radial-gradient(circle at 70% 20%, #2196f333, #0000 40%), radial-gradient(circle at 10% 100%, #8fb2e04d, #0000 50%);
   background-size: auto, auto, auto;
 }
 
@@ -748,7 +750,7 @@ onBeforeUnmount(() => {
     right: 0;
     bottom: 0;
     height: 140px;
-    background: linear-gradient(180deg, rgba(248, 250, 252, 0) 0%, rgba(248, 250, 252, 0.08) 38%, rgba(248, 250, 252, 0.18) 100%);
+    background: linear-gradient(180deg, rgba($bg-section, 0) 0%, rgba($bg-section, 0.08) 38%, rgba($bg-section, 0.18) 100%);
     z-index: 1;
     pointer-events: none;
   }
@@ -820,15 +822,23 @@ onBeforeUnmount(() => {
 .hero-title {
   font-size: clamp(48px, 3.2vw, 68px);
   font-weight: 800;
-  color: #1a365d;
+  color: $text-primary;
   margin-bottom: 16px;
   line-height: 1.3;
   animation: fadeInUp 0.8s ease-out 0.1s backwards;
 }
 
+.hero-title-accent {
+  color: $primary-green;
+}
+
+.hero-title-accent-secondary {
+  color: $secondary-cyan;
+}
+
 .hero-description {
   font-size: clamp(17px, 1.1vw, 24px);
-  color: #4a5568;
+  color: $text-secondary;
   margin-bottom: 20px;
   line-height: 1.8;
   animation: fadeInUp 0.8s ease-out 0.3s backwards;
@@ -1069,7 +1079,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 14px 34px rgba(16, 24, 40, 0.12);
   padding: 14px 18px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
   position: relative;
   z-index: 2;
@@ -1320,14 +1330,14 @@ onBeforeUnmount(() => {
       .section-title {
         font-size: 40px;
         font-weight: 800;
-        color: #1a365d;
+        color: $text-primary;
         text-align: center;
         margin-bottom: 16px;
       }
 
       .section-description {
         font-size: 18px;
-        color: #4a5568;
+        color: $text-secondary;
         text-align: center;
         max-width: 720px;
         margin: 0 auto;
@@ -1345,11 +1355,11 @@ onBeforeUnmount(() => {
 
     .category-card {
       position: relative;
-      border: 1.5px solid #e8edf5;
-      border-radius: 20px;
+      border: 1.5px solid $border-color;
+      border-radius: $card-radius;
       padding: 28px 14px 20px;
       min-height: 165px;
-      background: #ffffff;
+      background: $bg-card;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1363,15 +1373,15 @@ onBeforeUnmount(() => {
 
       &:hover {
         transform: translateY(-6px);
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.10);
-        border-color: #c7d7f5;
+        box-shadow: $shadow-card;
+        border-color: $primary-green-light;
       }
 
       &--active {
         transform: translateY(-4px);
 
         &:hover {
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+          box-shadow: $shadow-hover;
         }
       }
     }
@@ -1383,11 +1393,11 @@ onBeforeUnmount(() => {
       width: 24px;
       height: 24px;
       border-radius: 999px;
-      color: #ffffff;
+      color: $bg-primary;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.24);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.16);
 
       svg {
         width: 14px;
@@ -1432,6 +1442,7 @@ onBeforeUnmount(() => {
       font-size: 16px;
       font-weight: 600;
       line-height: 1.4;
+      color: $text-primary;
       transition: color 0.3s;
     }
 
@@ -1445,12 +1456,12 @@ onBeforeUnmount(() => {
     }
 
     .search-card {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid #e8edf5;
-      border-radius: 20px;
+      background: rgba($bg-primary, 0.92);
+      border: 1px solid $border-color;
+      border-radius: $card-radius;
       padding: 22px 24px;
       margin-bottom: 8px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      box-shadow: $shadow-small;
       backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
@@ -1463,10 +1474,10 @@ onBeforeUnmount(() => {
       gap: 8px;
       font-size: 16px;
       font-weight: 700;
-      color: #1a365d;
+      color: $text-primary;
 
       :deep(.el-icon) {
-        color: #4285f4;
+        color: $secondary-cyan;
         font-size: 20px;
       }
     }
@@ -1486,35 +1497,35 @@ onBeforeUnmount(() => {
       min-width: 0;
 
       :deep(.el-input__wrapper) {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 14px;
-        border: 1.5px solid #e2e8f0;
+        background: rgba($bg-primary, 0.95);
+        border-radius: $radius-input;
+        border: 1.5px solid $border-color;
         box-shadow: none;
         transition: all 0.3s ease;
         padding: 4px 12px;
 
         &:hover {
-          border-color: #c3d4f5;
+          border-color: $primary-green-light;
         }
 
         &.is-focus {
-          border-color: #4285f4;
-          box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.12);
+          border-color: $primary-green;
+          box-shadow: 0 0 0 3px rgba($primary-green, 0.12);
         }
       }
 
       :deep(.el-input__inner) {
         font-size: 15px;
-        color: #2c3e50;
+        color: $text-primary;
         height: 42px;
 
         &::placeholder {
-          color: #b0bec5;
+          color: $text-tertiary;
         }
       }
 
       :deep(.el-icon) {
-        color: #94a3b8;
+        color: $text-tertiary;
         font-size: 16px;
       }
     }
@@ -1539,15 +1550,15 @@ onBeforeUnmount(() => {
       border-radius: 10px;
       font-weight: 700;
       font-size: 15px;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      color: #4a5568;
+      background: $bg-section;
+      border: 1px solid $border-color;
+      color: $text-secondary;
       transition: all 0.2s ease;
 
       &:hover {
-        background: #e8edf5;
-        border-color: #cbd5e1;
-        color: #1f2937;
+        background: $border-light;
+        border-color: $border-color;
+        color: $text-primary;
       }
     }
 
