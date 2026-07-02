@@ -130,19 +130,18 @@
         <el-divider style="margin: 24px 0" />
         <!-- 六大類分類卡片 -->
         <div class="category-card-grid">
-
-          <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
-            <span v-if="selectedCategory === catInfo.id" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
+          <button v-for="cat in categoryCards" :key="cat.id" :class="['category-card', { 'category-card--active': isActiveCategory(cat.id) }]" :style="isActiveCategory(cat.id) ? activeCardStyle(cat.color) : {}" @click="selectCategory(cat.id)">
+            <span v-if="isActiveCategory(cat.id)" class="category-card-check" :style="{ backgroundColor: cat.color }">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
             </span>
-            <div class="category-card-icon-wrap" :style="getCategoryIconWrapStyle(catInfo)">
-              <span v-html="categoryIcons[catInfo.id]" class="category-svg-icon"></span>
+            <div class="category-card-icon-wrap" :style="iconWrapStyle(cat.color)">
+              <span v-html="cat.icon" class="category-svg-icon"></span>
             </div>
-            <div class="category-card-label" :style="{ color: selectedCategory === catInfo.id ? catInfo.color : catInfo.color }">{{ catInfo.id }}類</div>
-            <div class="category-card-name">{{ catInfo.displayName }}</div>
-            <div class="category-card-count" :style="getCategoryCountStyle(catInfo)">{{ getCategoryCodeCount(catInfo.id) }} 項</div>
+            <div class="category-card-label" :style="{ color: cat.color }">{{ cat.id }}類</div>
+            <div class="category-card-name">{{ cat.name }}</div>
+            <div class="category-card-count" :style="countStyle(cat.id, cat.color)">{{ cat.count }} 項</div>
           </button>
         </div>
 
@@ -219,12 +218,13 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Search, Management } from '@element-plus/icons-vue'
 import { useCirculationModes } from '../composables/useCirculationModes'
 import ParticleBackground from '../components/ParticleBackground.vue'
 import CirculationModesGrid from '../components/CirculationModesGrid.vue'
 import CirculationModal from '../components/CirculationModal.vue'
-import { wasteCategories, getCategoryById, getAllWasteCodes } from '@/data/wasteCategories'
+import { getCategories } from '@/api/wasteCode'
+import { categoryVisuals, fallbackVisual } from '@/data/categoryVisuals'
+import { getAllWasteCodes } from '@/data/wasteCategories'
 import { getWasteSpeciesCardsLocal } from '@/data/wasteSpecies'
 
 const router = useRouter()
@@ -260,15 +260,62 @@ let footerStatsObserver = null
 let footerStatsAnimationFrame = null
 
 // 六大類分類顯示信息
-// Lucide-style SVG icons
-const categoryIcons = {
-  A: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M10 3v8l-5 9a1 1 0 00.9 1.5h12.2a1 1 0 00.9-1.5L14 11V3"/><line x1="7" y1="17" x2="17" y2="17"/></svg>',
-  B: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="currentColor" stroke="none"/></svg>',
-  C: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6z"/><polyline points="9 12 11 14 15 10"/></svg>',
-  D: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><path d="M2 22V9l7-6h6l7 6v13"/><rect x="9" y="15" width="6" height="7"/><line x1="6" y1="12" x2="6" y2="14"/><line x1="18" y1="12" x2="18" y2="14"/></svg>',
-  E: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>',
-  R: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>',
+// 分類資料改用 getCategories() 取得（目前是模擬 API，未來換成真實 API 呼叫，這裡完全不用改）
+const categories = ref([])
+const categoriesLoading = ref(false)
+
+const loadCategories = async () => {
+  categoriesLoading.value = true
+  try {
+    const result = await getCategories()
+    categories.value = Array.isArray(result) ? result.filter((cat) => cat.id !== 'ALL') : []
+  } catch (error) {
+    console.error('載入分類失敗：', error)
+    categories.value = []
+  } finally {
+    categoriesLoading.value = false
+  }
 }
+
+// 依 id 尋找分類完整資料（含 codes），取代原本從靜態資料匯入的 getCategoryById
+const findCategoryById = (categoryId) => categories.value.find((cat) => cat.id === categoryId)
+
+// 把 API 資料（id / name / codes）跟前端視覺設定（顏色 / icon）合併，組成卡片要用的完整資料
+const categoryCards = computed(() =>
+  categories.value.map((cat) => {
+    const visual = categoryVisuals[cat.id] || fallbackVisual
+    return {
+      id: cat.id,
+      name: getCategoryShortName(cat),
+      color: visual.color,
+      icon: visual.icon,
+      count: cat.codes?.length || 0
+    }
+  })
+)
+
+// 卡片是否為目前選中狀態
+const isActiveCategory = (id) => selectedCategory.value === id
+
+// 選中卡片的外框/底色樣式
+const activeCardStyle = (color) => ({
+  background: `linear-gradient(180deg, #ffffff 0%, ${color}10 100%)`,
+  borderColor: color,
+  boxShadow: `0 10px 24px ${color}2e, 0 0 0 1px ${color}30`
+})
+
+// icon 圓底樣式
+const iconWrapStyle = (color) => ({
+  background: `${color}14`,
+  border: `1px solid ${color}28`,
+  color
+})
+
+// 右下角「X 項」標籤樣式
+const countStyle = (id, color) =>
+  isActiveCategory(id)
+    ? { color, background: `${color}18`, border: `1px solid ${color}36` }
+    : { color: '#94a3b8', background: '#f1f5f9' }
 
 const codeCardDecorIcons = {
   flask: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M10 3v8l-5 9a1 1 0 0 0 .9 1.5h12.2a1 1 0 0 0 .9-1.5L14 11V3"/><line x1="7" y1="17" x2="17" y2="17"/></svg>',
@@ -289,15 +336,7 @@ const codeCardTopIconPools = {
   R: [codeCardDecorIcons.recycle, codeCardDecorIcons.leaf, codeCardDecorIcons.truck, codeCardDecorIcons.bin]
 }
 
-// 六大類分類顯示信息
-const categoriesDisplay = ref([
-  { id: 'A', displayName: '製程有害', color: '#4285F4' },
-  { id: 'B', displayName: '毒性有害', color: '#EF4444' },
-  { id: 'C', displayName: '有害特性認定', color: '#22C55E' },
-  { id: 'D', displayName: '一般事業廢棄物', color: '#F97316' },
-  { id: 'E', displayName: '混合五金廢料', color: '#8B5CF6' },
-  { id: 'R', displayName: '公告應回收', color: '#06B6D4' }
-])
+
 
 const hotTags = ref(['pH值', '廢液', '廢鹼', '污泥', '事業廢棄物'])
 
@@ -425,7 +464,7 @@ const footerHighlightsForStatsBar = footerHighlights.map((item) => ({
 const wasteSpeciesCards = getWasteSpeciesCardsLocal()
 
 // 說明：依目前條件即時計算「current Category」內容，提供畫面顯示與決策判斷使用。
-const currentCategory = computed(() => getCategoryById(selectedCategory.value) || wasteCategories[0])
+const currentCategory = computed(() => findCategoryById(selectedCategory.value) || categories.value[0])
 // 說明：依目前條件即時計算「current Category Codes」內容，提供畫面顯示與決策判斷使用。
 const currentCategoryCodes = computed(() => {
   if (selectedCategory.value === 'ALL') {
@@ -470,37 +509,8 @@ const getCategoryShortName = (category) => category?.name?.split(' - ')[1] || ca
 
 // 說明：回傳「get Category Color」資料供畫面渲染或後續商業規則使用。
 const getCategoryColor = (category) => {
-  // 說明：封裝「category Info」商業邏輯，供目前流程重複使用。
-  const categoryInfo = categoriesDisplay.value.find(c => c.id === category?.id)
-  return categoryInfo?.color || '#64748B'
-}
-
-// 說明：回傳「get Category Code Count」資料供畫面渲染或後續商業規則使用。
-const getCategoryCodeCount = (categoryId) => getCategoryById(categoryId)?.codes?.length || 0
-
-// 說明：回傳「get Category Card Style」資料供畫面渲染或後續商業規則使用。
-const getCategoryCardStyle = (catInfo) => {
-  const isActive = selectedCategory.value === catInfo.id
-  if (!isActive) return {}
-  return {
-    background: `linear-gradient(180deg, #ffffff 0%, ${catInfo.color}10 100%)`,
-    borderColor: catInfo.color,
-    boxShadow: `0 10px 24px ${catInfo.color}2e, 0 0 0 1px ${catInfo.color}30`,
-  }
-}
-
-// 說明：回傳「get Category Icon Wrap Style」資料供畫面渲染或後續商業規則使用。
-const getCategoryIconWrapStyle = (catInfo) => {
-  const isActive = selectedCategory.value === catInfo.id
-
-  return { background: `${catInfo.color}14`, border: `1px solid ${catInfo.color}28`, color: catInfo.color }
-}
-
-// 說明：回傳「get Category Count Style」資料供畫面渲染或後續商業規則使用。
-const getCategoryCountStyle = (catInfo) => {
-  const isActive = selectedCategory.value === catInfo.id
-  if (isActive) return { color: catInfo.color, background: `${catInfo.color}18`, border: `1px solid ${catInfo.color}36` }
-  return { color: '#94a3b8', background: '#f1f5f9' }
+  const visual = categoryVisuals[category?.id] || fallbackVisual
+  return visual.color
 }
 
 // 說明：回傳「get Code Card Top Icon」資料供畫面渲染或後續商業規則使用。
@@ -516,9 +526,10 @@ const applyTag = (tag) => {
 }
 
 // 說明：封裝「select Category」商業邏輯，供目前流程重複使用。
+// 改用 findCategoryById
 const selectCategory = (categoryId) => {
   selectedCategory.value = categoryId
-  selectedCode.value = defaultCodeMap[categoryId] || getCategoryById(categoryId)?.codes?.[0]?.code || ''
+  selectedCode.value = defaultCodeMap[categoryId] || findCategoryById(categoryId)?.codes?.[0]?.code || ''
   currentPage.value = 1
 }
 
@@ -637,7 +648,8 @@ const animateFooterStats = () => {
   footerStatsAnimationFrame = requestAnimationFrame(step)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await loadCategories()   // ← 新增這行，等分類資料載入完再往下跑
   animatedFooterStatValues.value = footerStats.map(() => '0')
 
   if (typeof IntersectionObserver !== 'undefined' && footerInsightsRef.value) {
