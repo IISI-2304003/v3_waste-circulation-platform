@@ -48,19 +48,27 @@
               <div class="summary-list">
                 <div class="summary-row" v-for="item in conditionSummary" :key="item.id">
                   <div class="summary-item-grid">
-                    <div class="summary-icon" :style="{ color: item.color }">
-                      <el-icon>
-                        <component :is="item.icon" />
-                      </el-icon>
-                    </div>
-                    <div class="summary-main">
-                      <div class="summary-label">{{ item.label }}</div>
-                      <div class="summary-value">{{ item.value }}</div>
-                    </div>
-                    <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
-                      <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
-                      <span class="impact-label">{{ item.levelLabel }}</span>
-                    </div>
+                    <el-row :gutter="24">
+                      <el-col :xs="3" :sm="2" :md="2">
+                        <div class="summary-icon" :style="{ color: item.color }">
+                          <el-icon>
+                            <component :is="item.icon" />
+                          </el-icon>
+                        </div>
+                      </el-col>
+                      <el-col :xs="24" :sm="9" :md="9">
+                        <div class="summary-label">{{ item.label }}</div>
+                      </el-col>
+                      <el-col :xs="18" :sm="10" :md="10">
+                        <div class="summary-value">{{ item.value }}</div>
+                      </el-col>
+                      <el-col :xs="6" :sm="3" :md="3">
+                        <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
+                          <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
+                          <span class="impact-label">{{ item.levelLabel }}</span>
+                        </div>
+                      </el-col>
+                    </el-row>
                   </div>
                 </div>
               </div>
@@ -288,6 +296,12 @@ const IMPACT_LEVEL_SCORE_MAP = {
   low: 30
 }
 
+const IMPACT_LEVEL_STYLE_MAP = {
+  high: { color: '#1f9d55', levelLabel: '高' },
+  medium: { color: '#f59e0b', levelLabel: '中' },
+  low: { color: '#ef4444', levelLabel: '低' }
+}
+
 // 計算條件的影響度級別
 // 說明：回傳「get Impact Level」資料供畫面渲染或後續商業規則使用。
 const getImpactLevel = (condition) => {
@@ -296,9 +310,9 @@ const getImpactLevel = (condition) => {
   // 中(medium): 部分設定，74-50 分
   // 低(low): 未設定或最少設定，49-0 分
   const score = condition.score || 0
-  if (score >= 75) return { level: 'high', color: 'var(--ds-primary-green)', levelLabel: '高' }
-  if (score >= 50) return { level: 'medium', color: 'var(--ds-accent-orange)', levelLabel: '中' }
-  return { level: 'low', color: 'var(--ds-error)', levelLabel: '低' }
+  if (score >= 75) return { level: 'high', ...IMPACT_LEVEL_STYLE_MAP.high }
+  if (score >= 50) return { level: 'medium', ...IMPACT_LEVEL_STYLE_MAP.medium }
+  return { level: 'low', ...IMPACT_LEVEL_STYLE_MAP.low }
 }
 
 // 說明：封裝「to Radar Score」商業邏輯，供目前流程重複使用。
@@ -507,19 +521,28 @@ const radarOption = computed(() => ({
     ...conditionSummary.value.map((item, index) => {
       // 只在該頂點位置放值，其餘補 null
       // 說明：封裝「value」商業邏輯，供目前流程重複使用。
-      const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : null)
+      const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : '-')
       const size = item.level === 'high'
         ? radarResponsiveConfig.value.symbolSize.high
         : item.level === 'medium'
           ? radarResponsiveConfig.value.symbolSize.medium
           : radarResponsiveConfig.value.symbolSize.low
+      const pointColor = IMPACT_LEVEL_STYLE_MAP[item.level]?.color || '#1f9d55'
       return {
         type: 'radar',
+        z: 5,
+        silent: true,
         data: [{
           value,
           symbol: 'circle',
           symbolSize: size,
-          itemStyle: { color: item.color },
+          itemStyle: {
+            color: pointColor,
+            borderColor: '#ffffff',
+            borderWidth: 1.5,
+            // shadowBlur: 6,
+            // shadowColor: `${pointColor}66`
+          },
           lineStyle: { width: 0 },      // 不畫連線
           areaStyle: { opacity: 0 }     // 不畫填色
         }],
@@ -892,19 +915,16 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 10px;
 
-    .summary-item-grid {
-      display: grid;
-      grid-template-columns: 26px minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 10px;
+    :deep(.el-col) {
+      min-width: 0; // 關鍵：允許 flex item 縮小到比內容更窄
     }
 
-    .summary-main {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    // .summary-main {
+    //   min-width: 0;
+    //   display: flex;
+    //   flex-direction:row;
+    //   gap: 2px;
+    // }
 
     .summary-icon {
       width: 26px;
@@ -930,6 +950,7 @@ onBeforeUnmount(() => {
       color: #4caf50;
       font-weight: 600;
 
+
       &.muted {
         color: #b0bec5;
       }
@@ -944,6 +965,10 @@ onBeforeUnmount(() => {
       border: 1px solid;
       font-size: 12px;
       font-weight: 600;
+      max-width: 100%;
+      // overflow: hidden;
+      // white-space: nowrap;
+      // text-overflow: ellipsis; // 內容過長時省略號截斷
 
       .impact-dot {
         width: 8px;
@@ -954,6 +979,8 @@ onBeforeUnmount(() => {
 
       .impact-label {
         color: currentColor;
+        // overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
@@ -973,7 +1000,7 @@ onBeforeUnmount(() => {
 
   .radar-chart {
     width: 100%;
-    height: clamp(320px, 36vw, 520px);
+    height: clamp(320px, 36vw, 400px);
     overflow: visible;
   }
 }
@@ -1528,8 +1555,11 @@ onBeforeUnmount(() => {
       border: 1px solid rgba(217, 231, 227, 0.9);
 
       .summary-item-grid {
-        grid-template-columns: 22px minmax(0, 1fr) auto;
-        gap: 8px;
+        width: 100%;
+      }
+
+      :deep(.el-col) {
+        flex-wrap: nowrap; // 防止欄位被擠到換行
       }
 
       .summary-main {
@@ -1543,22 +1573,27 @@ onBeforeUnmount(() => {
       }
 
       .summary-label {
-        font-size: 13px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       .summary-value {
-        font-size: 14px;
-        line-height: 1.35;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       .summary-impact-tag {
-        grid-column: auto;
-        justify-self: end;
-        align-self: center;
-        margin-left: 4px;
-        margin-top: 0;
-        font-size: 11px;
-        padding: 3px 9px;
+        flex-shrink: 0; // 關鍵：不讓標籤被壓縮
+        white-space: nowrap;
+        padding: 2px 8px;
+        font-size: 10px;
+        justify-content: center;
+      }
+
+      .impact-label {
+        white-space: nowrap;
       }
     }
   }

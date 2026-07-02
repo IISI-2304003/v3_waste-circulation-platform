@@ -27,7 +27,7 @@
 														<span>事業名稱</span>
 													</div>
 												</template>
-												<el-input v-model="businessName" placeholder="輸入事業名稱" />
+												<el-input v-model="businessName" :class="{ 'is-invalid': shouldMarkInvalid('businessName') }" placeholder="輸入事業名稱" />
 											</el-form-item>
 										</el-col>
 
@@ -115,7 +115,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>月產出量 (公噸)</span>
 												</template>
-												<el-input-number v-model="store.sourceConditions.outputAmount" :min="0" :max="100000" :step="1" controls-position="right" />
+												<el-input-number v-model="store.sourceConditions.outputAmount" :class="{ 'is-invalid': shouldMarkInvalid('sourceOutputAmount') }" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
 										</el-col>
 
@@ -124,7 +124,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>產出頻率</span>
 												</template>
-												<el-select v-model="store.sourceConditions.frequency" placeholder="選擇產出頻率" filterable>
+												<el-select v-model="store.sourceConditions.frequency" :class="{ 'is-invalid': shouldMarkInvalid('sourceFrequency') }" placeholder="選擇產出頻率" filterable>
 													<el-option v-for="item in sourceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -141,7 +141,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>是否有再利用空間</span>
 												</template>
-												<el-select v-model="store.siteConditions.hasReuseSpace" placeholder="選擇是否有再利用空間" filterable>
+												<el-select v-model="store.siteConditions.hasReuseSpace" :class="{ 'is-invalid': shouldMarkInvalid('hasReuseSpace') }" placeholder="選擇是否有再利用空間" filterable>
 													<el-option v-for="item in reuseSpaceOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -159,7 +159,7 @@
 												<template #label>
 													<span><span class="required-mark">*</span>是否有產生衍生廢棄物</span>
 												</template>
-												<el-select v-model="store.siteConditions.hasSecondaryWaste" placeholder="選擇是否有產生衍生廢棄物" filterable>
+												<el-select v-model="store.siteConditions.hasSecondaryWaste" :class="{ 'is-invalid': shouldMarkInvalid('hasSecondaryWaste') }" placeholder="選擇是否有產生衍生廢棄物" filterable>
 													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -501,6 +501,10 @@ const resetAll = () => {
 const getMissingRequiredFields = () => {
 	const missingFields = []
 
+	if (!String(store.businessConditions.businessName || '').trim()) {
+		missingFields.push({ sectionId: 'physical', label: '事業名稱' })
+	}
+
 	if (!String(store.businessConditions.businessAddress || '').trim()) {
 		missingFields.push({ sectionId: 'physical', label: '事業地址' })
 	}
@@ -511,6 +515,22 @@ const getMissingRequiredFields = () => {
 
 	if (!store.sourceConditions.process) {
 		missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
+	}
+
+	if (store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined) {
+		missingFields.push({ sectionId: 'source', label: '月產出量 (公噸)' })
+	}
+
+	if (!store.sourceConditions.frequency) {
+		missingFields.push({ sectionId: 'source', label: '產出頻率' })
+	}
+
+	if (store.siteConditions.hasReuseSpace === null) {
+		missingFields.push({ sectionId: 'site', label: '是否有再利用空間' })
+	}
+
+	if (store.siteConditions.hasSecondaryWaste === null) {
+		missingFields.push({ sectionId: 'environment', label: '是否有產生衍生廢棄物' })
 	}
 
 	if (!store.businessConditions.capitalAmount) {
@@ -548,9 +568,14 @@ const shouldMarkInvalid = (fieldKey) => {
 	if (!hasValidationAttempted.value) return false
 
 	const fieldCheckMap = {
+		businessName: () => !String(store.businessConditions.businessName || '').trim(),
 		businessAddress: () => !String(store.businessConditions.businessAddress || '').trim(),
 		sourceIndustry: () => !store.sourceConditions.industry,
 		sourceProcess: () => !store.sourceConditions.process,
+		sourceOutputAmount: () => store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined,
+		sourceFrequency: () => !store.sourceConditions.frequency,
+		hasReuseSpace: () => store.siteConditions.hasReuseSpace === null,
+		hasSecondaryWaste: () => store.siteConditions.hasSecondaryWaste === null,
 		capitalAmount: () => !store.businessConditions.capitalAmount,
 		clearanceFrequency: () => !store.businessConditions.clearanceFrequency
 	}
@@ -683,7 +708,7 @@ defineExpose({
 
 .glass-panel {
 	border: 1px solid rgba(255, 255, 255, 0.82);
-	background: rgba(255, 255, 255, 0.66);
+	background: rgba(255, 255, 255, 0.8);
 	box-shadow:
 		0 14px 34px rgba(53, 93, 83, 0.14),
 		inset 0 1px 0 rgba(255, 255, 255, 0.78);

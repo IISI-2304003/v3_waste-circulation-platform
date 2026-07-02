@@ -5,7 +5,7 @@ const defaultSource = () => ({
     industry: '',
     process: '',
     outputAmount: null,
-    outputFrequency: '',
+    frequency: '',
 });
 
 // 說明：封裝「default Site」商業邏輯，供目前流程重複使用。
