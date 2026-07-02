@@ -131,7 +131,20 @@
         <!-- 六大類分類卡片 -->
         <div class="category-card-grid">
 
-          <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
+          <button v-for="catInfo in wasteCategoryList" :key="catInfo.waste_class_code" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.waste_class_code }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.waste_class_code)">
+            <span v-if="selectedCategory === catInfo.waste_class_code" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            <div class="category-card-icon-wrap" :style="getCategoryIconWrapStyle(catInfo)">
+              <span v-html="categoryIcons[catInfo.waste_class_code]" class="category-svg-icon"></span>
+            </div>
+            <div class="category-card-label" :style="{ color: selectedCategory === catInfo.waste_class_code ? catInfo.color : catInfo.color }">{{ catInfo.waste_class_code }}類</div>
+            <div class="category-card-name" :style="{ color: '#1a365d' }">{{ catInfo.waste_class_name }}</div>
+            <div class="category-card-count" :style="getCategoryCountStyle(catInfo)">{{ getCategoryCodeCount(catInfo.waste_class_code) }} 項</div>
+          </button>
+          <!-- <button v-for="catInfo in categoriesDisplay" :key="catInfo.id" :class="['category-card', { 'category-card--active': selectedCategory === catInfo.id }]" :style="getCategoryCardStyle(catInfo)" @click="selectCategory(catInfo.id)">
             <span v-if="selectedCategory === catInfo.id" class="category-card-check" :style="{ backgroundColor: catInfo.color }">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -143,7 +156,7 @@
             <div class="category-card-label" :style="{ color: selectedCategory === catInfo.id ? catInfo.color : catInfo.color }">{{ catInfo.id }}類</div>
             <div class="category-card-name" :style="{ color: '#1a365d' }">{{ catInfo.displayName }}</div>
             <div class="category-card-count" :style="getCategoryCountStyle(catInfo)">{{ getCategoryCodeCount(catInfo.id) }} 項</div>
-          </button>
+          </button> -->
         </div>
 
 
@@ -226,6 +239,37 @@ import CirculationModesGrid from '../components/CirculationModesGrid.vue'
 import CirculationModal from '../components/CirculationModal.vue'
 import { wasteCategories, getCategoryById, getAllWasteCodes } from '@/data/wasteCategories'
 import { getWasteSpeciesCardsLocal } from '@/data/wasteSpecies'
+import { getWasteCategoryList } from '../api/wasteCategory.js'
+
+const wasteCategoryList = ref([])
+const wasteColorMap = {
+  A: '#4285F4',
+  B: '#EF4444',
+  C: '#22C55E',
+  D: '#F97316',
+  E: '#8B5CF6',
+  R: '#06B6D4'
+}
+async function fetchWasteCategory() {
+    try {
+        const data = await getWasteCategoryList()
+
+        wasteCategoryList.value = data
+          .filter(item => !['H', 'S'].includes(item.waste_class_code))
+          .map(item => ({
+            ...item,
+            color: wasteColorMap[item.waste_class_code]
+          }))
+
+        console.log('有接到資料', wasteCategoryList.value)
+
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+fetchWasteCategory();
+
 
 const router = useRouter()
 const route = useRoute()
@@ -258,6 +302,7 @@ const activeProcessStep = ref(0)
 const activeInsightCard = ref(0)
 let footerStatsObserver = null
 let footerStatsAnimationFrame = null
+
 
 // 六大類分類顯示信息
 // Lucide-style SVG icons
@@ -470,6 +515,7 @@ const getCategoryColor = (category) => {
   const categoryInfo = categoriesDisplay.value.find(c => c.id === category?.id)
   return categoryInfo?.color || '#64748B'
 }
+
 
 // 說明：回傳「get Category Code Count」資料供畫面渲染或後續商業規則使用。
 const getCategoryCodeCount = (categoryId) => getCategoryById(categoryId)?.codes?.length || 0

@@ -2,8 +2,33 @@
  * 廢棄物代碼 API
  * 提供廢棄物代碼的查詢與搜尋功能
  */
-
+import request from './index'
 import { wasteCategories, getCategoryById, getAllWasteCodes, searchWasteCodes } from '../data/wasteCategories';
+
+export function getWasteDetailList() {
+  return request({
+    url: '/wastedetail',
+    method: 'get'
+  })
+}
+
+
+async function fetchWasteDetail() {
+    try {
+        const data = await getWasteDetailList()
+        
+        const wasteDetailList = []
+        wasteDetailList.value = data
+
+        console.log('盡然接到資料', wasteDetailList.value)
+
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+fetchWasteDetail();
+
 
 /**
  * 取得所有類別
