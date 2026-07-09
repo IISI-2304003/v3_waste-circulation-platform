@@ -9,6 +9,9 @@ import dClassCodes from './wasteCodes/D-class.json';
 import eClassCodes from './wasteCodes/E-class.json';
 import rClassCodes from './wasteCodes/R-class.json';
 
+// DB 遷移說明：目前各類代碼仍由本地 JSON 載入。
+// 當後端提供完整類別與代碼清單（如 C-0201~C-0215）後，
+// 此檔可保留為 fallback，或改為僅存前端顯示用 metadata。
 export const wasteCategories = [
     {
         id: 'A',
@@ -84,6 +87,7 @@ export const wasteCategories = [
 
 // 說明：回傳「get Category By Id」資料供畫面渲染或後續商業規則使用。
 export function getCategoryById(categoryId) {
+    // DB 遷移說明：若類別改由 API 即時取得，這裡可改為查 store / API response cache。
     return wasteCategories.find((cat) => cat.id === categoryId);
 }
 
@@ -94,6 +98,7 @@ export function getCategoryByCode(code) {
 
 // 說明：回傳「get All Waste Codes」資料供畫面渲染或後續商業規則使用。
 export function getAllWasteCodes() {
+    // DB 遷移說明：目前是把本地各類 codes 合併；改 DB 後可直接用後端聚合端點。
     return wasteCategories.flatMap((cat) => cat.codes);
 }
 
@@ -101,6 +106,7 @@ export function getAllWasteCodes() {
 export function searchWasteCodes(keyword) {
     if (!keyword) return [];
 
+    // DB 遷移說明：資料量變大時建議改由後端搜尋（含分頁、排序），前端保留關鍵字輸入與顯示。
     const lowerKeyword = keyword.toLowerCase();
     const allCodes = getAllWasteCodes();
 

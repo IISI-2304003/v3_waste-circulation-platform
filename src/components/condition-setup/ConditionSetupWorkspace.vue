@@ -89,11 +89,8 @@
 												<template #label>
 													<span><span class="required-mark">*</span>來源產業</span>
 												</template>
-												<el-select v-model="store.sourceConditions.industry" :class="{ 'is-invalid': shouldMarkInvalid('sourceIndustry') }" placeholder="選擇來源產業">
-													<el-option label="電子與半導體" value="semiconductor" />
-													<el-option label="鋼鐵冶金" value="steel" />
-													<el-option label="化工製程" value="chemical" />
-													<el-option label="食品加工" value="food" />
+												<el-select v-model="selectedAnnouncementCategory" :class="{ 'is-invalid': shouldMarkInvalid('sourceIndustry') }" placeholder="選擇來源產業" @change="handleProcessChange">
+													<el-option v-for="item in announcementCategoryList" :key="item.id" :label="item.name" :value="item.id" />
 												</el-select>
 											</el-form-item>
 										</el-col>
@@ -103,8 +100,8 @@
 												<template #label>
 													<span><span class="required-mark">*</span>廢棄物來源製程</span>
 												</template>
-												<el-select v-model="store.sourceConditions.process" :class="{ 'is-invalid': shouldMarkInvalid('sourceProcess') }" placeholder="選擇來源製程" filterable>
-													<el-option v-for="item in sourceProcessOptions" :key="item.value" :label="item.label" :value="item.value" />
+												<el-select v-model="selectProcess" :class="{ 'is-invalid': shouldMarkInvalid('sourceProcess') }" placeholder="選擇來源製程" filterable>
+													<el-option v-for="item in processList" :key="item.code" :label="`${item.code} ${item.name}`" :value="item.name" />
 												</el-select>
 											</el-form-item>
 										</el-col>
@@ -285,6 +282,8 @@ import { useConditionSetupStore } from '@/stores/conditionSetup'
 import FlowStepProgress from './FlowStepProgress.vue'
 import VerticalConditionNav from './VerticalConditionNav.vue'
 import ConditionAccordionSection from './ConditionAccordionSection.vue'
+import { getAnnouncementCategoryList } from '@/api/announcementCategory'
+import { getProcessList } from '@/api/process'
 
 const props = defineProps({
 	initialStandards: {
@@ -337,6 +336,34 @@ const expandedMap = reactive({
 	technology: true,
 	demand: true
 })
+// 製成
+const selectProcess = ref('')
+const processList = ref([])
+
+async function fetchProcess() {
+    try {
+        const data = await getProcessList()
+
+        processList.value = data
+
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+fetchProcess();
+
+async function handleProcessChange(Announcement){
+	try{
+		const res = await getProcessList(Announcement)
+		console.log(Announcement)
+		const data = await res
+
+		processList.value = data 
+	}catch(error){
+		console.error(error)
+	}
+}
 
 const sourceProcessOptions = [
 	{ value: '260001', label: '260001 積體電路製造程序' },
@@ -600,6 +627,24 @@ const setStandards = (parsedStandards) => {
 defineExpose({
 	setStandards
 })
+
+//這裡寫公告類別資料
+const selectedAnnouncementCategory = ref('')
+const announcementCategoryList = ref([])
+
+async function fetchAnnouncementCategory() {
+    try {
+        const data = await getAnnouncementCategoryList()
+
+        announcementCategoryList.value = data
+
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+fetchAnnouncementCategory();
+
 </script>
 
 <style scoped lang="scss">

@@ -5,29 +5,15 @@
 import request from './index'
 import { wasteCategories, getCategoryById, getAllWasteCodes, searchWasteCodes } from '../data/wasteCategories';
 
+// DB 遷移說明：本檔目前同時存在「真實 API 呼叫」與「本地資料模擬」。
+// 後續建議以後端端點為主，逐步移除 setTimeout + 本地資料邏輯。
+
 export function getWasteDetailList() {
-  return request({
-    url: '/wastedetail',
-    method: 'get'
-  })
+    return request({
+        url: '/wastedetail',
+        method: 'get'
+    })
 }
-
-
-async function fetchWasteDetail() {
-    try {
-        const data = await getWasteDetailList()
-        
-        const wasteDetailList = []
-        wasteDetailList.value = data
-
-        console.log('盡然接到資料', wasteDetailList.value)
-
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-fetchWasteDetail();
 
 
 /**
@@ -36,6 +22,7 @@ fetchWasteDetail();
 // 說明：回傳「get Categories」資料供畫面渲染或後續商業規則使用。
 export async function getCategories() {
     // 模擬非同步操作
+    // DB 遷移說明：改為直接呼叫後端類別端點（可沿用 getWasteCategoryList 模式）。
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve(wasteCategories);
@@ -48,6 +35,7 @@ export async function getCategories() {
  */
 // 說明：回傳「get Waste Codes By Category」資料供畫面渲染或後續商業規則使用。
 export async function getWasteCodesByCategory(categoryId) {
+    // DB 遷移說明：改為呼叫 /waste-codes?categoryId=...，避免前端依賴本地 codes。
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             const category = getCategoryById(categoryId);
@@ -65,11 +53,13 @@ export async function getWasteCodesByCategory(categoryId) {
  */
 // 說明：回傳「get Waste Code Detail」資料供畫面渲染或後續商業規則使用。
 export async function getWasteCodeDetail(code) {
+    // DB 遷移說明：此處是 C-0201~C-0215 單筆詳情的主要替換點，
+    // 未來改成直接請求後端 detail 端點。
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             const allCodes = getAllWasteCodes();
             // 說明：封裝「code Detail」商業邏輯，供目前流程重複使用。
-            const codeDetail = allCodes.find((c) => c.code === code);
+            const codeDetail = allCodes.find((c) => (c.code || c.waste_code) === code);
 
             if (codeDetail) {
                 resolve(codeDetail);
@@ -87,13 +77,17 @@ export async function getWasteCodeDetail(code) {
  */
 // 說明：依條件執行搜尋/篩選，回傳符合的目標資料。
 export async function searchWasteCodeAPI(keyword, categoryId = null) {
+    // DB 遷移說明：資料量增加後建議改為後端搜尋，前端僅處理輸入與結果顯示。
     return new Promise((resolve) => {
         setTimeout(() => {
             let results = searchWasteCodes(keyword);
 
             // 如果指定類別，進一步過濾
             if (categoryId) {
-                results = results.filter((code) => code.categoryId === categoryId);
+                results = results.filter((code) => {
+                    const codeValue = code.code || code.waste_code || ''
+                    return code.categoryId === categoryId || codeValue.startsWith(`${categoryId}-`)
+                });
             }
 
             resolve(results);

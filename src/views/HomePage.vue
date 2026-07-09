@@ -240,8 +240,10 @@ import CirculationModal from '../components/CirculationModal.vue'
 import { wasteCategories, getCategoryById, getAllWasteCodes } from '@/data/wasteCategories'
 import { getWasteSpeciesCardsLocal } from '@/data/wasteSpecies'
 import { getWasteCategoryList } from '../api/wasteCategory.js'
+import { getWasteDetailList } from '@/api/wasteCode'
 
 const wasteCategoryList = ref([])
+const backendCodesByCategory = ref({ C: [], D: [] })
 const wasteColorMap = {
   A: '#4285F4',
   B: '#EF4444',
@@ -269,6 +271,39 @@ async function fetchWasteCategory() {
 }
 
 fetchWasteCategory();
+
+async function fetchWasteDetails() {
+  try {
+    const data = await getWasteDetailList()
+    const rows = Array.isArray(data) ? data : []
+
+    const normalized = rows
+      .filter((item) => item?.waste_code)
+      .map((item) => {
+        const code = String(item.waste_code).trim()
+        const categoryId = code.split('-')[0]
+        return {
+          id: code,
+          code,
+          categoryId,
+          name: item.waste_name || code,
+          description: item.remark || '',
+          waste_code: code,
+          waste_name: item.waste_name || code,
+          remark: item.remark || ''
+        }
+      })
+
+    backendCodesByCategory.value = {
+      C: normalized.filter((item) => item.categoryId === 'C'),
+      D: normalized.filter((item) => item.categoryId === 'D')
+    }
+  } catch (error) {
+    console.error('取得廢棄物明細失敗', error)
+  }
+}
+
+fetchWasteDetails();
 
 
 const router = useRouter()
@@ -474,8 +509,23 @@ const currentCategory = computed(() => getCategoryById(selectedCategory.value) |
 // 說明：依目前條件即時計算「current Category Codes」內容，提供畫面顯示與決策判斷使用。
 const currentCategoryCodes = computed(() => {
   if (selectedCategory.value === 'ALL') {
-    return getAllWasteCodes()
+    const all = getAllWasteCodes()
+    const withoutCD = all.filter((item) => !String(item.code || '').match(/^[CD]-/))
+    return [
+      ...withoutCD,
+      ...backendCodesByCategory.value.C,
+      ...backendCodesByCategory.value.D
+    ]
   }
+
+  if (selectedCategory.value === 'C' && backendCodesByCategory.value.C.length > 0) {
+    return backendCodesByCategory.value.C
+  }
+
+  if (selectedCategory.value === 'D' && backendCodesByCategory.value.D.length > 0) {
+    return backendCodesByCategory.value.D
+  }
+
   return currentCategory.value?.codes || []
 })
 // 說明：依目前條件即時計算「filtered Category Codes」內容，提供畫面顯示與決策判斷使用。
@@ -517,12 +567,19 @@ const getCategoryColor = (category) => {
 }
 
 
-// 說明：回傳「get Category Code Count」資料供畫面渲染或後續商業規則使用。
-const getCategoryCodeCount = (categoryId) => getCategoryById(categoryId)?.codes?.length || 0
+const getCategoryCodeCount = (categoryId) => {
+  if (categoryId === 'C' && backendCodesByCategory.value.C.length > 0) {
+    return backendCodesByCategory.value.C.length
+  }
+  if (categoryId === 'D' && backendCodesByCategory.value.D.length > 0) {
+    return backendCodesByCategory.value.D.length
+  }
+  return getCategoryById(categoryId)?.codes?.length || 0
+}
 
 // 說明：回傳「get Category Card Style」資料供畫面渲染或後續商業規則使用。
 const getCategoryCardStyle = (catInfo) => {
-  const isActive = selectedCategory.value === catInfo.id
+  const isActive = selectedCategory.value === catInfo.waste_class_code
   if (!isActive) return {}
   return {
     background: `linear-gradient(180deg, #ffffff 0%, ${catInfo.color}10 100%)`,
@@ -533,14 +590,14 @@ const getCategoryCardStyle = (catInfo) => {
 
 // 說明：回傳「get Category Icon Wrap Style」資料供畫面渲染或後續商業規則使用。
 const getCategoryIconWrapStyle = (catInfo) => {
-  const isActive = selectedCategory.value === catInfo.id
+  const isActive = selectedCategory.value === catInfo.waste_class_code
 
   return { background: `${catInfo.color}14`, border: `1px solid ${catInfo.color}28`, color: catInfo.color }
 }
 
 // 說明：回傳「get Category Count Style」資料供畫面渲染或後續商業規則使用。
 const getCategoryCountStyle = (catInfo) => {
-  const isActive = selectedCategory.value === catInfo.id
+  const isActive = selectedCategory.value === catInfo.waste_class_code
   if (isActive) return { color: catInfo.color, background: `${catInfo.color}18`, border: `1px solid ${catInfo.color}36` }
   return { color: '#94a3b8', background: '#f1f5f9' }
 }
@@ -560,7 +617,14 @@ const applyTag = (tag) => {
 // 說明：封裝「select Category」商業邏輯，供目前流程重複使用。
 const selectCategory = (categoryId) => {
   selectedCategory.value = categoryId
-  selectedCode.value = defaultCodeMap[categoryId] || getCategoryById(categoryId)?.codes?.[0]?.code || ''
+
+  const dynamicCodes = categoryId === 'C'
+    ? backendCodesByCategory.value.C
+    : categoryId === 'D'
+      ? backendCodesByCategory.value.D
+      : []
+
+  selectedCode.value = defaultCodeMap[categoryId] || dynamicCodes[0]?.code || getCategoryById(categoryId)?.codes?.[0]?.code || ''
   currentPage.value = 1
 }
 
