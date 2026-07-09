@@ -112,9 +112,9 @@ const onSlideChange = () => {
 .mode-card {
   width: 100%;
   height: 100%;
-  background: #FFFFFF;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: $bg-card;
+  border-radius: $card-radius;
+  box-shadow: $shadow-card;
   padding: 32px 24px;
   display: flex;
   flex-direction: column;
@@ -127,7 +127,7 @@ const onSlideChange = () => {
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 8px 32px rgba(76, 175, 80, 0.25);
+    box-shadow: $shadow-hover;
     border-color: currentColor;
   }
 }
@@ -138,7 +138,7 @@ const onSlideChange = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(76, 175, 80, 0.1);
+  background: rgba($primary-green, 0.1);
   border-radius: 50%;
   transition: all 0.3s;
 
@@ -149,18 +149,18 @@ const onSlideChange = () => {
 
 .mode-name {
   font-size: 22px;
-  font-weight: 600;
-  color: #2C3E50;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
   text-align: center;
   margin: 0;
 }
 
 .mode-badge {
   padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 13px;
-  color: #FFFFFF;
-  font-weight: 500;
+  border-radius: $tag-radius;
+  font-size: $font-size-small;
+  color: $bg-primary;
+  font-weight: $font-weight-medium;
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.3s;
@@ -173,13 +173,13 @@ const onSlideChange = () => {
 
 /* Swiper 分頁器樣式覆蓋 */
 :deep(.swiper-pagination-bullet) {
-  background: #4CAF50;
+  background: $primary-green;
   opacity: 0.5;
 }
 
 :deep(.swiper-pagination-bullet-active) {
   opacity: 1;
-  background: #4CAF50;
+  background: $primary-green;
 }
 
 /* 響應式 */

@@ -100,14 +100,14 @@ watch(visible, (newVal) => {
 .circulation-modal {
   :deep(.el-dialog__header) {
     padding: 32px 32px;
-    border-bottom: 1px solid #E0E0E0;
-    background: linear-gradient(135deg, #E8F5E9 80%, #FFFFFF 100%);
+    border-bottom: 1px solid $border-color;
+    background: linear-gradient(135deg, rgba($primary-green, 0.12) 80%, $bg-primary 100%);
   }
 
   :deep(.el-dialog__title) {
     font-size: 24px;
-    font-weight: 600;
-    color: #2C3E50;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
   }
 
   :deep(.el-dialog__body) {
@@ -118,7 +118,7 @@ watch(visible, (newVal) => {
 
   :deep(.el-dialog__footer) {
     padding: 16px 32px;
-    border-top: 1px solid #E0E0E0;
+    border-top: 1px solid $border-color;
   }
 }
 
@@ -147,32 +147,32 @@ watch(visible, (newVal) => {
   align-items: center;
   gap: 8px;
   font-size: 18px;
-  font-weight: 600;
-  color: #2C3E50;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid #E8F5E9;
+  border-bottom: 2px solid $border-light;
 }
 
 .mode-description {
   font-size: 17px;
   line-height: 1.8;
-  color: #2C3E50;
+  color: $text-primary;
   text-align: justify;
   padding: 16px;
-  background: #F9FAFB;
-  border-radius: 8px;
-  border-left: 4px solid #4CAF50;
+  background: $bg-section;
+  border-radius: $input-radius;
+  border-left: 4px solid $primary-green;
   // min-height: 230px;
 }
 
 .notice-content {
   padding: 12px 16px;
-  background: #F9FAFB;
-  border-radius: 4px;
+  background: $bg-section;
+  border-radius: $input-radius;
   font-size: 15px;
   line-height: 1.8;
-  color: #607D8B;
+  color: $text-secondary;
 }
 
 .category-tag {
@@ -182,8 +182,8 @@ watch(visible, (newVal) => {
 
 /* 流程圖容器 */
 .flowchart-container {
-  background: #F9FAFB;
-  border-radius: 12px;
+  background: $bg-section;
+  border-radius: $button-radius;
   height: 100%;
   padding: 24px;
   min-height: 200px;
@@ -200,21 +200,21 @@ watch(visible, (newVal) => {
 
 .placeholder-text {
   font-size: 18px;
-  font-weight: 600;
-  color: #607D8B;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
   margin: 0;
 }
 
 .placeholder-subtext {
   font-size: 14px;
-  color: #90A4AE;
+  color: $text-tertiary;
   margin: 0;
   word-break: break-all;
 }
 
 .placeholder-note {
-  font-size: 13px;
-  color: #B0BEC5;
+  font-size: $font-size-small;
+  color: $text-tertiary;
   font-style: italic;
   margin: 8px 0 24px;
 }
@@ -228,9 +228,9 @@ watch(visible, (newVal) => {
   // margin-top: 24px;
   // padding: 24px;
   width: 100%;
-  background: #FFFFFF;
-  border-radius: 8px;
-  border: 2px dashed #E0E0E0;
+  background: $bg-card;
+  border-radius: $input-radius;
+  border: 2px dashed $border-color;
 }
 
 .flow-step {
@@ -239,21 +239,21 @@ watch(visible, (newVal) => {
   align-items: center;
   gap: 12px;
   padding: 16px 24px;
-  background: #F9FAFB;
-  border-radius: 8px;
-  border: 2px solid #E8F5E9;
+  background: $bg-section;
+  border-radius: $input-radius;
+  border: 2px solid $border-light;
   transition: all 0.3s;
 
   &:hover {
-    border-color: #4CAF50;
+    border-color: $primary-green;
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+    box-shadow: $shadow-hover;
   }
 
   span {
     font-size: 14px;
-    font-weight: 500;
-    color: #2C3E50;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
   }
 }
 

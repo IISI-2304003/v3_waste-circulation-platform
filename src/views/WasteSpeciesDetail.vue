@@ -183,7 +183,7 @@ const handleNextStep = () => {
 
 .waste-species-detail {
 	min-height: 100vh;
-	background: linear-gradient(135deg, rgba(245, 250, 248, 0.95), rgba(240, 248, 245, 0.98));
+	background: linear-gradient(135deg, rgba($primary-green, 0.08), rgba($bg-primary, 0.98));
 	padding: 24px 20px 96px;
 }
 
@@ -194,11 +194,11 @@ const handleNextStep = () => {
 
 	:deep(.el-button) {
 		color: $primary-green;
-		font-weight: 600;
+		font-weight: $font-weight-semibold;
 		transition: all 0.3s ease;
 
 		&:hover {
-			color: darken($primary-green, 10%);
+			color: $primary-green-dark;
 			transform: translateX(-4px);
 		}
 	}
@@ -211,9 +211,9 @@ const handleNextStep = () => {
 }
 
 .detail-wrapper {
-	background: #ffffff;
+	background: $bg-card;
 	border-radius: 28px;
-	box-shadow: 0 12px 48px rgba(76, 129, 99, 0.12);
+	box-shadow: $shadow-card;
 	padding: 48px;
 	overflow: hidden;
 }
@@ -241,22 +241,22 @@ const handleNextStep = () => {
 	min-width: 60px;
 	padding: 10px 16px;
 	border-radius: 999px;
-	background: linear-gradient(135deg, #4f8f6f 0%, #3a7a5c 100%);
-	color: #ffffff;
+	background: linear-gradient(135deg, $primary-green 0%, $primary-green-dark 100%);
+	color: $bg-primary;
 	font-size: 16px;
-	font-weight: 700;
+	font-weight: $font-weight-bold;
 	margin-bottom: 16px;
-	box-shadow: 0 8px 20px rgba(79, 143, 111, 0.3);
+	box-shadow: $shadow-hover;
 }
 
 .species-display-image {
 	width: 100%;
 	aspect-ratio: 3 / 2;
 	border-radius: 24px;
-	background: linear-gradient(160deg, rgba(231, 243, 236, 0.92), rgba(245, 250, 248, 0.96));
-	border: 2px solid rgba(79, 143, 111, 0.2);
+	background: linear-gradient(160deg, rgba($primary-green, 0.12), rgba($bg-section, 0.98));
+	border: 2px solid rgba($primary-green, 0.2);
 	overflow: hidden;
-	box-shadow: 0 16px 40px rgba(79, 143, 111, 0.15);
+	box-shadow: $shadow-card;
 	margin-bottom: 12px;
 
 	img {
@@ -271,8 +271,8 @@ const handleNextStep = () => {
 	margin: 0;
 	text-align: center;
 	font-size: 13px;
-	color: #667f8d;
-	font-weight: 500;
+	color: $text-secondary;
+	font-weight: $font-weight-medium;
 }
 
 .species-header {
@@ -282,10 +282,10 @@ const handleNextStep = () => {
 .species-title {
 	margin: 0 0 16px;
 	font-size: 42px;
-	font-weight: 700;
-	color: #2c3e50;
+	font-weight: $font-weight-bold;
+	color: $text-primary;
 	line-height: 1.3;
-	background: linear-gradient(135deg, #2e6e4f 0%, #4f8f6f 100%);
+	background: linear-gradient(135deg, $primary-green-dark 0%, $primary-green 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
@@ -294,15 +294,15 @@ const handleNextStep = () => {
 .species-description {
 	margin: 0;
 	font-size: 16px;
-	color: #607d8b;
+	color: $text-secondary;
 	line-height: 1.8;
 }
 
 .section-subtitle {
 	margin: 0 0 16px;
 	font-size: 18px;
-	font-weight: 700;
-	color: #2c3e50;
+	font-weight: $font-weight-bold;
+	color: $text-primary;
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -317,9 +317,9 @@ const handleNextStep = () => {
 	gap: 16px;
 	align-items: flex-start;
 	padding: 16px;
-	border-radius: 16px;
-	background: linear-gradient(135deg, rgba(79, 143, 111, 0.08), rgba(51, 150, 243, 0.06));
-	border: 1px solid rgba(79, 143, 111, 0.15);
+	border-radius: $card-radius;
+	background: linear-gradient(135deg, rgba($primary-green, 0.08), rgba($secondary-cyan, 0.06));
+	border: 1px solid rgba($primary-green, 0.15);
 }
 
 .classification-icon {
@@ -330,7 +330,7 @@ const handleNextStep = () => {
 .classification-content p {
 	margin: 0;
 	font-size: 15px;
-	color: #445e70;
+	color: $text-secondary;
 	line-height: 1.7;
 	flex: 1;
 }
@@ -382,19 +382,19 @@ const handleNextStep = () => {
 	margin-bottom: 32px;
 
 	:deep(.el-alert) {
-		border-radius: 16px;
+		border-radius: $card-radius;
 		border-width: 2px;
 		padding: 16px 20px;
-		background: linear-gradient(135deg, rgba(255, 193, 7, 0.08), rgba(255, 152, 0, 0.06));
-		border-color: rgba(255, 193, 7, 0.3);
+		background: linear-gradient(135deg, rgba($accent-orange, 0.08), rgba($accent-orange, 0.06));
+		border-color: rgba($accent-orange, 0.3);
 
 		.el-alert__title {
-			font-weight: 700;
-			color: #ff9800;
+			font-weight: $font-weight-bold;
+			color: $accent-orange;
 		}
 
 		.el-alert__description {
-			color: #ff6f00;
+			color: $accent-orange-dark;
 			font-size: 14px;
 			line-height: 1.6;
 		}
@@ -406,18 +406,18 @@ const handleNextStep = () => {
 	justify-content: center;
 	gap: 16px;
 	padding-top: 32px;
-	border-top: 2px solid rgba(79, 143, 111, 0.1);
+	border-top: 2px solid rgba($primary-green, 0.1);
 }
 
 .next-button {
 	min-width: 280px;
 	height: 56px;
 	font-size: 16px;
-	font-weight: 600;
+	font-weight: $font-weight-semibold;
 	border-radius: 14px;
-	background: linear-gradient(135deg, #4f8f6f 0%, #2e6e4f 100%);
+	background: linear-gradient(135deg, $primary-green 0%, $primary-green-dark 100%);
 	border: none;
-	box-shadow: 0 12px 32px rgba(79, 143, 111, 0.28);
+	box-shadow: $shadow-hover;
 	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	display: flex;
 	align-items: center;
@@ -426,8 +426,8 @@ const handleNextStep = () => {
 
 	&:hover {
 		transform: translateY(-4px);
-		box-shadow: 0 20px 48px rgba(79, 143, 111, 0.36);
-		background: linear-gradient(135deg, #5da07d 0%, #3a7a5c 100%);
+		box-shadow: 0 20px 48px rgba($primary-green, 0.36);
+		background: linear-gradient(135deg, $primary-green-light 0%, $primary-green-dark 100%);
 	}
 
 	&:active {
@@ -454,9 +454,9 @@ const handleNextStep = () => {
 	align-items: center;
 	justify-content: center;
 	min-height: 400px;
-	background: #ffffff;
+	background: $bg-card;
 	border-radius: 28px;
-	box-shadow: 0 12px 48px rgba(76, 129, 99, 0.12);
+	box-shadow: $shadow-card;
 }
 
 // 響應式設計

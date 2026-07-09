@@ -13,7 +13,7 @@
         </el-col>
         <el-col :xs="24" :md="18">
           <div class="header-title">
-            <h1 class="hero-title">產業廢棄物循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
+            <h1 class="hero-title">產業廢棄物循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
             <p>路徑推薦</p>
           </div>
         </el-col>
@@ -30,10 +30,12 @@
               <div class="banner-title-row">
                 <div class="ai-icon"><el-icon>
                     <Monitor />
-                  </el-icon></div>
+                  </el-icon>
+                </div>
                 <div>
                   <h2>媒合分析結果</h2>
                   <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
+                  <p class="reminder-text">貼心提醒: 本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
                 </div>
               </div>
 
@@ -46,19 +48,27 @@
               <div class="summary-list">
                 <div class="summary-row" v-for="item in conditionSummary" :key="item.id">
                   <div class="summary-item-grid">
-                    <div class="summary-icon" :style="{ color: item.color }">
-                      <el-icon>
-                        <component :is="item.icon" />
-                      </el-icon>
-                    </div>
-                    <div class="summary-main">
-                      <div class="summary-label">{{ item.label }}</div>
-                      <div class="summary-value">{{ item.value }}</div>
-                    </div>
-                    <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
-                      <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
-                      <span class="impact-label">{{ item.levelLabel }}</span>
-                    </div>
+                    <el-row :gutter="24">
+                      <el-col :xs="3" :sm="2" :md="2">
+                        <div class="summary-icon" :style="{ color: item.color }">
+                          <el-icon>
+                            <component :is="item.icon" />
+                          </el-icon>
+                        </div>
+                      </el-col>
+                      <el-col :xs="24" :sm="9" :md="9">
+                        <div class="summary-label">{{ item.label }}</div>
+                      </el-col>
+                      <el-col :xs="18" :sm="10" :md="10">
+                        <div class="summary-value">{{ item.value }}</div>
+                      </el-col>
+                      <el-col :xs="6" :sm="3" :md="3">
+                        <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
+                          <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
+                          <span class="impact-label">{{ item.levelLabel }}</span>
+                        </div>
+                      </el-col>
+                    </el-row>
                   </div>
                 </div>
               </div>
@@ -98,10 +108,7 @@
               <!-- 頂部色塊區 -->
               <div class="path-header">
                 <span class="path-rank-badge" :style="{ background: path.gradient }">推薦路徑{{ path.rank }}</span>
-
-
               </div>
-
               <!-- 流程圖區 -->
               <div class="path-body">
                 <div class="path-intro">
@@ -270,10 +277,29 @@ const yesNoText = (value) => {
   return '未設定'
 }
 
+const clearanceFrequencyLabelMap = {
+  daily: '每日',
+  weekly: '每週',
+  monthly: '每月',
+  quarterly: '每季',
+  yearly: '每年'
+}
+
+const toClearanceFrequencyLabel = (value) => {
+  if (!value) return '未設定'
+  return clearanceFrequencyLabelMap[value] || value
+}
+
 const IMPACT_LEVEL_SCORE_MAP = {
   high: 100,
   medium: 65,
   low: 30
+}
+
+const IMPACT_LEVEL_STYLE_MAP = {
+  high: { color: '#1f9d55', levelLabel: '高' },
+  medium: { color: '#f59e0b', levelLabel: '中' },
+  low: { color: '#ef4444', levelLabel: '低' }
 }
 
 // 計算條件的影響度級別
@@ -284,9 +310,9 @@ const getImpactLevel = (condition) => {
   // 中(medium): 部分設定，74-50 分
   // 低(low): 未設定或最少設定，49-0 分
   const score = condition.score || 0
-  if (score >= 75) return { level: 'high', color: '#22c55e', levelLabel: '高' }
-  if (score >= 50) return { level: 'medium', color: '#eab308', levelLabel: '中' }
-  return { level: 'low', color: '#ef4444', levelLabel: '低' }
+  if (score >= 75) return { level: 'high', ...IMPACT_LEVEL_STYLE_MAP.high }
+  if (score >= 50) return { level: 'medium', ...IMPACT_LEVEL_STYLE_MAP.medium }
+  return { level: 'low', ...IMPACT_LEVEL_STYLE_MAP.low }
 }
 
 // 說明：封裝「to Radar Score」商業邏輯，供目前流程重複使用。
@@ -319,6 +345,7 @@ const conditionSummary = computed(() => {
   const technologyScore = 50 // 默認中等影響度
 
   const demandScore = 50 // 默認中等影響度
+  console.log("store.businessConditions", store.businessConditions);
 
   return [
     {
@@ -356,7 +383,7 @@ const conditionSummary = computed(() => {
     {
       id: 'business',
       label: '經濟效益',
-      value: store.businessConditions.clearanceFrequency ? `${store.businessConditions.clearanceFrequency}` : '未設定',
+      value: toClearanceFrequencyLabel(store.businessConditions.clearanceFrequency),
       score: businessScore,
       icon: Money,
       ...getImpactLevel({ score: businessScore })
@@ -494,19 +521,28 @@ const radarOption = computed(() => ({
     ...conditionSummary.value.map((item, index) => {
       // 只在該頂點位置放值，其餘補 null
       // 說明：封裝「value」商業邏輯，供目前流程重複使用。
-      const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : null)
+      const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : '-')
       const size = item.level === 'high'
         ? radarResponsiveConfig.value.symbolSize.high
         : item.level === 'medium'
           ? radarResponsiveConfig.value.symbolSize.medium
           : radarResponsiveConfig.value.symbolSize.low
+      const pointColor = IMPACT_LEVEL_STYLE_MAP[item.level]?.color || '#1f9d55'
       return {
         type: 'radar',
+        z: 5,
+        silent: true,
         data: [{
           value,
           symbol: 'circle',
           symbolSize: size,
-          itemStyle: { color: item.color },
+          itemStyle: {
+            color: pointColor,
+            borderColor: '#ffffff',
+            borderWidth: 1.5,
+            // shadowBlur: 6,
+            // shadowColor: `${pointColor}66`
+          },
           lineStyle: { width: 0 },      // 不畫連線
           areaStyle: { opacity: 0 }     // 不畫填色
         }],
@@ -707,7 +743,7 @@ onBeforeUnmount(() => {
 }
 
 .back-btn {
-  color: #5d7772;
+  color: $text-secondary;
   font-size: 14px;
 }
 
@@ -720,23 +756,72 @@ onBeforeUnmount(() => {
   // max-width: 1360px;
   // margin: 24px 18px;
   padding: 28px 32px;
-  background: #ffffff80;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow: 0 14px 34px rgba(53, 93, 83, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  background: rgba($bg-primary, 0.8);
+  border-radius: $card-radius;
+  border: 1px solid rgba($bg-primary, 0.82);
+  box-shadow: $shadow-card, inset 0 1px 0 rgba($bg-primary, 0.78);
   backdrop-filter: blur(16px);
   // display: grid;
   // grid-template-columns: 300px 1fr 220px;
   gap: 24px;
   align-items: start;
+
+  .banner-row {
+    display: flex;
+    align-items: flex-start;
+
+    .banner-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      .banner-title-row {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        margin-bottom: 18px;
+        font-weight: 600;
+
+        .hero-title-accent {
+          color: $primary-green;
+        }
+
+        .hero-title-accent-secondary {
+          color: $secondary-cyan;
+        }
+
+        h2 {
+          margin: 0 0 5px;
+          font-size: 21px;
+          font-weight: 700;
+          color: $text-primary;
+        }
+
+        p {
+          margin: 0;
+          font-size: 15px;
+          line-height: 1.6;
+          color: $text-secondary;
+
+          &.reminder-text {
+            font-size: 15px;
+            color: $error;
+            line-height: 1.4;
+            margin-top: 10px;
+          }
+        }
+
+      }
+
+    }
+  }
+
+
 }
 
-.banner-title-row {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-bottom: 18px;
-}
+
+
 
 .ai-icon {
   width: 40px;
@@ -751,31 +836,7 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
 }
 
-.banner-row {
-  display: flex;
-  align-items: flex-start;
 
-  .banner-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-
-    h2 {
-      margin: 0 0 5px;
-      font-size: 21px;
-      font-weight: 700;
-      color: #2d554a;
-    }
-
-    p {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.6;
-      color: #7a9490;
-    }
-  }
-}
 
 .score-card {
   background: linear-gradient(145deg, #f4fbf7, #edf7f3);
@@ -854,19 +915,16 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 10px;
 
-    .summary-item-grid {
-      display: grid;
-      grid-template-columns: 26px minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 10px;
+    :deep(.el-col) {
+      min-width: 0; // 關鍵：允許 flex item 縮小到比內容更窄
     }
 
-    .summary-main {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    // .summary-main {
+    //   min-width: 0;
+    //   display: flex;
+    //   flex-direction:row;
+    //   gap: 2px;
+    // }
 
     .summary-icon {
       width: 26px;
@@ -892,6 +950,7 @@ onBeforeUnmount(() => {
       color: #4caf50;
       font-weight: 600;
 
+
       &.muted {
         color: #b0bec5;
       }
@@ -906,6 +965,10 @@ onBeforeUnmount(() => {
       border: 1px solid;
       font-size: 12px;
       font-weight: 600;
+      max-width: 100%;
+      // overflow: hidden;
+      // white-space: nowrap;
+      // text-overflow: ellipsis; // 內容過長時省略號截斷
 
       .impact-dot {
         width: 8px;
@@ -916,6 +979,8 @@ onBeforeUnmount(() => {
 
       .impact-label {
         color: currentColor;
+        // overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
@@ -935,7 +1000,7 @@ onBeforeUnmount(() => {
 
   .radar-chart {
     width: 100%;
-    height: clamp(320px, 36vw, 520px);
+    height: clamp(320px, 36vw, 400px);
     overflow: visible;
   }
 }
@@ -1074,6 +1139,7 @@ onBeforeUnmount(() => {
     max-height: 7.2em;
     overflow: hidden;
     display: -webkit-box;
+    line-clamp: 4;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
   }
@@ -1489,8 +1555,11 @@ onBeforeUnmount(() => {
       border: 1px solid rgba(217, 231, 227, 0.9);
 
       .summary-item-grid {
-        grid-template-columns: 22px minmax(0, 1fr) auto;
-        gap: 8px;
+        width: 100%;
+      }
+
+      :deep(.el-col) {
+        flex-wrap: nowrap; // 防止欄位被擠到換行
       }
 
       .summary-main {
@@ -1504,22 +1573,27 @@ onBeforeUnmount(() => {
       }
 
       .summary-label {
-        font-size: 13px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       .summary-value {
-        font-size: 14px;
-        line-height: 1.35;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       .summary-impact-tag {
-        grid-column: auto;
-        justify-self: end;
-        align-self: center;
-        margin-left: 4px;
-        margin-top: 0;
-        font-size: 11px;
-        padding: 3px 9px;
+        flex-shrink: 0; // 關鍵：不讓標籤被壓縮
+        white-space: nowrap;
+        padding: 2px 8px;
+        font-size: 10px;
+        justify-content: center;
+      }
+
+      .impact-label {
+        white-space: nowrap;
       }
     }
   }
