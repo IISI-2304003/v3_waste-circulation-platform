@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const apiBaseURL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 // 創建 Axios 實例
 const request = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+    baseURL: apiBaseURL,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -12,6 +14,10 @@ const request = axios.create({
 // 請求攔截器
 request.interceptors.request.use(
     (config) => {
+        if ((config.baseURL || '').includes('ngrok-free.app') || (config.url || '').includes('ngrok-free.app')) {
+            config.headers['ngrok-skip-browser-warning'] = 'true';
+        }
+
         // 可在此添加 token 等認證資訊
         // const token = localStorage.getItem('token')
         // if (token) {

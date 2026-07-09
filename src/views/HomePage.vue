@@ -281,18 +281,20 @@ const loadCategories = async () => {
 const findCategoryById = (categoryId) => categories.value.find((cat) => cat.id === categoryId)
 
 // 把 API 資料（id / name / codes）跟前端視覺設定（顏色 / icon）合併，組成卡片要用的完整資料
-const categoryCards = computed(() =>
-  categories.value.map((cat) => {
+const categoryCards = computed(() => {
+  console.log('getCategories result:', categories.value)
+  return categories.value.map((cat) => {
     const visual = categoryVisuals[cat.id] || fallbackVisual
     return {
       id: cat.id,
       name: getCategoryShortName(cat),
       color: visual.color,
       icon: visual.icon,
-      count: cat.codes?.length || 0
+      count: Array.isArray(cat.codes) ? cat.codes.length : 0
     }
   })
-)
+})
+
 
 // 卡片是否為目前選中狀態
 const isActiveCategory = (id) => selectedCategory.value === id

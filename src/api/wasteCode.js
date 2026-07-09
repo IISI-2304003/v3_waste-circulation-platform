@@ -3,6 +3,7 @@
  * 提供廢棄物代碼的查詢與搜尋功能
  */
 
+import request from './index';
 import { wasteCategories, getCategoryById, getAllWasteCodes, searchWasteCodes } from '../data/wasteCategories';
 
 /**
@@ -10,12 +11,13 @@ import { wasteCategories, getCategoryById, getAllWasteCodes, searchWasteCodes } 
  */
 // 說明：回傳「get Categories」資料供畫面渲染或後續商業規則使用。
 export async function getCategories() {
-    // 模擬非同步操作
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(wasteCategories);
-        }, 100);
-    });
+    const ALLOWED_CATEGORY_IDS = new Set(['A', 'B', 'C', 'D', 'E', 'R']);
+    const result = await request.get('/wastecategory');
+    
+
+    if (!Array.isArray(result)) return [];
+
+    return result.filter((item) => ALLOWED_CATEGORY_IDS.has(item.waste_class_code)).map((item) => ({ id: item.waste_class_code, name: item.waste_class_name, codes: [] }));
 }
 
 /**
@@ -212,7 +214,7 @@ export function parseSemanticInput(text) {
  */
 // 說明：回傳「get Parameter Options」資料供畫面渲染或後續商業規則使用。
 export function getParameterOptions() {
-    return ['pH', '含水率', '硫酸濃度', '比重', '外觀', '雙氧水', 'HF濃度', '鐵', '灼熱殘渣', '總汞', '六價鉻', '總砷', '總鉛', '總鎘', '總鉻', '總銅', '總硒','總鋇','總銀'];
+    return ['pH', '含水率', '硫酸濃度', '比重', '外觀', '雙氧水', 'HF濃度', '鐵', '灼熱殘渣', '總汞', '六價鉻', '總砷', '總鉛', '總鎘', '總鉻', '總銅', '總硒', '總鋇', '總銀'];
 }
 
 /**
