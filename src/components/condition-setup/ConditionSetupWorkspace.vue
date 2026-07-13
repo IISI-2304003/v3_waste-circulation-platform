@@ -91,10 +91,7 @@
 													<span><span class="required-mark">*</span>來源產業</span>
 												</template>
 												<el-select v-model="store.sourceConditions.industry" :class="{ 'is-invalid': shouldMarkInvalid('sourceIndustry') }" placeholder="選擇來源產業">
-													<el-option label="電子與半導體" value="semiconductor" />
-													<el-option label="鋼鐵冶金" value="steel" />
-													<el-option label="化工製程" value="chemical" />
-													<el-option label="食品加工" value="food" />
+													<el-option v-for="item in sourceIndustryOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
 										</el-col>
@@ -301,12 +298,13 @@
 </template>
 
 <script setup>
-import { computed, nextTick, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search, Location, House } from '@element-plus/icons-vue'
 import AcceptanceStandardForm from '@/components/AcceptanceStandardForm.vue'
 import SemanticInputModal from '@/components/SemanticInputModal.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import { getAnnouncementCategoryOptions, getProcessList } from '@/api/wasteCode'
 import FlowStepProgress from './FlowStepProgress.vue'
 import VerticalConditionNav from './VerticalConditionNav.vue'
 import ConditionAccordionSection from './ConditionAccordionSection.vue'
@@ -339,6 +337,8 @@ const businessRef = ref(null)
 const environmentRef = ref(null)
 const technologyRef = ref(null)
 const demandRef = ref(null)
+const sourceIndustryOptions = ref([])
+const sourceProcessOptions = ref([])
 const reuseSpaceOptions = [
 	{ value: true, label: '有' },
 	{ value: false, label: '無' }
@@ -370,19 +370,6 @@ const expandedMap = reactive({
 	technology: true,
 	demand: true
 })
-
-const sourceProcessOptions = [
-	{ value: '260001', label: '260001 積體電路製造程序' },
-	{ value: '260003', label: '260003 記憶體製造程序' },
-	{ value: '260004', label: '260004 二極體製造程序' },
-	{ value: '260005', label: '260005 發光二極體製造程序' },
-	{ value: '260006', label: '260006 電晶體製造程序' },
-	{ value: '260009', label: '260009 其他分離式元件製造程序' },
-	{ value: '260011', label: '260011 晶片製造程序' },
-	{ value: '260012', label: '260012 晶圓製造程序' },
-	{ value: '260013', label: '260013 晶圓包裝程序' }
-]
-
 const sourceFrequencyOptions = [
 	{ value: 'daily', label: '每日' },
 	{ value: 'weekly', label: '每週' },
@@ -473,6 +460,63 @@ const sectionRefMap = {
 	technology: technologyRef,
 	demand: demandRef
 }
+
+// 說明：初始化載入來源產業選項，供「來源產業」下拉使用。
+const loadSourceIndustryOptions = async () => {
+	try {
+		const data = await getAnnouncementCategoryOptions()
+		const categoryList = Array.isArray(data) ? data : data?.value
+		sourceIndustryOptions.value = Array.isArray(categoryList)
+			? categoryList.map((item) => ({
+				value: String(item.id),
+				label: String(item.name)
+			}))
+			: []
+	} catch (error) {
+		sourceIndustryOptions.value = []
+		console.error('載入來源產業失敗：', error)
+	}
+}
+
+// 說明：依來源產業 ID 取得製程資料，供來源製程下拉使用。
+async function fetchProcess() {
+	if (!store.sourceConditions.industry) {
+		sourceProcessOptions.value = []
+		return
+	}
+
+	try {
+		const data = await getProcessList(store.sourceConditions.industry)
+		const processList = Array.isArray(data) ? data : data?.value
+		sourceProcessOptions.value = Array.isArray(processList)
+			? processList.map((item) => ({
+				value: String(item.id),
+				label: `${item.code} ${item.name}`
+			}))
+			: []
+	} catch (error) {
+		sourceProcessOptions.value = []
+		console.error(error)
+	}
+}
+
+watch(
+	() => store.sourceConditions.industry,
+	async (nextIndustry, prevIndustry) => {
+		if (nextIndustry === prevIndustry) return
+
+		store.sourceConditions.process = ''
+		await fetchProcess()
+	},
+	{ immediate: true }
+)
+
+onMounted(async () => {
+	await loadSourceIndustryOptions()
+	if (store.sourceConditions.industry) {
+		await fetchProcess()
+	}
+})
 
 // 說明：由切換操作觸發；更新展開/收合或開關狀態。
 const toggleSection = (sectionId) => {

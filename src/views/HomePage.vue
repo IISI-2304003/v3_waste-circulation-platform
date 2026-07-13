@@ -222,10 +222,9 @@ import { useCirculationModes } from '../composables/useCirculationModes'
 import ParticleBackground from '../components/ParticleBackground.vue'
 import CirculationModesGrid from '../components/CirculationModesGrid.vue'
 import CirculationModal from '../components/CirculationModal.vue'
-import { getCategories } from '@/api/wasteCode'
+import { getCategories, getWasteCodesByCategory } from '@/api/wasteCode'
 import { categoryVisuals, fallbackVisual } from '@/data/categoryVisuals'
 import { getAllWasteCodes } from '@/data/wasteCategories'
-import { getWasteSpeciesCardsLocal } from '@/data/wasteSpecies'
 
 const router = useRouter()
 const route = useRoute()
@@ -247,10 +246,6 @@ const dialogVisible = ref(false)
 const selectedMode = ref(null)
 const currentPage = ref(1)
 const pageSize = ref(9)
-const activeTab = ref('wasteSpeciesRef')
-const speciesSearchKeyword = ref('')
-const speciesCurrentPage = ref(1)
-const speciesPageSize = 10
 const footerInsightsRef = ref(null)
 const hasFooterStatsAnimated = ref(false)
 const animatedFooterStatValues = ref([])
@@ -268,7 +263,11 @@ const loadCategories = async () => {
   categoriesLoading.value = true
   try {
     const result = await getCategories()
-    categories.value = Array.isArray(result) ? result.filter((cat) => cat.id !== 'ALL') : []
+    categories.value = Array.isArray(result)
+      ? result.filter((cat) => cat.id !== 'ALL').map((cat) => ({ ...cat, codes: Array.isArray(cat.codes) ? cat.codes : [], codesLoaded: false }))
+      : []
+
+    await Promise.all(categories.value.map((cat) => loadCategoryCodes(cat.id)))
   } catch (error) {
     console.error('載入分類失敗：', error)
     categories.value = []
@@ -279,6 +278,21 @@ const loadCategories = async () => {
 
 // 依 id 尋找分類完整資料（含 codes），取代原本從靜態資料匯入的 getCategoryById
 const findCategoryById = (categoryId) => categories.value.find((cat) => cat.id === categoryId)
+
+const loadCategoryCodes = async (categoryId) => {
+  const category = findCategoryById(categoryId)
+  if (!category || category.codesLoaded) return
+
+  try {
+    const codes = await getWasteCodesByCategory(categoryId)
+    category.codes = Array.isArray(codes) ? codes : []
+    category.codesLoaded = true
+  } catch (error) {
+    console.error(`載入 ${categoryId} 類別細項失敗：`, error)
+    category.codes = []
+    category.codesLoaded = true
+  }
+}
 
 // 把 API 資料（id / name / codes）跟前端視覺設定（顏色 / icon）合併，組成卡片要用的完整資料
 const categoryCards = computed(() => {
@@ -463,8 +477,6 @@ const footerHighlightsForStatsBar = footerHighlights.map((item) => ({
   icon: item.icon
 }))
 
-const wasteSpeciesCards = getWasteSpeciesCardsLocal()
-
 // 說明：依目前條件即時計算「current Category」內容，提供畫面顯示與決策判斷使用。
 const currentCategory = computed(() => findCategoryById(selectedCategory.value) || categories.value[0])
 // 說明：依目前條件即時計算「current Category Codes」內容，提供畫面顯示與決策判斷使用。
@@ -496,16 +508,6 @@ const currentPageCodes = computed(() => {
   const end = start + pageSize.value
   return displayCodes.value.slice(start, end)
 })
-// 說明：依目前條件即時計算「species Display Cards」內容，提供畫面顯示與決策判斷使用。
-const speciesDisplayCards = computed(() => {
-  const keyword = speciesSearchKeyword.value.trim().toLowerCase()
-  if (!keyword) return wasteSpeciesCards
-
-  return wasteSpeciesCards.filter((species) => {
-    const targetText = `${species.id} ${species.name} ${species.representativeItems.join(' ')}`.toLowerCase()
-    return targetText.includes(keyword)
-  })
-})
 // 說明：回傳「get Category Short Name」資料供畫面渲染或後續商業規則使用。
 const getCategoryShortName = (category) => category?.name?.split(' - ')[1] || category?.name || ''
 
@@ -531,6 +533,7 @@ const applyTag = (tag) => {
 // 改用 findCategoryById
 const selectCategory = (categoryId) => {
   selectedCategory.value = categoryId
+  loadCategoryCodes(categoryId)
   selectedCode.value = defaultCodeMap[categoryId] || findCategoryById(categoryId)?.codes?.[0]?.code || ''
   currentPage.value = 1
 }
@@ -549,12 +552,8 @@ const handleCardClick = (code) => {
   })
 }
 
-watch([activeTab, selectedCategory, searchKeyword], () => {
+watch([selectedCategory, searchKeyword], () => {
   currentPage.value = 1
-})
-
-watch([activeTab, speciesSearchKeyword], () => {
-  speciesCurrentPage.value = 1
 })
 
 // 說明：封裝「show Mode Detail」商業邏輯，供目前流程重複使用。
@@ -674,9 +673,6 @@ onMounted(async () => {
     animateFooterStats()
   }
 
-  if (route.query.tab) {
-    activeTab.value = route.query.tab
-  }
   if (route.query.category) {
     selectedCategory.value = route.query.category
   }

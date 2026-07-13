@@ -6,6 +6,21 @@
 import request from './index';
 import { wasteCategories, getCategoryById, getAllWasteCodes, searchWasteCodes } from '../data/wasteCategories';
 
+// 說明：回傳來源產業選單資料（/announcementcategory）。
+export async function getAnnouncementCategoryOptions() {
+    const result = await request.get('/announcementcategory');
+    return result;
+}
+
+// 說明：依來源產業 ID 取得對應製程清單。
+export function getProcessList(announcementCategoryId) {
+    return request.get('/process', {
+        params: {
+            announcementCategoryId,
+        },
+    });
+}
+
 /**
  * 取得所有類別
  */
@@ -13,7 +28,6 @@ import { wasteCategories, getCategoryById, getAllWasteCodes, searchWasteCodes } 
 export async function getCategories() {
     const ALLOWED_CATEGORY_IDS = new Set(['A', 'B', 'C', 'D', 'E', 'R']);
     const result = await request.get('/wastecategory');
-    
 
     if (!Array.isArray(result)) return [];
 
@@ -25,16 +39,22 @@ export async function getCategories() {
  */
 // 說明：回傳「get Waste Codes By Category」資料供畫面渲染或後續商業規則使用。
 export async function getWasteCodesByCategory(categoryId) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const category = getCategoryById(categoryId);
-            if (category) {
-                resolve(category.codes);
-            } else {
-                reject(new Error(`未找到類別：${categoryId}`));
-            }
-        }, 100);
-    });
+    const result = await request.get('/wastedetail');
+
+    if (!Array.isArray(result)) return [];
+
+    const prefix = `${categoryId}-`;
+    return result
+        .filter((item) => {
+            const wasteCode = String(item?.waste_code || '');
+            return wasteCode.startsWith(prefix);
+        })
+        .map((item) => ({
+            code: item.waste_code,
+            name: item.waste_name,
+            description: item.remark || '',
+            categoryId,
+        }));
 }
 
 /**
