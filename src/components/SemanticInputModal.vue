@@ -1,12 +1,12 @@
 <template>
-	<el-dialog v-model="visible" title="語意化搜尋" width="min(700px, 92vw)" class="semantic-input-dialog" :close-on-click-modal="false" @close="handleClose">
+	<el-dialog v-model="visible" title="語意化搜尋" width="min(700px, 92vw)" class="semantic-input-dialog" :modal="true" append-to-body :close-on-click-modal="false" @close="handleClose">
 		<div class="semantic-modal-content">
 			<!-- 說明 -->
 			<div class="modal-description">
 				<el-alert title="使用說明" type="info" :closable="false" show-icon>
 					<p>輸入廢棄物特性參數後，系統會自動解析為查詢條件。</p>
 					<p class="example-text">
-						請以頓號（、）分隔條件，例如：硫酸含量 < 5%、重金屬含量 < 100 mg/kg、pH值 < 2</p>
+						請以頓號（、）分隔條件，例如：硫酸含量 &lt; 5%、重金屬含量 &lt; 100 mg/kg、pH值 &lt; 2</p>
 				</el-alert>
 			</div>
 

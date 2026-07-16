@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" :title="mode?.name" width="75%" top="5vh" destroy-on-close :close-on-click-modal="true" class="circulation-modal">
+  <el-dialog v-model="visible" :title="mode?.name" width="75%" top="5vh" destroy-on-close :modal="true" append-to-body :close-on-click-modal="true" class="circulation-modal">
     <div v-if="mode" class="mode-detail-content">
       <el-row :gutter="40">
         <!-- 上方：流程圖 -->

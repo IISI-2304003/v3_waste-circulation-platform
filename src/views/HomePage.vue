@@ -212,6 +212,7 @@
     </section>
 
     <CirculationModal v-model="dialogVisible" :mode="selectedMode" @search="handleModeSearch" />
+    <WasteCodeEntryModal v-model="entryModalVisible" :code="pendingEntry?.code" :list="getCodeNameByCode(pendingEntry?.code)" :color="getCategoryColor(currentCategory)" @lookup="handleEntryLookup" @analysis="handleEntryAnalysis" />
   </div>
 </template>
 
@@ -225,6 +226,7 @@ import CirculationModal from '../components/CirculationModal.vue'
 import { getCategories, getWasteCodesByCategory } from '@/api/wasteCode'
 import { categoryVisuals, fallbackVisual } from '@/data/categoryVisuals'
 import { getAllWasteCodes } from '@/data/wasteCategories'
+import WasteCodeEntryModal from '../components/WasteCodeEntryModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -253,6 +255,9 @@ const activeProcessStep = ref(0)
 const activeInsightCard = ref(0)
 let footerStatsObserver = null
 let footerStatsAnimationFrame = null
+// 分類選擇彈窗
+const entryModalVisible = ref(false)
+const pendingEntry = ref(null) // { code, category, page }
 
 // 六大類分類顯示信息
 // 分類資料改用 getCategories() 取得（目前是模擬 API，未來換成真實 API 呼叫，這裡完全不用改）
@@ -296,7 +301,6 @@ const loadCategoryCodes = async (categoryId) => {
 
 // 把 API 資料（id / name / codes）跟前端視覺設定（顏色 / icon）合併，組成卡片要用的完整資料
 const categoryCards = computed(() => {
-  console.log('getCategories result:', categories.value)
   return categories.value.map((cat) => {
     const visual = categoryVisuals[cat.id] || fallbackVisual
     return {
@@ -538,19 +542,35 @@ const selectCategory = (categoryId) => {
   currentPage.value = 1
 }
 
-// 說明：由使用者互動觸發；執行「handle Card Click」流程並同步更新相關狀態。
-const handleCardClick = (code) => {
-  router.push({
-    path: '/standard-input',
-    query: {
-      from: 'home',
-      entry: 'wasteCode',
-      code,
-      category: selectedCategory.value,
-      page: currentPage.value
-    }
-  })
+// 分類選擇彈窗
+const getCodeNameByCode = (code) => {
+  const list = currentCategory.value?.codes || []
+  return list.find((item) => item.code === code) || ''
 }
+
+const navigateToEntry = (action, { code, category, page }) => {
+  if (action === 'analysis') {
+    router.push({
+      path: '/standard-input', // ← 換成你實際的路由
+      query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'full' }
+    })
+  } else {
+    router.push({
+      path: '/technology-match',
+      query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'quick' }
+    })
+  }
+}
+
+const handleCardClick = (code) => {
+  pendingEntry.value = { code, category: selectedCategory.value, page: currentPage.value }
+  entryModalVisible.value = true
+}
+
+const handleEntryLookup = () => navigateToEntry('lookup', pendingEntry.value)
+const handleEntryAnalysis = () => navigateToEntry('analysis', pendingEntry.value)
+
+// 分類選擇彈窗(End)
 
 watch([selectedCategory, searchKeyword], () => {
   currentPage.value = 1
@@ -2103,26 +2123,35 @@ onBeforeUnmount(() => {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 18px 40px rgba(82, 116, 98, 0.1);
 }
 
+// @media (max-width: 1200px) {
+//   .search-section {
+//     .container {
+//       .category-card-grid {
+//         grid-template-columns: repeat(3, 1fr);
+//       }
+//     }
+//   }
+
+//   .codes-grid {
+//     grid-template-columns: repeat(3, 1fr);
+//   }
+
+//   .species-grid {
+//     grid-template-columns: repeat(4, 1fr);
+//   }
+// }
+
 @media (max-width: 1200px) {
-  .search-section {
-    .container {
-      .category-card-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+
+
+  .hero-section {
+    padding: 24px 20px 80px 20px;
+    min-height: auto;
+
+    &::before {
+      background: url('../assets/Bg_mobile.png') center top / 100% auto no-repeat;
     }
   }
-
-  .codes-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .species-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 968px) {
-
 
   .insight-process-board {
     flex-direction: row;
@@ -2158,6 +2187,8 @@ onBeforeUnmount(() => {
   }
 
   .search-section {
+    margin-top: 50px;
+
     .container {
       .search-card {
         padding: 18px 16px;
@@ -2207,26 +2238,37 @@ onBeforeUnmount(() => {
     flex-direction: column;
     gap: 40px;
     text-align: center;
+    align-items: center;
+    /* 加這行，強制水平置中每個子項目 */
   }
 
   .hero-left {
+    order: 1;
+    /* 文字/流程放下面 */
     text-align: center;
     max-width: 100%;
+    width: 100%;
     margin-top: 20px;
   }
 
   .hero-right {
+    order: 2;
+    /* 十大循環模式圖放上面 */
     min-width: auto;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     min-height: 800px;
+    margin-top: 100px;
   }
 
   .hero-bottom-left {
+
     max-width: 100%;
-    margin-top: 0;
+    width: 100%;
+    margin: 0 auto;
+    margin-top: 20px;
   }
 
   .hero-title {
@@ -2237,6 +2279,10 @@ onBeforeUnmount(() => {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .hero-actions {
+    justify-content: center;
   }
 
   .search-shell {
@@ -2521,7 +2567,7 @@ onBeforeUnmount(() => {
   }
 
   .search-section {
-    margin-top: -80px;
+    margin-top: 0px;
     padding: 24px 18px 76px;
   }
 

@@ -22,7 +22,7 @@
 		<div class="page-shell" style="padding: 24px;">
 			<FlowStepProgress :active-step="3" />
 
-			<div class="summary-mode-row panel-card">
+			<div v-if="!isQuickMode" class="summary-mode-row panel-card">
 				<!-- 左：媒合需求摘要 -->
 				<section class="summary-panel-inner">
 					<div class="section-header">
@@ -244,7 +244,7 @@
 				</div>
 			</section>
 
-			<section class="panel-card suppliers-panel">
+			<section v-if="!isQuickMode" class="panel-card suppliers-panel">
 				<div class="suppliers-header">
 					<div class="section-header suppliers-title">
 						<div class="ai-icon">
@@ -307,7 +307,7 @@
 				<div v-else class="alternative-empty">目前無其他替代方案。</div>
 			</section>
 
-			<el-dialog v-model="detailDialogVisible" class="vendor-detail-dialog " width="min(1120px, 94vw)" align-center destroy-on-close :close-on-click-modal="true" :close-on-press-escape="true" append-to-body @closed="closeVendorDetail">
+			<el-dialog v-model="detailDialogVisible" class="vendor-detail-dialog " width="min(1120px, 94vw)" align-center destroy-on-close :modal="true" :close-on-click-modal="true" :close-on-press-escape="true" append-to-body @closed="closeVendorDetail">
 				<template #header>
 					<div v-if="activeVendor" class="dialog-top-header">
 						<div class="top-header-main">
@@ -486,7 +486,7 @@
 			</el-dialog>
 
 			<div class="actions panel-card">
-				<el-button size="large" @click="goPrevious">
+				<el-button v-if="!isQuickMode" size="large" @click="goPrevious">
 					<el-icon class="el-icon--left">
 						<ArrowLeft />
 					</el-icon>
@@ -508,7 +508,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import CirculationModal from '@/components/CirculationModal.vue'
 import circulationModesData from '@/data/circulationModes.json'
@@ -521,6 +521,9 @@ import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
 
 const router = useRouter()
+const route = useRoute()
+const isQuickMode = computed(() => route.query.mode === 'quick')// 模式判斷
+console.log('isQuickMode', isQuickMode.value)
 const conditionStore = useConditionSetupStore()
 
 const sortType = ref('overall')
@@ -2155,10 +2158,6 @@ const goBackHome = () => {
 	font-weight: 700;
 }
 
-.actions {
-	display: flex;
-	justify-content: space-between;
-}
 
 .detail-btn {
 	flex-shrink: 0;
@@ -2180,8 +2179,9 @@ const goBackHome = () => {
 }
 
 .export-btn {
-	align-self: flex-end;
+	// align-self: flex-end;
 	margin-top: auto;
+	float: right;
 	font-size: 15px;
 	font-weight: 700;
 	border: none;

@@ -178,7 +178,7 @@
       </el-button> -->
     </div>
 
-    <el-dialog v-model="modesDialogVisible" class="top-modes-dialog" width="min(1080px, 94vw)" align-center destroy-on-close>
+    <el-dialog v-model="modesDialogVisible" class="top-modes-dialog" width="min(1080px, 94vw)" align-center destroy-on-close :modal="true" append-to-body>
       <template #header>
         <div class="modes-dialog-header">
           <h3>十大循環模式說明</h3>
@@ -733,6 +733,14 @@ onBeforeUnmount(() => {
       color: #2d554a;
     }
 
+    .hero-title-accent {
+      color: $primary-green;
+    }
+
+    .hero-title-accent-secondary {
+      color: $secondary-cyan;
+    }
+
     p {
       margin: 3px 0 0;
       font-size: clamp(24px, 0.898rem + 0.49vw, 36px);
@@ -747,9 +755,7 @@ onBeforeUnmount(() => {
   font-size: 14px;
 }
 
-.header-title {
-  text-align: left;
-}
+
 
 /* ─── Analysis Banner ─── */
 .analysis-banner {

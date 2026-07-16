@@ -23,17 +23,17 @@
 
 			<!-- 環繞的循環模式圖標 -->
 			<div class="modes-circle">
-				<div v-for="(mode, index) in modes" :key="mode.id" class="mode-item" :style="getModePosition(index)" @click="handleModeClick(mode)">
-					<div class="mode-circle" :style="{
-						borderColor: mode.color,
-						animationDelay: `${index * 0.1}s`,
-						'--glow-color': mode.color
-					}">
-						<div class="icon-glow" :style="{ backgroundColor: mode.color }"></div>
-						<el-icon :size="28" :style="{ color: mode.color }">
-							<component :is="getIcon(mode.icon)" />
-						</el-icon>
-					</div>
+				<div v-for="(mode, index) in modes" :key="mode.id" class="mode-item" :style="getModePosition(index)" @mouseenter="handleModeEnter(mode)" @mouseleave="handleModeLeave" @click="handleExploreMode">
+					<el-tooltip class="box-item" effect="dark" content="點選查看更多" placement="top">
+						<div class="mode-circle" :style="{
+							borderColor: mode.color,
+							animationDelay: `${index * 0.1}s`,
+							'--glow-color': mode.color
+						}">
+							<div class="icon-glow" :style="{ backgroundColor: mode.color }"></div>
+							<img class="mode-icon-img" :src="mode.icon" :alt="mode.name" />
+						</div>
+					</el-tooltip>
 					<span class="mode-name" :style="{ animationDelay: `${index * 0.1}s` }">
 						{{ getShortName(mode.name) }}
 					</span>
@@ -41,12 +41,13 @@
 			</div>
 
 			<!-- 點選後顯示的卡片區塊內容 -->
-			<div v-if="selectedMode" class="mode-detail-card">
+			<div v-if="selectedMode" class="mode-detail-card" @mouseenter="handleCardEnter" @mouseleave="handleModeLeave">
 				<h3>{{ selectedMode.name }}</h3>
 				<p>{{ selectedMode.description || '尚未提供模式說明。' }}</p>
-				<el-button type="primary" round class="explore-btn" @click="handleExploreMode">
+				<p class="mode-text">點擊圖示查看完整流程</p>
+				<!-- <el-button type="primary" round class="explore-btn" @click="handleExploreMode">
 					探索此模式
-				</el-button>
+				</el-button> -->
 			</div>
 
 		</div>
@@ -89,13 +90,6 @@ let gridResizeObserver = null
 // 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 const normalizeModeName = (name = '') => String(name).replace(/\s+/g, '').trim()
 
-// 說明：初始化模式卡片時優先選擇「廠內模式1」，若不存在則退回第一筆模式。
-const getDefaultMode = (modes = []) => {
-	const targetName = normalizeModeName('廠內模式1')
-	// 說明：封裝「matched Mode」商業邏輯，供目前流程重複使用。
-	const matchedMode = modes.find((mode) => normalizeModeName(mode?.name) === targetName)
-	return matchedMode || modes[0] || null
-}
 
 // 基準畫布尺寸（所有縮放的基準值）。
 // 想讓整體更大/更小可先調這個數字，再搭配 gridScale 的上下限微調。
@@ -150,24 +144,7 @@ const orbitRadius = computed(() => {
 	return 225
 })
 
-// 圖標映射
-const iconMap = {
-	'cycle-internal': Operation,
-	'cycle-cross-process': Connection,
-	'cycle-park': OfficeBuilding,
-	'cycle-supply-chain': Link,
-	'cycle-cross-industry': Share,
-	'cycle-energy': Lightning,
-	'cycle-extraction': Coin,
-	'cycle-construction': House,
-	'cycle-compost': Apple,
-	'cycle-innovation': Star
-}
 
-// 說明：回傳「get Icon」資料供畫面渲染或後續商業規則使用。
-const getIcon = (iconName) => {
-	return iconMap[iconName] || Operation
-}
 
 // 縮短名稱顯示
 // 說明：回傳「get Short Name」資料供畫面渲染或後續商業規則使用。
@@ -207,8 +184,30 @@ const getModePosition = (index) => {
 }
 
 // 說明：由圓環模式節點點擊觸發；更新 selectedMode 顯示對應模式卡片。
-const handleModeClick = (mode) => {
+let hideTimer = null
+const handleModeEnter = (mode) => {
+	if (hideTimer) {
+		clearTimeout(hideTimer)
+		hideTimer = null
+	}
 	selectedMode.value = mode
+}
+
+
+// 說明：滑鼠離開模式節點時觸發，延遲一小段時間後隱藏卡片
+// （延遲是為了讓使用者能把滑鼠移到卡片上點擊「探索此模式」而不會被瞬間關閉）
+const handleModeLeave = () => {
+	hideTimer = setTimeout(() => {
+		selectedMode.value = null
+	}, 150)
+}
+
+// 說明：滑鼠移到卡片本身時，取消隱藏計時器，讓卡片保持顯示
+const handleCardEnter = () => {
+	if (hideTimer) {
+		clearTimeout(hideTimer)
+		hideTimer = null
+	}
 }
 
 // 說明：由「探索此模式」按鈕觸發；送出 mode-click 事件給父層進行後續流程。
@@ -217,15 +216,6 @@ const handleExploreMode = () => {
 	emit('mode-click', selectedMode.value)
 }
 
-watch(
-	() => props.modes,
-	(modes) => {
-		if (!Array.isArray(modes) || modes.length === 0) return
-		if (selectedMode.value) return
-		selectedMode.value = getDefaultMode(modes)
-	},
-	{ immediate: true }
-)
 
 onMounted(() => {
 	updateGridMetrics()
@@ -373,6 +363,8 @@ onBeforeUnmount(() => {
 				box-shadow: 0 0 25px var(--glow-color), 0 0 40px rgba(76, 175, 80, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2);
 				transform: scale(1.1);
 				border-color: var(--glow-color);
+
+
 			}
 
 			.icon-glow {
@@ -403,16 +395,22 @@ onBeforeUnmount(() => {
 		animation: floating 3s ease-in-out infinite;
 		overflow: hidden;
 
-		&::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent);
-			border-radius: 50%;
-			pointer-events: none;
+		// &::before {
+		// 	content: '';
+		// 	position: absolute;
+		// 	top: 0;
+		// 	left: 0;
+		// 	width: 100%;
+		// 	height: 100%;
+		// 	background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent);
+		// 	border-radius: 50%;
+		// 	pointer-events: none;
+		// }
+
+		.mode-icon-img {
+			width: 55px;
+			height: 55px;
+			object-fit: contain;
 		}
 	}
 }
@@ -498,6 +496,12 @@ onBeforeUnmount(() => {
 
 	.explore-btn {
 		width: 100%;
+	}
+
+	.mode-text {
+		font-size: 14px;
+		color: #4CAF50;
+		text-align: center;
 	}
 }
 
@@ -706,19 +710,37 @@ onBeforeUnmount(() => {
 			font-size: 18px;
 			margin-bottom: 12px;
 		}
+
+		.mode-text {
+			font-size: 16px;
+			color: #4CAF50;
+		}
 	}
 }
 
 /* 平板版 */
 @media (min-width: 969px) and (max-width: 1200px) {
+	.circulation-modes-grid {
+		--grid-offset-x: 0px;
+		/* 新增：歸零，避免繼承桌機 -70px */
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	.circle-container {
 		width: 500px;
 		height: 500px;
+		margin: 0 auto;
+		left: 0;
 	}
 
 	.center-earth {
 		width: 150px;
 		height: 150px;
+		left: 0;
+		/* 新增：歸零，避免繼承 -160px */
+		top: 0;
 	}
 
 	.recycle-icon {

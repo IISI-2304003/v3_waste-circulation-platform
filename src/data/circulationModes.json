@@ -2,7 +2,7 @@
     {
         "id": 1,
         "name": "廠內模式1",
-        "icon": "cycle-internal",
+        "icon": "/src/assets/icons/icon_01.png",
         "color": "#4CAF50",
         "description": "物料製程內未排出，逕自循環使用",
         "flowchartUrl": "/flowcharts/01_OnSite_recyle.png",
@@ -18,7 +18,7 @@
     {
         "id": 2,
         "name": "廠內模式2",
-        "icon": "cycle-cross-process",
+        "icon": "/src/assets/icons/icon_02.png",
         "color": "#66BB6A",
         "description": "廢棄物於製程排出後,廠內回原製程作原料使用回原製程做原料使用。",
         "flowchartUrl": "/flowcharts/02_OnSite_recyle.png",
@@ -35,7 +35,7 @@
     {
         "id": 3,
         "name": "廠內模式3",
-        "icon": "cycle-park",
+        "icon": "/src/assets/icons/icon_03.png",
         "color": "#26A69A",
         "description": "廢棄物於製程排出後，經廠內其他製程或設備處理、加工，可製成再生料、其他產品、原物料，再提供廠內製程使用，或提供他廠製程使用。",
         "flowchartUrl": "/flowcharts/03_OnSite_recyle.png",
@@ -53,7 +53,7 @@
     {
         "id": 4,
         "name": "廠外模式1",
-        "icon": "cycle-supply-chain",
+        "icon": "/src/assets/icons/icon_04.png",
         "color": "#00BCD4",
         "description": "委託不同法人處理及再利用，做出資源化原料、材料丶產品。",
         "flowchartUrl": "/flowcharts/01_OutSite_recyle.png",
@@ -70,7 +70,7 @@
     {
         "id": 5,
         "name": "廠外模式2",
-        "icon": "cycle-cross-industry",
+        "icon": "/src/assets/icons/icon_05.png",
         "color": "#388E3C",
         "description": "送至同一法人不同廠區處理及再利用。",
         "flowchartUrl": "/flowcharts/02_OutSite_recyle.png",
@@ -86,7 +86,7 @@
     {
         "id": 6,
         "name": "廠外模式3",
-        "icon": "cycle-energy",
+        "icon": "/src/assets/icons/icon_06.png",
         "color": "#FF9800",
         "description": "送回原供應商調整物料成分與濃度或填充相同物料，且再返回原廠原製程循環使用。",
         "flowchartUrl": "/flowcharts/03_OutSite_recyle.png",
@@ -103,7 +103,7 @@
     {
         "id": 7,
         "name": "廠外模式4",
-        "icon": "cycle-extraction",
+        "icon": "/src/assets/icons/icon_07.png",
         "color": "#A0522D",
         "description": "原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。",
         "flowchartUrl": "/flowcharts/04_OutSite_recyle.png",
@@ -119,7 +119,7 @@
     {
         "id": 8,
         "name": "廠外模式5",
-        "icon": "cycle-construction",
+        "icon": "/src/assets/icons/icon_08.png",
         "color": "#607D8B",
         "description": "串聯同一法人各廠區間物質流，物料送回原供應商調整成分與濃度，再返回原廠原製程循環使用。",
         "flowchartUrl": "/flowcharts/05_OutSite_recyle.png",
@@ -136,7 +136,7 @@
     {
         "id": 9,
         "name": "廠外模式6",
-        "icon": "cycle-compost",
+        "icon": "/src/assets/icons/icon_09.png",
         "color": "#8BC34A",
         "description": "送至同一法人前處理，再送至其他公司純化（再製）、調整成分與濃度，再返回原廠使用。",
         "flowchartUrl": "/flowcharts/06_OutSite_recyle.png",
@@ -154,7 +154,7 @@
     {
         "id": 10,
         "name": "廠外模式7",
-        "icon": "cycle-innovation",
+        "icon": "/src/assets/icons/icon_10.png",
         "color": "#9C27B0",
         "description": "原料購入使用後，送至其他公司前處理，再送回供應商調整、再製造，並返回原廠使用。",
         "flowchartUrl": "/flowcharts/07_OutSite_recyle.png",
