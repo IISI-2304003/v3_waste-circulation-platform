@@ -249,6 +249,7 @@ import {
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import { getAnnouncementCategoryOptions } from '@/api/wasteCode'
 import circulationModes from '@/data/circulationModes.json'
 // import { b } from 'vue-router/dist/index-CzEDAlw7.js'
 
@@ -257,6 +258,7 @@ const store = useConditionSetupStore()
 const modesDialogVisible = ref(false)
 const activeModeId = ref(1)
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1440)
+const industryOptions = ref([])
 
 // 說明：由視窗 resize 事件觸發；更新 viewportWidth 供雷達圖響應式參數重算。
 const updateViewportWidth = () => {
@@ -359,7 +361,11 @@ const conditionSummary = computed(() => {
     {
       id: 'source',
       label: '料源穩定性',
-      value: store.sourceConditions.industry ? `${industryLabelMap[store.sourceConditions.industry]}` : '未設定',
+      value: (() => {
+        if (!store.sourceConditions.industry) return '未設定'
+        const matched = industryOptions.value.find((o) => o.value === store.sourceConditions.industry)
+        return matched ? matched.label : store.sourceConditions.industry
+      })(),
       score: sourceScore,
       icon: Connection,
       ...getImpactLevel({ score: sourceScore })
@@ -601,6 +607,7 @@ const baseInternalPath = {
   gradient: 'linear-gradient(160deg,#f29f3a,#e27400)',
   accentColor: '#2da84a',
   score: 94,
+  matchRate: 3,
   steps: [
     { label: '原料購入', icon: Goods },
     { label: '廠內前處理', icon: Files },
@@ -662,8 +669,17 @@ const goNext = (path) => {
   router.push('/technology-match')
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', updateViewportWidth)
+  try {
+    const data = await getAnnouncementCategoryOptions()
+    const list = Array.isArray(data) ? data : data?.value
+    industryOptions.value = Array.isArray(list)
+      ? list.map((item) => ({ value: String(item.id), label: String(item.name) }))
+      : []
+  } catch {
+    industryOptions.value = []
+  }
 })
 
 onBeforeUnmount(() => {

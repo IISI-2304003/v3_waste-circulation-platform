@@ -420,13 +420,13 @@ const footerProcessSteps = [
 
 const footerStats = [
   {
-    label: '媒合成功案例',
-    value: '2,458+',
+    label: '有害物質廢棄物件數',
+    value: '258+',
     unit: '',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M6 20V8l4-3 4 3v12"/><path d="M10 8l-4-3"/><path d="M10 8l4-3"/></svg>'
   },
   {
-    label: '合作廠商數',
+    label: '廠商數',
     value: '1,236+',
     unit: '',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="7" height="10" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/><path d="M6 14h1"/><path d="M6 17h1"/><path d="M17 8h1"/><path d="M17 11h1"/></svg>'

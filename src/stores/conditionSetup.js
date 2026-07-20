@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 // 說明：封裝「default Source」商業邏輯，供目前流程重複使用。
 const defaultSource = () => ({
     industry: '',
+    industryLabel: '',
     process: '',
     outputAmount: null,
     frequency: '',

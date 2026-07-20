@@ -66,7 +66,7 @@
 									</el-button>
 								</div>
 
-								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="initialStandards" @change="handleStandardsChange" />
+								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" @change="handleStandardsChange" />
 
 								<!-- <div class="report-upload">
 									<h4>檢測報告上傳區</h4>
@@ -106,16 +106,6 @@
 												</el-select>
 											</el-form-item>
 										</el-col>
-
-										<el-col :xs="24" :sm="24" :md="12">
-											<el-form-item>
-												<template #label>
-													<span><span class="required-mark">*</span>月產出量 (公噸)</span>
-												</template>
-												<el-input-number v-model="store.sourceConditions.outputAmount" :class="{ 'is-invalid': shouldMarkInvalid('sourceOutputAmount') }" :min="0" :max="100000" :step="1" controls-position="right" />
-											</el-form-item>
-										</el-col>
-
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
@@ -126,6 +116,16 @@
 												</el-select>
 											</el-form-item>
 										</el-col>
+										<el-col :xs="24" :sm="24" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>產出量 (公噸)</span>
+												</template>
+												<el-input-number v-model="store.sourceConditions.outputAmount" :class="{ 'is-invalid': shouldMarkInvalid('sourceOutputAmount') }" :min="0" :max="100000" :step="1" controls-position="right" />
+											</el-form-item>
+										</el-col>
+
+
 									</el-row>
 								</el-form>
 							</ConditionAccordionSection>
@@ -505,7 +505,12 @@ watch(
 	async (nextIndustry, prevIndustry) => {
 		if (nextIndustry === prevIndustry) return
 
-		store.sourceConditions.process = ''
+		const matched = sourceIndustryOptions.value.find((item) => item.value === nextIndustry)
+		store.sourceConditions.industryLabel = matched ? matched.label : ''
+		// prevIndustry 為 undefined 代表是元件初次掛載（immediate），不清空已選製程
+		if (prevIndustry !== undefined) {
+			store.sourceConditions.process = ''
+		}
 		await fetchProcess()
 	},
 	{ immediate: true }
@@ -514,6 +519,8 @@ watch(
 onMounted(async () => {
 	await loadSourceIndustryOptions()
 	if (store.sourceConditions.industry) {
+		const matched = sourceIndustryOptions.value.find((item) => item.value === store.sourceConditions.industry)
+		if (matched) store.sourceConditions.industryLabel = matched.label
 		await fetchProcess()
 	}
 })

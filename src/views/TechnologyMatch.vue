@@ -581,7 +581,7 @@ const demandSummary = computed(() => {
 	if (uploadedReports?.length) preferenceTokens.push(`已上傳${uploadedReports.length}份報告`)
 
 	const priorityText = preferenceTokens.length > 0 ? preferenceTokens.join('、') : '未設定'
-	const sourceLabel = sourceConditions.industry ? (industryLabelMap[sourceConditions.industry] || sourceConditions.industry) : '未設定'
+	const sourceLabel = sourceConditions.industry ? (sourceConditions.industryLabel || sourceConditions.industry) : '未設定'
 	const acceptanceList = Array.isArray(acceptanceConditions) ? acceptanceConditions.map(formatAcceptanceCondition).filter(Boolean) : []
 	const acceptanceText = acceptanceList.length > 0
 		? `${acceptanceList.slice(0, 2).join('；')}${acceptanceList.length > 2 ? ` 等${acceptanceList.length}項` : ''}`
