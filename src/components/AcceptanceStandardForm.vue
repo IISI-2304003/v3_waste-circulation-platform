@@ -214,7 +214,7 @@ watch(standards, (value) => {
 	// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 	const normalized = value.map(({ id, ...rest }) => ({ ...rest }))
 	emit('change', normalized)
-}, { deep: true, immediate: true })
+}, { deep: true })
 
 // 對父層暴露方法
 defineExpose({
