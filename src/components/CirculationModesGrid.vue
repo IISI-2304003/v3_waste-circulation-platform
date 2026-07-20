@@ -31,7 +31,7 @@
 							'--glow-color': mode.color
 						}">
 							<div class="icon-glow" :style="{ backgroundColor: mode.color }"></div>
-							<img class="mode-icon-img" :src="mode.icon" :alt="mode.name" />
+							<img class="mode-icon-img" :src="getIconUrl(mode.icon)" :alt="mode.name" />
 						</div>
 					</el-tooltip>
 					<span class="mode-name" :style="{ animationDelay: `${index * 0.1}s` }">
@@ -68,6 +68,32 @@ import {
 	Apple,
 	Star
 } from '@element-plus/icons-vue'
+import icon01 from '@/assets/icons/icon_01.png'
+import icon02 from '@/assets/icons/icon_02.png'
+import icon03 from '@/assets/icons/icon_03.png'
+import icon04 from '@/assets/icons/icon_04.png'
+import icon05 from '@/assets/icons/icon_05.png'
+import icon06 from '@/assets/icons/icon_06.png'
+import icon07 from '@/assets/icons/icon_07.png'
+import icon08 from '@/assets/icons/icon_08.png'
+import icon09 from '@/assets/icons/icon_09.png'
+import icon10 from '@/assets/icons/icon_10.png'
+
+const iconMap = {
+	icon_01: icon01,
+	icon_02: icon02,
+	icon_03: icon03,
+	icon_04: icon04,
+	icon_05: icon05,
+	icon_06: icon06,
+	icon_07: icon07,
+	icon_08: icon08,
+	icon_09: icon09,
+	icon_10: icon10
+}
+
+// 映射icon名稱到實際URL
+const getIconUrl = (iconName) => iconMap[iconName] || ''
 
 const props = defineProps({
 	modes: {
