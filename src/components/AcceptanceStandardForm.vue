@@ -134,6 +134,7 @@ const standards = ref([
 ])
 const searchResults = ref([])
 const hasSearched = ref(false)
+let isUpdatingFromProp = false
 
 // 選項資料
 const parameterOptions = Array.from(new Set([...getParameterOptions(), '外觀']))
@@ -161,10 +162,18 @@ const handleParameterChange = (standard) => {
 // 監聽初始資料
 watch(() => props.initialStandards, (newVal) => {
 	if (newVal && newVal.length > 0) {
-		standards.value = newVal.map(std => ({
-			...std,
-			id: generateId()
-		}))
+		// 只在數據內容真的改變時才更新，避免無限循環
+		const hasActualChange = JSON.stringify(newVal) !== JSON.stringify(
+			standards.value.map(({ id, ...rest }) => ({ ...rest }))
+		)
+		if (hasActualChange) {
+			isUpdatingFromProp = true
+			standards.value = newVal.map(std => ({
+				...std,
+				id: std.id || generateId()
+			}))
+			isUpdatingFromProp = false
+		}
 	}
 }, { immediate: true })
 
@@ -211,6 +220,9 @@ const setStandards = (parsedStandards) => {
 }
 
 watch(standards, (value) => {
+	// 避免 prop 更新導致的重複發射
+	if (isUpdatingFromProp) return
+
 	// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
 	const normalized = value.map(({ id, ...rest }) => ({ ...rest }))
 	emit('change', normalized)
