@@ -8,13 +8,14 @@ const request = axios.create({
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
     },
 });
 
 // 請求攔截器
 request.interceptors.request.use(
     (config) => {
-        if ((config.baseURL || '').includes('ngrok-free.app') || (config.url || '').includes('ngrok-free.app')) {
+        if ((config.baseURL || '').includes('ngrok-free.dev') || (config.url || '').includes('ngrok-free.dev')) {
             config.headers['ngrok-skip-browser-warning'] = 'true';
         }
 
