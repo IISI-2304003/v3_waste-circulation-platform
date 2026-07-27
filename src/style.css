@@ -14,7 +14,8 @@
     --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
     --mono: ui-monospace, Consolas, monospace;
 
-    font: 18px/145% var(--sans);
+    font: 22px/145% var(--sans);
+    font-weight: 600;
     letter-spacing: 0.18px;
     color-scheme: light dark;
     color: var(--text);
@@ -25,7 +26,7 @@
     -moz-osx-font-smoothing: grayscale;
 
     @media (max-width: 1024px) {
-        font-size: 16px;
+        font-size: 20px;
     }
 }
 
@@ -50,31 +51,32 @@
 
 body {
     margin: 0;
+    font-weight: 600;
 }
 
 h1,
 h2 {
     font-family: var(--heading);
-    font-weight: 500;
+    font-weight: 700;
     color: var(--text-h);
 }
 
 h1 {
-    font-size: 56px;
+    font-size: 72px;
     letter-spacing: -1.68px;
     margin: 32px 0;
     @media (max-width: 1024px) {
-        font-size: 36px;
+        font-size: 48px;
         margin: 20px 0;
     }
 }
 h2 {
-    font-size: 24px;
+    font-size: 32px;
     line-height: 118%;
     letter-spacing: -0.24px;
     margin: 0 0 8px;
     @media (max-width: 1024px) {
-        font-size: 20px;
+        font-size: 28px;
     }
 }
 p {
@@ -90,14 +92,14 @@ code,
 }
 
 code {
-    font-size: 15px;
+    font-size: 18px;
     line-height: 135%;
     padding: 4px 8px;
     background: var(--code-bg);
 }
 
 .counter {
-    font-size: 16px;
+    font-size: 20px;
     padding: 5px 10px;
     border-radius: 12px;
     color: var(--accent);
@@ -289,4 +291,41 @@ code {
         right: 0;
         border-right-color: var(--border);
     }
+}
+
+/* ===== 全站 Label 字級放大 ===== */
+.el-form-item__label,
+label {
+    font-size: 20px !important;
+}
+
+/* ===== 保持 input / select 字級不隨全站放大 ===== */
+input,
+select,
+textarea,
+.el-input__inner,
+.el-textarea__inner,
+.el-select__input,
+.el-select-dropdown__item,
+.el-select-dropdown__empty,
+.el-input-number__input,
+.el-date-editor .el-input__inner,
+.el-cascader__search-input {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+}
+
+input::placeholder,
+textarea::placeholder,
+.el-input__inner::placeholder,
+.el-textarea__inner::placeholder {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+}
+
+.el-input__placeholder,
+.el-select__placeholder,
+.el-select__selected-item {
+    font-size: 14px !important;
+    font-weight: 400 !important;
 }

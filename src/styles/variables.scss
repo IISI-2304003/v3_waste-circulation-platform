@@ -34,18 +34,18 @@ $input-border: #dde5ec;
 $font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif;
 $font-family-code: 'Courier New', Courier, monospace;
 
-$font-weight-regular: 400;
-$font-weight-medium: 500;
-$font-weight-semibold: 600;
-$font-weight-bold: 700;
+$font-weight-regular: 600;
+$font-weight-medium: 600;
+$font-weight-semibold: 700;
+$font-weight-bold: 800;
 
-$font-size-hero: 56px;
-$font-size-h1: 40px;
-$font-size-h2: 32px;
-$font-size-h3: 24px;
-$font-size-h4: 20px;
-$font-size-body: 16px;
-$font-size-small: 15px;
+$font-size-hero: 72px;
+$font-size-h1: 56px;
+$font-size-h2: 40px;
+$font-size-h3: 32px;
+$font-size-h4: 28px;
+$font-size-body: 18px;
+$font-size-small: 18px;
 
 $line-height-tight: 1.2;
 $line-height-base: 1.6;
@@ -182,11 +182,13 @@ $z-tooltip: 1070;
     --el-button-border-radius: #{$radius-button};
     --el-component-size: 44px;
     --el-font-size-base: #{$font-size-body};
+    --el-form-item-label-font-size: 20px;
     --el-font-weight-primary: #{$font-weight-regular};
     --el-box-shadow: #{$shadow-card};
     --el-box-shadow-light: #{$shadow-small};
     --el-box-shadow-dark: #{$shadow-hover};
     --el-checkbox-border-radius: 4px;
+    --el-message-content-font-size: 20px;
 }
 
 * {
@@ -395,6 +397,11 @@ button,
     border-radius: 4px !important;
 }
 
+.el-checkbox__label {
+    font-size: 18px !important;
+    font-weight: 600;
+}
+
 .el-input,
 .el-input-number,
 .el-select,
@@ -415,6 +422,7 @@ button,
         box-shadow $transition-base ease,
         transform $transition-base ease;
     font-size: $font-size-body !important;
+    font-weight: 400 !important;
     color: $text-primary !important;
     background-color: #ffffff !important;
 }
@@ -441,6 +449,7 @@ button,
 .el-select__placeholder,
 .el-input-number .el-input__inner {
     font-size: $font-size-body !important;
+    font-weight: 400 !important;
     color: $text-primary !important;
 }
 

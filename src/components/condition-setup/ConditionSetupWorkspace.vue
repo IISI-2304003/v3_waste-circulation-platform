@@ -857,7 +857,7 @@ defineExpose({
 	align-items: center;
 	gap: 6px;
 	color: #426b64;
-	font-size: 15px;
+	font-size: 18px;
 	font-weight: 600;
 
 	:deep(.el-icon) {
@@ -949,7 +949,7 @@ defineExpose({
 
 :deep(.el-form-item__label) {
 	color: #426b64;
-	font-size: 15px;
+	font-size: 18px;
 	font-weight: 600;
 	line-height: 1.3;
 }
@@ -1005,6 +1005,7 @@ defineExpose({
 		line-height: 1.5;
 		white-space: normal;
 		word-break: break-word;
+		font-size: 18px;
 	}
 }
 
@@ -1165,7 +1166,7 @@ defineExpose({
 	}
 
 	:deep(.el-form-item__label) {
-		font-size: 14px;
+		font-size: 18px;
 	}
 
 	.option-checkbox-group,

@@ -87,7 +87,7 @@ defineEmits(['toggle'])
 
 	h3 {
 		margin: 0;
-		font-size: 16px;
+		font-size: 20px;
 		font-weight: 700;
 		color: #2e4a45;
 		white-space: nowrap;
