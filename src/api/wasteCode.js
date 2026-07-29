@@ -127,13 +127,13 @@ export async function searchByStandards(standards) {
  * 解析語意化輸入
  * 將自然語言描述轉換為允收標準參數
  */
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 export function parseSemanticInput(text) {
     // 說明：封裝「lines」商業邏輯，供目前流程重複使用。
     const lines = text.split('\n').filter((line) => line.trim());
     const results = [];
 
-    // 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+    // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
     const normalizeUnit = (unit = '') => unit.replace(/\s+/g, '').toLowerCase();
 
     const unitMap = {
@@ -147,7 +147,7 @@ export function parseSemanticInput(text) {
         gl: 'g/L',
     };
 
-    // 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+    // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
     const normalizeOperator = (op = '') => {
         const source = op.replace(/\s+/g, '');
         if (source === '<' || source === '＜') return '小於(<)';
@@ -158,7 +158,7 @@ export function parseSemanticInput(text) {
         return '';
     };
 
-    // 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+    // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
     const normalizeUnitOutput = (unit = '') => {
         if (!unit) return '';
         const normalized = normalizeUnit(unit);

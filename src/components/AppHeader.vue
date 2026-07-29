@@ -6,7 +6,7 @@
 				<div class="logo-section" @click="goHome">
 					<img src="../assets/logo.png" alt="環境部資源循環署" class="logo" />
 					<div class="logo-text">
-						<h1 class="site-title">資源循環利用智慧媒合平台</h1>
+						<h1 class="site-title">資源循環利用智慧決策平台</h1>
 						<p class="site-subtitle">環境部資源循環署</p>
 					</div>
 				</div>

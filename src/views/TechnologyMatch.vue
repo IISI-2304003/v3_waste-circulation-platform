@@ -13,7 +13,7 @@
 				<el-col :xs="24" :md="18">
 					<div class="header-title">
 						<h1 class="hero-title">產業廢棄物循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
-						<p>技術媒合</p>
+						<p>技術決策</p>
 					</div>
 				</el-col>
 			</el-row>
@@ -23,13 +23,13 @@
 			<FlowStepProgress :active-step="3" />
 
 			<div v-if="!isQuickMode" class="summary-mode-row panel-card">
-				<!-- 左：媒合需求摘要 -->
+				<!-- 左：決策需求摘要 -->
 				<section class="summary-panel-inner">
 					<div class="section-header">
 						<div class="ai-icon"><el-icon>
 								<Monitor />
 							</el-icon></div>
-						<h2>媒合需求摘要</h2>
+						<h2>決策需求摘要</h2>
 					</div>
 					<div class="summary-grid">
 						<div v-for="item in visibleDemandSummary" :key="item.label" class="summary-item">
@@ -104,7 +104,7 @@
 								<Opportunity />
 							</el-icon>
 						</div>
-						<h2>媒合結果推薦</h2>
+						<h2>決策結果推薦</h2>
 					</div>
 					<el-select v-model="sortType" class="sort-select" placeholder="排序條件">
 						<el-option label="綜合排序" value="overall" />
@@ -421,7 +421,7 @@
 									</div>
 									<span class="capacity-text">{{ activeVendor.capacityLevelText }}</span>
 								</div>
-								<p class="capacity-note">（{{ activeVendor.capacityLevelText }}）收受能力充足，可立即媒合合作。</p>
+								<p class="capacity-note">（{{ activeVendor.capacityLevelText }}）收受能力充足，可立即決策合作。</p>
 							</div>
 						</section>
 
@@ -540,7 +540,7 @@ const industryLabelMap = {
 	food: '食品加工'
 }
 
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const extractCountyCity = (address = '') => {
 	const text = String(address || '')
 	if (!text) return ''
@@ -548,7 +548,7 @@ const extractCountyCity = (address = '') => {
 	return match ? match[1] : text
 }
 
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const formatAcceptanceCondition = (condition) => {
 	if (!condition?.parameter) return ''
 	if (condition.operator === '範圍' && condition.valueMin != null && condition.valueMax != null) {
@@ -600,7 +600,7 @@ const demandSummary = computed(() => {
 // 說明：依目前條件即時計算「visible Demand Summary」內容，提供畫面顯示與決策判斷使用。
 const visibleDemandSummary = computed(() => demandSummary.value.filter((item) => item.value && item.value !== '未設定'))
 
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
 
 const baseExternalPaths = [
@@ -678,7 +678,7 @@ const selectedMode = computed(() => {
 			...(matchedRecommended || {}),
 			modeName: conditionStore.selectedRecommendedPath.modeName,
 			title: conditionStore.selectedRecommendedPath.title || matchedRecommended?.title || '',
-			summary: conditionStore.selectedRecommendedPath.summary || matchedRecommended?.summary || '依據您選擇的循環路徑，系統提供對應技術媒合建議。',
+			summary: conditionStore.selectedRecommendedPath.summary || matchedRecommended?.summary || '依據您選擇的循環路徑，系統提供對應技術決策建議。',
 			accentColor: matchedRecommended?.accentColor || 'var(--ds-primary-green)',
 			steps: matchedRecommended?.steps || []
 		}

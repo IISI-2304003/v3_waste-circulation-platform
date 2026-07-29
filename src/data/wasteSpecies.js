@@ -40,7 +40,7 @@ export const buildSpeciesImage = (seed) => {
 // 說明：建立初始化資料或執行初始化流程，供後續操作使用。
 export const buildSpeciesFallbackImage = () => '/species/fallback.jpg';
 
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 export const normalizeWasteSpecies = (rawItem, index = 0) => {
     const rawId = rawItem?.id ?? rawItem?.speciesId ?? `${index + 1}`;
     const id = String(rawId).padStart(2, '0');
@@ -56,7 +56,7 @@ export const normalizeWasteSpecies = (rawItem, index = 0) => {
     };
 };
 
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 export const normalizeWasteSpeciesList = (rawList = []) => {
     if (!Array.isArray(rawList)) return [];
     return rawList.map((item, index) => normalizeWasteSpecies(item, index));

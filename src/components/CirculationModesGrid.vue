@@ -113,7 +113,7 @@ const gridMetrics = ref({
 
 let gridResizeObserver = null
 
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const normalizeModeName = (name = '') => String(name).replace(/\s+/g, '').trim()
 
 

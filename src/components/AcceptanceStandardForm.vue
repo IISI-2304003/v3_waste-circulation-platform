@@ -128,7 +128,7 @@ function createEmptyStandard() {
 	}
 }
 
-// 狀態
+// 元件初始化時的預設值
 const standards = ref([
 	createEmptyStandard()
 ])
@@ -223,7 +223,7 @@ watch(standards, (value) => {
 	// 避免 prop 更新導致的重複發射
 	if (isUpdatingFromProp) return
 
-	// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+	// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 	const normalized = value.map(({ id, ...rest }) => ({ ...rest }))
 	emit('change', normalized)
 }, { deep: true })

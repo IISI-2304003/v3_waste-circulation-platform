@@ -33,7 +33,7 @@
                   </el-icon>
                 </div>
                 <div>
-                  <h2>媒合分析結果</h2>
+                  <h2>分析結果</h2>
                   <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
                   <p class="reminder-text">貼心提醒: 本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
                 </div>
@@ -147,7 +147,7 @@
                     </span>
                   </div>
                   <el-button type="primary" class="detail-btn" @click="goNext(path)">
-                    技術媒合推薦
+                    技術決策推薦
                     <el-icon class="el-icon--right">
                       <ArrowRight />
                     </el-icon>
@@ -169,9 +169,9 @@
         </el-icon>
         上一步：條件設定
       </el-button>
-      <div class="footer-hint">請先點選上方任一推薦路徑卡片的「技術媒合推薦」，即可進入下一步。</div>
+      <div class="footer-hint">請先點選上方任一推薦路徑卡片的「技術決策推薦」，即可進入下一步。</div>
       <!-- <el-button type="primary" @click="goNext">
-        下一步：技術媒合推薦
+        下一步：技術決策推薦
         <el-icon class="el-icon--right">
           <ArrowRight />
         </el-icon>
@@ -322,7 +322,7 @@ const toRadarScore = (level) => IMPACT_LEVEL_SCORE_MAP[level] || 0
 
 // 雷達圖「軸標籤文字內容」換行規則。
 // 想調整每行切幾個字，改這裡的 slice 範圍。
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const formatRadarIndicatorName = (label = '') => {
   const text = String(label)
   if (text.length <= 5) return text
@@ -628,7 +628,7 @@ const recommendedPaths = computed(() => {
   return withRank(baseExternalPaths)
 })
 
-// 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
 
 // 說明：依目前條件即時計算「all Circulation Modes」內容，提供畫面顯示與決策判斷使用。

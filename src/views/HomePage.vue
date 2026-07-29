@@ -13,7 +13,7 @@
 
           <div class="hero-actions">
             <el-button type="primary" size="large" round @click="scrollToSearch">
-              開始探索媒合
+              開始探索決策
               <el-icon class="el-icon--right">
                 <Search />
               </el-icon>
@@ -21,7 +21,7 @@
           </div>
 
           <div class="hero-bottom-left">
-            <div class="insight-process-board" aria-label="循環媒合流程" :style="{ '--process-active-index': activeProcessStep }">
+            <div class="insight-process-board" aria-label="循環決策流程" :style="{ '--process-active-index': activeProcessStep }">
               <button class="process-nav process-nav--prev" type="button" aria-label="上一個流程步驟" :disabled="activeProcessStep === 0" @click="prevProcessStep">‹</button>
               <div class="process-carousel-viewport">
                 <div class="process-carousel-track">
@@ -364,7 +364,7 @@ const footerHighlights = [
   {
     title: '智慧分析',
     subtitle: '智慧精準評估',
-    desc: '提升媒合效率',
+    desc: '提升決策效率',
     color: '#22c55e',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11c0 4.4 3.6 8 8 8"/><path d="M13 3c4.4 0 8 3.6 8 8"/><path d="M8 11l8-8"/><path d="M10 3H3v7"/><path d="M14 21h7v-7"/></svg>'
   },
@@ -411,7 +411,7 @@ const footerProcessSteps = [
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1.8 2.7 3 5 3 7.5A5.5 5.5 0 1 1 4 10.5C4 8 5.2 5.7 7 3"/><path d="M13 14c2 0 3.5 1.6 3.5 3.5S15 21 13 21s-3.5-1.6-3.5-3.5S11 14 13 14Z"/><path d="m16.5 7.5 4-1.5-1.5 4"/></svg>'
   },
   {
-    title: '4.媒合供應商',
+    title: '4.決策供應商',
     subtitle: '快速找到合作夥伴',
     color: '#f97316',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11 5.5 8.5a2.5 2.5 0 0 1 0-3.5v0a2.5 2.5 0 0 1 3.5 0L12 8"/><path d="m16 13 2.5 2.5a2.5 2.5 0 0 1 0 3.5v0a2.5 2.5 0 0 1-3.5 0L12 16"/><path d="m9 15 6-6"/><path d="m8 16-2 2"/><path d="m18 8 2-2"/></svg>'
@@ -636,7 +636,7 @@ const animateFooterStats = () => {
 
   const duration = 1400
   const startTime = performance.now()
-  // 說明：將輸入資料標準化為系統格式，供媒合與查詢流程使用。
+  // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
   const formatters = footerStatsAnimationMeta.map((meta) => new Intl.NumberFormat('zh-TW', {
     minimumFractionDigits: meta.decimals,
     maximumFractionDigits: meta.decimals

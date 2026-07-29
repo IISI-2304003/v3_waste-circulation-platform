@@ -285,7 +285,7 @@
 			</div>
 			<div class="action-buttons">
 				<el-button @click="resetAll">重設條件</el-button>
-				<el-button type="primary" @click="handleNext" class="detail-btn">下一步 : 媒合分析
+				<el-button type="primary" @click="handleNext" class="detail-btn">下一步 : 決策分析
 					<el-icon class="el-icon--right">
 						<ArrowRight />
 					</el-icon>
@@ -595,7 +595,7 @@ const getMissingRequiredFields = () => {
 	return missingFields
 }
 
-// 說明：由「下一步：媒合分析」按鈕觸發；先檢查必填欄位，通過後觸發 next 事件進入下一步。
+// 說明：由「下一步：決策分析」按鈕觸發；先檢查必填欄位，通過後觸發 next 事件進入下一步。
 const handleNext = async () => {
 	const missingFields = getMissingRequiredFields()
 	if (missingFields.length === 0) {
