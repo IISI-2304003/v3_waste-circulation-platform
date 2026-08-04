@@ -4,7 +4,6 @@
  */
 
 import request from './index';
-import { wasteCategories, getCategoryById, getAllWasteCodes, searchWasteCodes } from '../data/wasteCategories';
 
 // 說明：回傳來源產業選單資料（/announcementcategory）。
 export async function getAnnouncementCategoryOptions() {
@@ -35,26 +34,37 @@ export async function getCategories() {
 }
 
 /**
- * 根據類別 ID 取得該類別的所有廢棄物代碼
+ * 一次取得所有廢棄物代碼，並依類別分組回傳
+ * @returns {Object} 以 categoryId 為 key 的分組資料，例如 { A: [...], B: [...] }
  */
-// 說明：回傳「get Waste Codes By Category」資料供畫面渲染或後續商業規則使用。
-export async function getWasteCodesByCategory(categoryId) {
+// 說明：一次 API 請求取得全部資料，前端依類別前綴分組，避免重複請求。
+export async function getAllWasteCodesGrouped() {
     const result = await request.get('/wastedetail');
 
-    if (!Array.isArray(result)) return [];
+    if (!Array.isArray(result)) return {};
 
-    const prefix = `${categoryId}-`;
-    return result
-        .filter((item) => {
-            const wasteCode = String(item?.waste_code || '');
-            return wasteCode.startsWith(prefix);
-        })
-        .map((item) => ({
+    return result.reduce((groups, item) => {
+        const wasteCode = String(item?.waste_code || '');
+        const categoryId = wasteCode.split('-')[0];
+        if (!categoryId) return groups;
+        if (!groups[categoryId]) groups[categoryId] = [];
+        groups[categoryId].push({
             code: item.waste_code,
             name: item.waste_name,
             description: item.remark || '',
             categoryId,
-        }));
+        });
+        return groups;
+    }, {});
+}
+
+/**
+ * 根據類別 ID 取得該類別的所有廢棄物代碼
+ */
+// 說明：複用 getAllWasteCodesGrouped，取指定類別的結果。
+export async function getWasteCodesByCategory(categoryId) {
+    const grouped = await getAllWasteCodesGrouped();
+    return grouped[categoryId] || [];
 }
 
 /**
@@ -62,19 +72,19 @@ export async function getWasteCodesByCategory(categoryId) {
  */
 // 說明：回傳「get Waste Code Detail」資料供畫面渲染或後續商業規則使用。
 export async function getWasteCodeDetail(code) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const allCodes = getAllWasteCodes();
-            // 說明：封裝「code Detail」商業邏輯，供目前流程重複使用。
-            const codeDetail = allCodes.find((c) => c.code === code);
+    const result = await request.get('/wastedetail');
 
-            if (codeDetail) {
-                resolve(codeDetail);
-            } else {
-                reject(new Error(`未找到廢棄物代碼：${code}`));
-            }
-        }, 100);
-    });
+    if (!Array.isArray(result)) throw new Error(`未找到廢棄物代碼：${code}`);
+
+    const item = result.find((i) => i.waste_code === code);
+    if (!item) throw new Error(`未找到廢棄物代碼：${code}`);
+
+    return {
+        code: item.waste_code,
+        name: item.waste_name,
+        description: item.remark || '',
+        categoryId: String(item.waste_code || '').split('-')[0],
+    };
 }
 
 /**
@@ -84,18 +94,25 @@ export async function getWasteCodeDetail(code) {
  */
 // 說明：依條件執行搜尋/篩選，回傳符合的目標資料。
 export async function searchWasteCodeAPI(keyword, categoryId = null) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            let results = searchWasteCodes(keyword);
+    const result = await request.get('/wastedetail');
 
-            // 如果指定類別，進一步過濾
-            if (categoryId) {
-                results = results.filter((code) => code.categoryId === categoryId);
-            }
+    if (!Array.isArray(result)) return [];
 
-            resolve(results);
-        }, 200);
-    });
+    const lowerKeyword = keyword.toLowerCase();
+    return result
+        .filter((item) => {
+            const code = String(item.waste_code || '').toLowerCase();
+            const name = String(item.waste_name || '').toLowerCase();
+            const matchKeyword = code.includes(lowerKeyword) || name.includes(lowerKeyword);
+            const matchCategory = categoryId ? code.startsWith(`${categoryId}-`) : true;
+            return matchKeyword && matchCategory;
+        })
+        .map((item) => ({
+            code: item.waste_code,
+            name: item.waste_name,
+            description: item.remark || '',
+            categoryId: String(item.waste_code || '').split('-')[0],
+        }));
 }
 
 /**
@@ -103,24 +120,9 @@ export async function searchWasteCodeAPI(keyword, categoryId = null) {
  * @param {Array} standards - 允收標準陣列
  */
 // 說明：依條件執行搜尋/篩選，回傳符合的目標資料。
-export async function searchByStandards(standards) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const allCodes = getAllWasteCodes();
-
-            // 這裡是簡化後的匹配邏輯
-            // 實際上應依照 standards 條件做更完整的比對
-            // 說明：封裝「results」商業邏輯，供目前流程重複使用。
-            const results = allCodes.filter((code) => {
-                if (!code.standards || code.standards.length === 0) return false;
-
-                // 簡化規則：只要任一標準參數名稱相符就視為命中
-                return standards.some((searchStd) => code.standards.some((codeStd) => codeStd.parameter === searchStd.parameter));
-            });
-
-            resolve(results);
-        }, 300);
-    });
+// 注意：後端目前無允收標準篩選端點，暫時回傳空陣列，待後端支援後再實作。
+export async function searchByStandards(_standards) {
+    return [];
 }
 
 /**

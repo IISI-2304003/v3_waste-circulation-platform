@@ -106,11 +106,19 @@
 						</div>
 						<h2>決策結果推薦</h2>
 					</div>
-					<el-select v-model="sortType" class="sort-select" placeholder="排序條件">
-						<el-option label="綜合排序" value="overall" />
-						<el-option label="依距離" value="distance" />
-						<el-option label="依再利用量" value="capacity" />
-					</el-select>
+					<div class="sort-controls">
+						<el-select v-model="sortType" class="sort-select" placeholder="排序條件">
+							<el-option label="綜合排序" value="overall" />
+							<el-option label="依地區" value="distance" />
+							<el-option label="依再利用量" value="capacity" />
+						</el-select>
+						<el-select v-if="sortType === 'distance'" v-model="selectedRegions" multiple collapse-tags collapse-tags-tooltip placeholder="篩選縣市" class="sort-select region-select">
+							<el-option v-for="city in taiwanCities" :key="city" :label="city" :value="city">
+								<el-checkbox :model-value="selectedRegions.includes(city)" style="pointer-events:none" />
+								<span style="margin-left:8px">{{ city }}</span>
+							</el-option>
+						</el-select>
+					</div>
 				</div>
 
 				<div class="supplier-list">
@@ -527,6 +535,14 @@ console.log('isQuickMode', isQuickMode.value)
 const conditionStore = useConditionSetupStore()
 
 const sortType = ref('overall')
+const selectedRegions = ref([])
+
+const taiwanCities = [
+	'基隆市', '台北市', '新北市', '桃園市', '新竹市', '新竹縣',
+	'苗栗縣', '台中市', '彰化縣', '南投縣', '雲林縣', '嘉義市',
+	'嘉義縣', '台南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣',
+	'台東縣', '澎湖縣', '金門縣', '連江縣'
+]
 const currentPage = ref(1)
 const pageSize = 4
 const detailDialogVisible = ref(false)
@@ -660,6 +676,11 @@ const baseInternalPath = {
 }
 
 const allRecommendedPaths = computed(() => {
+	// 優先使用 CompanyMatch 評分計算出的推薦路徑
+	if (conditionStore.recommendedPaths?.length > 0) {
+		return conditionStore.recommendedPaths
+	}
+	// 後備：舊邏輯
 	const hasReuseSpace = conditionStore.siteConditions.hasReuseSpace === true
 	if (hasReuseSpace) {
 		return [baseInternalPath, ...baseExternalPaths.slice(0, 2)]
@@ -794,7 +815,13 @@ const recommendedVendors = computed(() => {
 
 // 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
-	const result = [...recommendedVendors.value]
+	let result = [...recommendedVendors.value]
+
+	// 依地區篩選
+	if (sortType.value === 'distance' && selectedRegions.value.length > 0) {
+		result = result.filter((v) => selectedRegions.value.includes(v.location))
+	}
+
 	if (sortType.value === 'distance') return result.sort((a, b) => a.distance - b.distance)
 	if (sortType.value === 'capacity') return result.sort((a, b) => b.capacity - a.capacity)
 	return result.sort((a, b) => b.score - a.score)
@@ -1499,8 +1526,19 @@ const goBackHome = () => {
 	margin-bottom: 0;
 }
 
+.sort-controls {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
 .sort-select {
 	width: 200px;
+}
+
+.region-select {
+	width: 220px;
 }
 
 .supplier-list {

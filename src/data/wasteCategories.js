@@ -2,13 +2,6 @@
  * 廢棄物類別定義
  */
 
-import aClassCodes from './wasteCodes/A-class.json';
-import bClassCodes from './wasteCodes/B-class.json';
-import cClassCodes from './wasteCodes/C-class.json';
-import dClassCodes from './wasteCodes/D-class.json';
-import eClassCodes from './wasteCodes/E-class.json';
-import rClassCodes from './wasteCodes/R-class.json';
-
 export const wasteCategories = [
     {
         id: 'A',
@@ -19,7 +12,7 @@ export const wasteCategories = [
         icon: 'warning',
         color: '#4E8DF5',
         pattern: /^A-\d{4}$/,
-        codes: aClassCodes,
+        // codes: aClassCodes,
     },
     {
         id: 'B',
@@ -30,7 +23,7 @@ export const wasteCategories = [
         icon: 'dangerous',
         color: '#1CCB8C',
         pattern: /^B-\d{4}$/,
-        codes: bClassCodes,
+        codes: [],
     },
     {
         id: 'C',
@@ -41,7 +34,7 @@ export const wasteCategories = [
         icon: 'document-checked',
         color: '#C87412',
         pattern: /^C-\d{4}$/,
-        codes: cClassCodes,
+        codes: [],
     },
     {
         id: 'D',
@@ -52,7 +45,7 @@ export const wasteCategories = [
         icon: 'office-building',
         color: '#F0645C',
         pattern: /^D-\d{4}$/,
-        codes: dClassCodes,
+        codes: [],
     },
     {
         id: 'E',
@@ -63,7 +56,7 @@ export const wasteCategories = [
         icon: 'coin',
         color: '#F28A2E',
         pattern: /^E-\d{4}$/,
-        codes: eClassCodes,
+        codes: [],
     },
     {
         id: 'R',
@@ -74,7 +67,7 @@ export const wasteCategories = [
         icon: 'refresh',
         color: '#86C33A',
         pattern: /^R-\d{4}$/,
-        codes: rClassCodes,
+        codes: [],
     },
     {
         id: 'ALL',
@@ -93,7 +86,6 @@ export const wasteCategories = [
 export function getCategoryById(categoryId) {
     return wasteCategories.find((cat) => cat.id === categoryId);
 }
-
 
 // 說明：回傳「get All Waste Codes」資料供畫面渲染或後續商業規則使用。
 export function getAllWasteCodes() {

@@ -142,8 +142,8 @@ const items = [
 
 // 說明：回傳「get Step Status」資料供畫面渲染或後續商業規則使用。
 const getStepStatus = (id) => {
-	if (props.activeSection === id) return 'configuring'
 	if (props.configuredSections.includes(id)) return 'configured'
+	if (props.activeSection === id) return 'configuring'
 	return 'unset'
 }
 

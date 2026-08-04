@@ -41,6 +41,9 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
         businessConditions: defaultBusiness(),
         acceptanceConditions: [],
         uploadedReports: [],
+        technologySelections: [],
+        demandSelections: [],
+        recommendedPaths: [],
         selectedRecommendedPath: defaultSelectedPath(),
     }),
     actions: {
@@ -52,6 +55,15 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
         },
         setAcceptanceConditions(conditions) {
             this.acceptanceConditions = Array.isArray(conditions) ? conditions : [];
+        },
+        setTechnologySelections(selections) {
+            this.technologySelections = Array.isArray(selections) ? selections : [];
+        },
+        setDemandSelections(selections) {
+            this.demandSelections = Array.isArray(selections) ? selections : [];
+        },
+        setRecommendedPaths(paths) {
+            this.recommendedPaths = Array.isArray(paths) ? paths : [];
         },
         setSelectedRecommendedPath(path) {
             this.selectedRecommendedPath = path
@@ -69,6 +81,9 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
             this.businessConditions = defaultBusiness();
             this.acceptanceConditions = [];
             this.uploadedReports = [];
+            this.technologySelections = [];
+            this.demandSelections = [];
+            this.recommendedPaths = [];
             this.selectedRecommendedPath = defaultSelectedPath();
         },
     },

@@ -394,8 +394,14 @@ const capitalAmountOptions = [
 	{ value: '100000001+', label: '100,000,001 元以上' }
 ]
 
-const technologySelections = ref([])
-const demandSelections = ref([])
+const technologySelections = computed({
+	get: () => store.technologySelections,
+	set: (val) => store.setTechnologySelections(val),
+})
+const demandSelections = computed({
+	get: () => store.demandSelections,
+	set: (val) => store.setDemandSelections(val),
+})
 
 // 各區塊「已設定」狀態判斷：不以必填為標準，而是公瓡輸入就計入
 // 說明：依目前條件即時計算「configured Sections」內容，提供畫面顯示與決策判斷使用。
@@ -406,7 +412,7 @@ const configuredSections = computed(() => {
 	const biz = store.businessConditions
 
 	// 物化特性：有允收條件或上傳檔案
-	if (store.acceptanceConditions.length > 0 || store.uploadedReports.length > 0) {
+	if (store.acceptanceConditions.length > 0) {
 		result.push('physical')
 	}
 	// 來源穩定性：任一欄位有內容
@@ -560,13 +566,13 @@ const getMissingRequiredFields = () => {
 		missingFields.push({ sectionId: 'physical', label: '事業地址' })
 	}
 
-	if (!store.sourceConditions.industry) {
-		missingFields.push({ sectionId: 'source', label: '來源產業' })
-	}
+	// if (!store.sourceConditions.industry) {
+	// 	missingFields.push({ sectionId: 'source', label: '來源產業' })
+	// }
 
-	if (!store.sourceConditions.process) {
-		missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
-	}
+	// if (!store.sourceConditions.process) {
+	// 	missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
+	// }
 
 	if (store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined) {
 		missingFields.push({ sectionId: 'source', label: '月產出量 (公噸)' })
@@ -621,8 +627,8 @@ const shouldMarkInvalid = (fieldKey) => {
 	const fieldCheckMap = {
 		businessName: () => !String(store.businessConditions.businessName || '').trim(),
 		businessAddress: () => !String(store.businessConditions.businessAddress || '').trim(),
-		sourceIndustry: () => !store.sourceConditions.industry,
-		sourceProcess: () => !store.sourceConditions.process,
+		// sourceIndustry: () => !store.sourceConditions.industry,
+		// sourceProcess: () => !store.sourceConditions.process,
 		sourceOutputAmount: () => store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined,
 		sourceFrequency: () => !store.sourceConditions.frequency,
 		hasReuseSpace: () => store.siteConditions.hasReuseSpace === null,
@@ -650,6 +656,7 @@ const handleSemanticConfirm = (parsedData) => {
 // 說明：由使用者互動觸發；執行「handle Standards Change」流程並同步更新相關狀態。
 const handleStandardsChange = (standards) => {
 	store.setAcceptanceConditions(standards)
+	console.log(store.acceptanceConditions)
 }
 
 // 說明：由「定位」按鈕觸發；取得瀏覽器座標並回填事業地址欄位。

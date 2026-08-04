@@ -26,11 +26,11 @@ const routes = [
         name: 'WasteSearch',
         component: () => import('../views/WasteSearchPage.vue'),
     },
-    {
-        path: '/waste/:code',
-        name: 'WasteCodeDetail',
-        component: () => import('../views/WasteCodeDetail.vue'),
-    },
+    // {
+    //     path: '/waste/:code',
+    //     name: 'WasteCodeDetail',
+    //     component: () => import('../views/WasteCodeDetail.vue'),
+    // },
     {
         path: '/waste-species/:id',
         name: 'WasteSpeciesDetail',

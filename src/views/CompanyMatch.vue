@@ -333,7 +333,10 @@ const formatRadarIndicatorName = (label = '') => {
 // 說明：依目前條件即時計算「condition Summary」內容，提供畫面顯示與決策判斷使用。
 const conditionSummary = computed(() => {
   // 計算每個條件的設定程度和評分
-  const acceptanceCount = Array.isArray(store.acceptanceConditions) ? store.acceptanceConditions.length : 0
+  // 只計算有效的條件（parameter 不為空）
+  const acceptanceCount = Array.isArray(store.acceptanceConditions)
+    ? store.acceptanceConditions.filter(c => c.parameter && String(c.parameter).trim()).length
+    : 0
   const acceptanceScore = acceptanceCount > 0 ? Math.min(acceptanceCount * 20, 100) : 0
 
   const sourceScore = (store.sourceConditions.industry && store.sourceConditions.process) ? 80 : 40
@@ -557,63 +560,49 @@ const radarOption = computed(() => ({
     })
   ]
 }))
-const baseExternalPaths = [
-  {
-    modeName: '廠外模式 4',
-    summary: '原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。',
-    gradient: 'linear-gradient(160deg,#3dc35a,#1e8c3e)',
-    accentColor: '#2da84a',
-    matchRate: 3,
-    steps: [
-      { label: '原料購入', icon: Goods },
-      { label: '純化(再製)', icon: Operation },
-      { label: '調整成分', icon: SetUp },
-      { label: '返回原製程', icon: Promotion }
-    ]
-  },
-  {
-    modeName: '廠外模式 6',
-    summary: '送至同一法人前處理，再送至其他公司純化（再製）、調整成分與濃度，再返回原廠使用。',
-    gradient: 'linear-gradient(160deg,#22b9ae,#0d7a73)',
-    accentColor: '#18a89f',
-    matchRate: 9,
-    steps: [
-      { label: '原料購入', icon: Goods },
-      { label: '前處理', icon: Files },
-      { label: '純化(再製)', icon: Operation },
-      { label: '調整成分', icon: SetUp },
-      { label: '返回原製程', icon: Promotion }
-    ]
-  },
-  {
-    modeName: '廠外模式 2',
-    title: '跨產業再利用',
-    summary: '送至同一法人不同廠區處理及再利用。',
-    gradient: 'linear-gradient(160deg,#a67fff,#6d3fd6)',
-    accentColor: '#8b55f5',
-    matchRate: 5,
-    steps: [
-      { label: '原料購入', icon: Goods },
-      { label: '異業處理', icon: Connection },
-      { label: '再利用', icon: Finished }
-    ]
-  }
-]
+// Icon 名稱字串 → Vue 元件映射
+const iconComponentMap = {
+  Goods, Files, Operation, Promotion, SetUp, Connection, Finished, DataAnalysis, Money,
+}
 
-const baseInternalPath = {
-  modeName: '廠內模式 1',
-  title: '廠內處理回原製程',
-  summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。',
-  gradient: 'linear-gradient(160deg,#f29f3a,#e27400)',
-  accentColor: '#2da84a',
-  score: 94,
-  matchRate: 3,
-  steps: [
-    { label: '原料購入', icon: Goods },
-    { label: '廠內前處理', icon: Files },
-    { label: '純化(再製)', icon: Operation },
-    { label: '返回原製程', icon: Promotion }
-  ]
+// 各模式漸層樣式（依 JSON id）
+const modeStyleMap = {
+  1: { gradient: 'linear-gradient(160deg,#4CAF50,#1e8c3e)', accentColor: '#4CAF50' },
+  2: { gradient: 'linear-gradient(160deg,#2295A4,#0d7a73)', accentColor: '#2295A4' },
+  3: { gradient: 'linear-gradient(160deg,#3682D2,#1565c0)', accentColor: '#3682D2' },
+  4: { gradient: 'linear-gradient(160deg,#FA8717,#e27400)', accentColor: '#FA8717' },
+  5: { gradient: 'linear-gradient(160deg,#a67fff,#6d3fd6)', accentColor: '#a67fff' },
+  6: { gradient: 'linear-gradient(160deg,#ef5350,#b71c1c)', accentColor: '#ef5350' },
+  7: { gradient: 'linear-gradient(160deg,#3dc35a,#1e8c3e)', accentColor: '#3dc35a' },
+  8: { gradient: 'linear-gradient(160deg,#ff7043,#bf360c)', accentColor: '#ff7043' },
+  9: { gradient: 'linear-gradient(160deg,#22b9ae,#0d7a73)', accentColor: '#22b9ae' },
+  10: { gradient: 'linear-gradient(160deg,#ab47bc,#6a1b9a)', accentColor: '#ab47bc' },
+}
+
+// 從 JSON 建立所有模式（步驟圖示轉為 Vue 元件）
+const allModes = circulationModes.map((mode) => ({
+  modeName: mode.name,
+  summary: mode.description,
+  steps: (mode.steps || []).map((step) => ({
+    label: step.label,
+    icon: iconComponentMap[step.icon] || Goods,
+  })),
+  ...(modeStyleMap[mode.id] || { gradient: `linear-gradient(160deg,${mode.color},${mode.color})`, accentColor: mode.color }),
+  matchRate: 0,
+}))
+
+// 評估因子對應矩陣（key 對應 JSON name，無空格）
+const modeFactorMatrix = {
+  '廠內模式1': [2, 6, 8, 10],
+  '廠內模式2': [1, 5, 8, 9],
+  '廠內模式3': [2, 3, 5, 7, 9],
+  '廠外模式1': [2, 3, 4, 7, 9],
+  '廠外模式2': [2, 3, 5, 6, 7],
+  '廠外模式3': [1, 6, 8, 10],
+  '廠外模式4': [1, 6, 7, 10],
+  '廠外模式5': [1, 6, 7],
+  '廠外模式6': [2, 5, 7, 9],
+  '廠外模式7': [2, 4, 7, 9],
 }
 
 // 說明：封裝「with Rank」商業邏輯，供目前流程重複使用。
@@ -621,11 +610,63 @@ const withRank = (paths) => paths.map((path, index) => ({ ...path, id: `r${index
 
 // 說明：依目前條件即時計算「recommended Paths」內容，提供畫面顯示與決策判斷使用。
 const recommendedPaths = computed(() => {
-  const hasReuseSpace = store.siteConditions.hasReuseSpace === true
-  if (hasReuseSpace) {
-    return withRank([baseInternalPath, ...baseExternalPaths.slice(0, 2)])
+  const { siteConditions, technologySelections, demandSelections } = store
+
+  // 啟用的評估因子（1-indexed）
+  const activeFactors = new Set()
+  if (demandSelections.includes('replace-raw-material')) activeFactors.add(1)
+  if (demandSelections.includes('non-original-process')) activeFactors.add(2)
+  if (demandSelections.includes('external-sale')) activeFactors.add(3)
+  if (technologySelections.includes('mature')) activeFactors.add(4)
+  if (technologySelections.includes('imported')) activeFactors.add(5)
+  if (technologySelections.includes('innovative')) activeFactors.add(6)
+  if (siteConditions.hasReuseSpace === false) activeFactors.add(7)
+  if (siteConditions.hasReuseSpace === true) activeFactors.add(8)
+  if (siteConditions.hasSecondaryWaste === true) activeFactors.add(9)
+  if (siteConditions.hasSecondaryWaste === false) activeFactors.add(10)
+
+  // 計算每個模式的命中分數（總分 + 各群組分）
+  // 平局排序優先序：製程核心需求 > 環境影響性 > 技術精進程度 > 場地可行性
+  const GROUP_FACTORS = {
+    demand: [1, 2, 3],   // 製程核心需求（Step 7）
+    environment: [9, 10],     // 環境影響性（Step 4）
+    technology: [4, 5, 6],   // 技術精進程度（Step 6）
+    site: [7, 8],      // 場地可行性（Step 3）
   }
-  return withRank(baseExternalPaths)
+
+  const scored = allModes.map((mode) => {
+    const factors = modeFactorMatrix[normalizeModeName(mode.modeName)] || []
+    const score = factors.filter((f) => activeFactors.has(f)).length
+    const groupScore = (group) => factors.filter((f) => GROUP_FACTORS[group].includes(f) && activeFactors.has(f)).length
+    return {
+      ...mode,
+      _score: score,
+      _demandScore: groupScore('demand'),
+      _envScore: groupScore('environment'),
+      _techScore: groupScore('technology'),
+      _siteScore: groupScore('site'),
+    }
+  })
+
+  // 無任何因子時，依有無再利用空間給預設排序
+  if (activeFactors.size === 0) {
+    const defaultOrder = siteConditions.hasReuseSpace === true
+      ? ['廠內模式1', '廠外模式4', '廠外模式6']
+      : ['廠外模式4', '廠外模式6', '廠外模式2']
+    const defaultModes = defaultOrder.map((name) => allModes.find((m) => normalizeModeName(m.modeName) === name)).filter(Boolean)
+    return withRank(defaultModes)
+  }
+
+  // 依總分排序；平局依群組優先序依次比較
+  scored.sort((a, b) => {
+    if (b._score !== a._score) return b._score - a._score
+    if (b._demandScore !== a._demandScore) return b._demandScore - a._demandScore
+    if (b._envScore !== a._envScore) return b._envScore - a._envScore
+    if (b._techScore !== a._techScore) return b._techScore - a._techScore
+    if (b._siteScore !== a._siteScore) return b._siteScore - a._siteScore
+    return 0
+  })
+  return withRank(scored.slice(0, 3))
 })
 
 // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
@@ -665,6 +706,7 @@ const goBackHome = () => {
 }
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goNext = (path) => {
+  store.setRecommendedPaths(recommendedPaths.value)
   store.setSelectedRecommendedPath(path)
   router.push('/technology-match')
 }

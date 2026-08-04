@@ -224,7 +224,10 @@ watch(standards, (value) => {
 	if (isUpdatingFromProp) return
 
 	// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
-	const normalized = value.map(({ id, ...rest }) => ({ ...rest }))
+	// 過濾掉空條件（parameter 為空的不提交）
+	const normalized = value
+		.filter(s => s.parameter && String(s.parameter).trim())
+		.map(({ id, ...rest }) => ({ ...rest }))
 	emit('change', normalized)
 }, { deep: true })
 

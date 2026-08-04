@@ -223,26 +223,15 @@ import { useCirculationModes } from '../composables/useCirculationModes'
 import ParticleBackground from '../components/ParticleBackground.vue'
 import CirculationModesGrid from '../components/CirculationModesGrid.vue'
 import CirculationModal from '../components/CirculationModal.vue'
-import { getCategories, getWasteCodesByCategory } from '@/api/wasteCode'
+import { getCategories, getAllWasteCodesGrouped } from '@/api/wasteCode'
 import { categoryVisuals, fallbackVisual } from '@/data/categoryVisuals'
-import { getAllWasteCodes } from '@/data/wasteCategories'
 import WasteCodeEntryModal from '../components/WasteCodeEntryModal.vue'
 
 const router = useRouter()
 const route = useRoute()
 const { modes } = useCirculationModes()
 
-const defaultCodeMap = {
-  A: 'A-0101',
-  B: 'B-0101',
-  C: 'C-0202',
-  D: 'D-0101',
-  E: 'E-0101',
-  R: 'R-0101'
-}
 
-const selectedCategory = ref('C')
-const selectedCode = ref('C-0202')
 const searchKeyword = ref('')
 const dialogVisible = ref(false)
 const selectedMode = ref(null)
@@ -260,9 +249,10 @@ const entryModalVisible = ref(false)
 const pendingEntry = ref(null) // { code, category, page }
 
 // 六大類分類顯示信息
-// 分類資料改用 getCategories() 取得（目前是模擬 API，未來換成真實 API 呼叫，這裡完全不用改）
+// 分類資料改用 getCategories() 取得
 const categories = ref([])
 const categoriesLoading = ref(false)
+const selectedCategory = ref('C')
 
 const loadCategories = async () => {
   categoriesLoading.value = true
@@ -272,7 +262,12 @@ const loadCategories = async () => {
       ? result.filter((cat) => cat.id !== 'ALL').map((cat) => ({ ...cat, codes: Array.isArray(cat.codes) ? cat.codes : [], codesLoaded: false }))
       : []
 
-    await Promise.all(categories.value.map((cat) => loadCategoryCodes(cat.id)))
+    // 一次 API 請求取得全部廢棄物代碼，再依類別分組填入
+    const grouped = await getAllWasteCodesGrouped()
+    categories.value.forEach((cat) => {
+      cat.codes = grouped[cat.id] || []
+      cat.codesLoaded = true
+    })
   } catch (error) {
     console.error('載入分類失敗：', error)
     categories.value = []
@@ -486,7 +481,7 @@ const currentCategory = computed(() => findCategoryById(selectedCategory.value) 
 // 說明：依目前條件即時計算「current Category Codes」內容，提供畫面顯示與決策判斷使用。
 const currentCategoryCodes = computed(() => {
   if (selectedCategory.value === 'ALL') {
-    return getAllWasteCodes()
+    return categories.value.flatMap((cat) => cat.codes || [])
   }
   return currentCategory.value?.codes || []
 })
@@ -538,7 +533,6 @@ const applyTag = (tag) => {
 const selectCategory = (categoryId) => {
   selectedCategory.value = categoryId
   loadCategoryCodes(categoryId)
-  selectedCode.value = defaultCodeMap[categoryId] || findCategoryById(categoryId)?.codes?.[0]?.code || ''
   currentPage.value = 1
 }
 
