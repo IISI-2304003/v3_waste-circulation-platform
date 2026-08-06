@@ -267,44 +267,5 @@ export function getOperatorOptions() {
 export async function getCompanyList() {
     const result = await request.get('/company');
     if (!Array.isArray(result)) return [];
-    console.log('getCompanyList', result);
     return result;
-
-    // return result.map((item) => {
-    //     // 解析許可總量數字，例如 "400公噸/月" → 400
-    //     const capacityNum = parseInt(String(item.permitted_quantity || '0').replace(/[^0-9]/g, ''), 10) || 0;
-
-    //     // 格式化日期，例如 "2028/5/17 上午 12:00:00" → "2028-05-17"
-    //     const formatDate = (dateStr) => {
-    //         if (!dateStr) return '';
-    //         const match = String(dateStr).match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
-    //         if (!match) return dateStr;
-    //         return `${match[1]}-${String(match[2]).padStart(2, '0')}-${String(match[3]).padStart(2, '0')}`;
-    //     };
-
-    //     return {
-    //         id: item.id,
-    //         name: item.company_name || '',
-    //         category: item.case_type || '',
-    //         wasteReuse: item.waste_code || '',
-    //         isReuseOrg: item.is_reuse_company === '是',
-    //         location: item.region || '',
-    //         distance: 0,
-    //         product: item.waste_name || '',
-    //         capacity: capacityNum,
-    //         score: 0,
-    //         controlNo: item.control_number || '',
-    //         validityPeriod: formatDate(item.permit_end_date),
-    //         image: '',
-    //         reasons: [],
-    //         capacityLevel: 0,
-    //         capacityLevelText: '',
-    //         contactPhone: item.phone || '',
-    //         factoryAddress: item.address || '',
-    //         acceptanceStandards: [],
-    //         permitNumber: item.permit_number || '',
-    //         permitStartDate: formatDate(item.permit_start_date),
-    //         contactPerson: item.contact_person || '',
-    //     };
-    // });
 }

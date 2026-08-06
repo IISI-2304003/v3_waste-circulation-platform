@@ -385,7 +385,7 @@
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<DataAnalysis />
 									</el-icon><span>許可總量</span></div>
-								<strong>{{ activeVendor.permitted_quantity }}</strong>
+								<strong>{{ activeVendor.permitted_quantity }}噸/月</strong>
 							</div>
 						</el-col>
 						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
@@ -460,7 +460,7 @@
 						</section>
 						<section class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
 							<p class="detail-title">決策結論</p>
-							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ selectedMode.modeName }}」,並與「{{ activeVendor.name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
+							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ selectedMode.modeName }}」,並與「{{ activeVendor.company_name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
 						</section>
 
 
@@ -513,7 +513,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, watch, onMounted, markRaw } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import CirculationModal from '@/components/CirculationModal.vue'
@@ -526,27 +526,66 @@ import {
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import factory1 from '@/assets/factory/factory-1.png'
+import factory2 from '@/assets/factory/factory-2.png'
+import factory3 from '@/assets/factory/factory-3.png'
+import factory4 from '@/assets/factory/factory-4.png'
+import factory5 from '@/assets/factory/factory-5.png'
+
+const factoryImages = [factory1, factory2, factory3, factory4, factory5] // 用於隨機分配廠商圖片
 
 const router = useRouter()
 const route = useRoute()
 const isQuickMode = computed(() => route.query.mode === 'quick')// 模式判斷
-console.log('isQuickMode', isQuickMode.value)
 const conditionStore = useConditionSetupStore()
 
 const sortType = ref('overall')
 const selectedRegions = ref([])
 
 const taiwanCities = [
-	'基隆市', '台北市', '新北市', '桃園市', '新竹市', '新竹縣',
-	'苗栗縣', '台中市', '彰化縣', '南投縣', '雲林縣', '嘉義市',
-	'嘉義縣', '台南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣',
-	'台東縣', '澎湖縣', '金門縣', '連江縣'
+	'基隆市', '臺北市', '新北市', '桃園市', '新竹市', '新竹縣',
+	'苗栗縣', '臺中市', '彰化縣', '南投縣', '雲林縣', '嘉義市',
+	'嘉義縣', '臺南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣',
+	'臺東縣', '澎湖縣', '金門縣', '連江縣'
 ]
 const currentPage = ref(1)
 const pageSize = 4
 const detailDialogVisible = ref(false)
 const activeVendor = ref(null)
 const modeDialogVisible = ref(false)
+
+const iconComponentMap = {
+	Goods: markRaw(Goods),
+	Files: markRaw(Files),
+	Operation: markRaw(Operation),
+	Promotion: markRaw(Promotion),
+	SetUp: markRaw(SetUp),
+	Connection: markRaw(Connection),
+	Finished: markRaw(Finished),
+	DataAnalysis: markRaw(DataAnalysis),
+	Money: markRaw(Money),
+	Location: markRaw(Location),
+	Monitor: markRaw(Monitor)
+}
+
+const demandSelectionLabelMap = {
+	'replace-raw-material': '再生產品可回廠原製程使用',
+	'non-original-process': '再生產品非原製程使用',
+	'external-sale': '再生產品對外販售'
+}
+
+const toRawIcon = (icon) => {
+	if (typeof icon === 'string') return iconComponentMap[icon] || iconComponentMap.Goods
+	return markRaw(icon || Goods)
+}
+
+const mapModeSteps = (steps = []) => {
+	if (!Array.isArray(steps)) return []
+	return steps.map((step) => ({
+		...step,
+		icon: toRawIcon(step?.icon)
+	}))
+}
 
 // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const extractCountyCity = (address = '') => {
@@ -578,7 +617,10 @@ const demandSummary = computed(() => {
 		: '未設定'
 	const regionText = regionFromAddress || regionFromSite
 
-	const productText = sourceConditions.process || businessConditions.recycledProductDemand || '未設定'
+	const demandSelectionText = Array.isArray(conditionStore.demandSelections)
+		? conditionStore.demandSelections.map((value) => demandSelectionLabelMap[value]).filter(Boolean).join('、')
+		: ''
+	const productText = sourceConditions.processLabel || sourceConditions.process || businessConditions.recycledProductDemand || demandSelectionText || '未設定'
 	const amountText = sourceConditions.outputAmount ? `${sourceConditions.outputAmount} 噸 / 月` : '未設定'
 
 	const preferenceTokens = []
@@ -596,12 +638,12 @@ const demandSummary = computed(() => {
 		: '未設定'
 
 	return [
-		{ icon: 'Location', label: '所在地區', value: regionText },
-		{ icon: 'DataAnalysis', label: '允收條件', value: acceptanceText },
-		{ icon: 'Goods', label: '再生產品項目', value: productText },
-		{ icon: 'Van', label: '每月需求量', value: amountText },
-		{ icon: 'Checked', label: '來源產業', value: sourceLabel },
-		{ icon: 'Checked', label: '優先條件', value: priorityText }
+		{ icon: iconComponentMap.Location, label: '所在地區', value: regionText },
+		{ icon: iconComponentMap.DataAnalysis, label: '允收條件', value: acceptanceText },
+		{ icon: iconComponentMap.Goods, label: '廢棄物來源製程', value: productText },
+		{ icon: iconComponentMap.Money, label: '每月需求量', value: amountText },
+		{ icon: iconComponentMap.Finished, label: '來源產業', value: sourceLabel },
+		{ icon: iconComponentMap.Monitor, label: '優先條件', value: priorityText }
 	]
 })
 
@@ -628,7 +670,7 @@ const selectedMode = computed(() => {
 			title: conditionStore.selectedRecommendedPath.title || matchedRecommended?.title || '',
 			summary: conditionStore.selectedRecommendedPath.summary || matchedRecommended?.summary || '依據您選擇的循環路徑，系統提供對應技術決策建議。',
 			accentColor: matchedRecommended?.accentColor || 'var(--ds-primary-green)',
-			steps: matchedRecommended?.steps || []
+			steps: mapModeSteps(matchedRecommended?.steps || [])
 		}
 	}
 
@@ -639,10 +681,10 @@ const selectedMode = computed(() => {
 			summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。',
 			accentColor: 'var(--ds-primary-green)',
 			steps: [
-				{ label: '原料購入', icon: Goods },
-				{ label: '廠內前處理', icon: Files },
-				{ label: '純化(再製)', icon: Operation },
-				{ label: '返回原製程', icon: Promotion }
+				{ label: '原料購入', icon: iconComponentMap.Goods },
+				{ label: '廠內前處理', icon: iconComponentMap.Files },
+				{ label: '純化(再製)', icon: iconComponentMap.Operation },
+				{ label: '返回原製程', icon: iconComponentMap.Promotion }
 			]
 		}
 	}
@@ -653,10 +695,10 @@ const selectedMode = computed(() => {
 		summary: '原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。',
 		accentColor: 'var(--ds-primary-green)',
 		steps: [
-			{ label: '原料購入', icon: Goods },
-			{ label: '純化(再製)', icon: Operation },
-			{ label: '調整成分', icon: SetUp },
-			{ label: '返回原製程', icon: Promotion }
+			{ label: '原料購入', icon: iconComponentMap.Goods },
+			{ label: '純化(再製)', icon: iconComponentMap.Operation },
+			{ label: '調整成分', icon: iconComponentMap.SetUp },
+			{ label: '返回原製程', icon: iconComponentMap.Promotion }
 		]
 
 	}
@@ -715,24 +757,53 @@ const vendors = ref([])
 onMounted(async () => {
 	try {
 		const data = await getCompanyList()
-		if (data.length > 0) vendors.value = data
+		if (data.length > 0) {
+			vendors.value = data.map((item) => ({
+				...item,
+				image: factoryImages[item.id % factoryImages.length]
+			}))
+		}
 	} catch {
 		console.error('載入廠商資料失敗')
 	}
 })
 
+// ⚠️ 暫時性 demo 用途：後端推薦邏輯完成後移除
+// 依「事業名稱」關鍵字，指定要顯示的廠商 id 清單
+const demoCompanyVendorMap = {
+	'聯華電子股份有限公司': [8,39,40,49,12],
+	'台灣美光 (台中一廠)': [36,49,45,9,24,29,8,13,20,23,34,11,19,21,3,2,39]
+	// 之後如果還要加其他 demo 公司，繼續往下加
+}
+
+// 說明：依目前輸入的事業名稱，找出對應的假推薦廠商 id 清單
+const getDemoVendorIds = (businessName = '') => {
+	const matchedKey = Object.keys(demoCompanyVendorMap).find((keyword) => businessName.includes(keyword))
+	return matchedKey ? demoCompanyVendorMap[matchedKey] : null
+}
+
 
 // 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
 	let result = vendors.value;
+	console.log('目前輸入的事業名稱：', JSON.stringify(conditionStore.businessConditions.businessName))
+	// ⚠️ demo 用途：依公司名稱做假篩選
+	const demoIds = getDemoVendorIds(conditionStore.businessConditions.businessName)
+	console.log('比對到的 demoIds：', demoIds)
+	if (demoIds) {
+		const idSet = new Set(demoIds)
+		result = result.filter((v) => idSet.has(v.id))
+	}
 
 	// 依地區篩選
 	if (sortType.value === 'distance' && selectedRegions.value.length > 0) {
-		result = result.filter((v) => selectedRegions.value.includes(v.location))
+		result = result.filter((v) => selectedRegions.value.includes(v.region))
 	}
 
 	if (sortType.value === 'distance') return result.sort((a, b) => a.distance - b.distance)
-	if (sortType.value === 'capacity') return result.sort((a, b) => b.capacity - a.capacity)
+	if (sortType.value === 'capacity') {
+		return [...result].sort((a, b) => b.permitted_quantity - a.permitted_quantity)
+	}
 	return result.sort((a, b) => b.score - a.score)
 })
 
@@ -740,7 +811,6 @@ const sortedVendors = computed(() => {
 const totalPages = computed(() => Math.ceil(sortedVendors.value.length / pageSize))
 // 說明：依目前條件即時計算「paged Vendors」內容，提供畫面顯示與決策判斷使用。
 const pagedVendors = computed(() => sortedVendors.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize))
-console.log('pagedVendors', pagedVendors.value)
 
 watch(sortType, () => {
 	currentPage.value = 1
@@ -753,7 +823,7 @@ watch(detailDialogVisible, (value) => {
 watch(() => selectedMode.value?.modeName, () => {
 	currentPage.value = 1
 	if (activeVendor.value) {
-		const allowedVendorIds = new Set(recommendedVendors.value.map((vendor) => vendor.id))
+		const allowedVendorIds = new Set(sortedVendors.value.map((vendor) => vendor.id))
 		if (!allowedVendorIds.has(activeVendor.value.id)) {
 			detailDialogVisible.value = false
 			activeVendor.value = null
@@ -861,6 +931,92 @@ const exportVendorPdf = () => {
 		</body>
 		</html>
 	`)
+	printWindow.document.close()
+	printWindow.focus()
+	setTimeout(() => {
+		printWindow.print()
+	}, 200)
+}
+
+// 說明：由匯出操作觸發；輸出目前模式與廠商排序的完整報告。
+const exportFullReportPdf = () => {
+	const printWindow = window.open('', '_blank', 'width=1080,height=760')
+	if (!printWindow) {
+		ElMessage.warning('無法開啟匯出視窗，請確認瀏覽器未封鎖彈出視窗')
+		return
+	}
+
+	const modeName = escapeHtml(selectedMode.value?.modeName || '未設定')
+	const modeTitle = escapeHtml(selectedMode.value?.title || '未設定')
+	const modeSummary = escapeHtml(selectedMode.value?.summary || '未設定')
+	const summaryRows = visibleDemandSummary.value
+		.map((item) => `<tr><th>${escapeHtml(item.label)}</th><td>${escapeHtml(item.value)}</td></tr>`)
+		.join('')
+
+	const vendorRows = sortedVendors.value
+		.map((vendor, index) => `
+			<tr>
+				<td>${index + 1}</td>
+				<td>${escapeHtml(vendor.company_name || vendor.name || '')}</td>
+				<td>${escapeHtml(vendor.region || vendor.location || '')}</td>
+				<td>${escapeHtml(vendor.waste_name || '')}</td>
+				<td>${escapeHtml(vendor.product || '')}</td>
+				<td>${escapeHtml(vendor.permitted_quantity || vendor.capacity || '')}</td>
+				<td>${escapeHtml(vendor.control_number || vendor.controlNo || '')}</td>
+			</tr>
+		`).join('')
+
+	printWindow.document.write(`
+		<!doctype html>
+		<html lang="zh-Hant">
+		<head>
+			<meta charset="UTF-8" />
+			<title>技術決策完整報告</title>
+			<style>
+				body{font-family:Segoe UI,Microsoft JhengHei,sans-serif;color:#1f2d3d;margin:24px;line-height:1.6;}
+				h1{margin:0 0 6px;font-size:28px;color:#1f4d47;}
+				h2{margin:20px 0 8px;font-size:18px;color:#2b5876;border-bottom:1px solid #dfe9f3;padding-bottom:4px;}
+				p{margin:4px 0;}
+				table{width:100%;border-collapse:collapse;table-layout:fixed;}
+				th,td{border:1px solid #dbe8f3;padding:8px 10px;font-size:13px;word-break:break-word;vertical-align:top;}
+				th{background:#f5f9fc;text-align:left;color:#355b78;}
+				.summary th{width:170px;}
+				.meta{color:#5b7890;font-size:13px;}
+				@media print { body { margin: 12mm; } }
+			</style>
+		</head>
+		<body>
+			<h1>技術決策完整報告</h1>
+			<p class="meta">匯出時間：${escapeHtml(new Date().toLocaleString('zh-TW'))}</p>
+
+			<h2>推薦循環模式</h2>
+			<p><strong>${modeName}</strong>｜${modeTitle}</p>
+			<p>${modeSummary}</p>
+
+			<h2>決策需求摘要</h2>
+			<table class="summary">
+				<tbody>${summaryRows || '<tr><th>摘要</th><td>無可匯出資料</td></tr>'}</tbody>
+			</table>
+
+			<h2>推薦廠商清單（依目前排序）</h2>
+			<table>
+				<thead>
+					<tr>
+						<th style="width:48px;">排名</th>
+						<th>廠商名稱</th>
+						<th style="width:110px;">所在地</th>
+						<th>再利用廢棄物</th>
+						<th>再生產品</th>
+						<th style="width:120px;">許可總量</th>
+						<th style="width:140px;">事業管制編號</th>
+					</tr>
+				</thead>
+				<tbody>${vendorRows || '<tr><td colspan="7">目前無廠商資料</td></tr>'}</tbody>
+			</table>
+		</body>
+		</html>
+	`)
+
 	printWindow.document.close()
 	printWindow.focus()
 	setTimeout(() => {

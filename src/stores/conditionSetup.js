@@ -5,6 +5,7 @@ const defaultSource = () => ({
     industry: '',
     industryLabel: '',
     process: '',
+    processLabel: '',
     outputAmount: null,
     frequency: '',
 });

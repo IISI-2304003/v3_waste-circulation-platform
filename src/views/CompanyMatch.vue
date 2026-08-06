@@ -140,7 +140,7 @@
 
                 <!-- 統計數字區 -->
                 <div class="path-stats">
-                  <div class="stat-item" >
+                  <div class="stat-item">
                     <!-- <span class="stat-value" :style="{ color: path.accentColor }">
                       {{ path.matchRate }} <span class="stat-unit" :style="{ color: path.accentColor }">家</span>
                     </span> -->
@@ -227,7 +227,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { use } from 'echarts/core'
 import { RadarChart } from 'echarts/charts'
@@ -561,7 +561,15 @@ const radarOption = computed(() => ({
 }))
 // Icon 名稱字串 → Vue 元件映射
 const iconComponentMap = {
-  Goods, Files, Operation, Promotion, SetUp, Connection, Finished, DataAnalysis, Money,
+  Goods: markRaw(Goods),
+  Files: markRaw(Files),
+  Operation: markRaw(Operation),
+  Promotion: markRaw(Promotion),
+  SetUp: markRaw(SetUp),
+  Connection: markRaw(Connection),
+  Finished: markRaw(Finished),
+  DataAnalysis: markRaw(DataAnalysis),
+  Money: markRaw(Money),
 }
 
 // 各模式漸層樣式（依 JSON id）

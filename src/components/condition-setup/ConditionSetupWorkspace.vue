@@ -525,13 +525,27 @@ watch(
 	},
 	{ immediate: true }
 )
-
+// 說明：來源製程選項改變時，更新 store 中的 processLabel。
+watch(
+	() => store.sourceConditions.process,
+	(nextProcess) => {
+		console.log('來源製程選項改變，更新 process:', store.sourceConditions.process)
+		const matched = sourceProcessOptions.value.find((item) => item.value === nextProcess)
+		store.sourceConditions.processLabel = matched ? matched.label : ''
+		console.log('來源製程選項改變，更新 processLabel:', store.sourceConditions.processLabel)
+	}
+)
 onMounted(async () => {
 	await loadSourceIndustryOptions()
 	if (store.sourceConditions.industry) {
 		const matched = sourceIndustryOptions.value.find((item) => item.value === store.sourceConditions.industry)
 		if (matched) store.sourceConditions.industryLabel = matched.label
 		await fetchProcess()
+		// ↓ 新增：industry 還原後，process 也要回填 label
+		if (store.sourceConditions.process) {
+			const matchedProcess = sourceProcessOptions.value.find((item) => item.value === store.sourceConditions.process)
+			if (matchedProcess) store.sourceConditions.processLabel = matchedProcess.label
+		}
 	}
 })
 
