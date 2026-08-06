@@ -186,9 +186,11 @@ const handleParameterChange = (standard) => {
 // 監聽初始資料
 watch(() => props.initialStandards, (newVal) => {
 	if (newVal && newVal.length > 0) {
-		// 只在數據內容真的改變時才更新，避免無限循環
+		// 只比對已填寫 parameter 的項目，避免使用者剛新增的空白列被誤判為「有變化」而覆蓋掉
 		const hasActualChange = JSON.stringify(newVal) !== JSON.stringify(
-			standards.value.map(({ id, ...rest }) => ({ ...rest }))
+			standards.value
+				.filter(s => s.parameter && String(s.parameter).trim())
+				.map(({ id, ...rest }) => ({ ...rest }))
 		)
 		if (hasActualChange) {
 			isUpdatingFromProp = true
