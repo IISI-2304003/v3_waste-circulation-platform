@@ -66,7 +66,7 @@
 									</el-button>
 								</div>
 
-								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" @change="handleStandardsChange" />
+								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" :wastecode="props.selectedCode" @change="handleStandardsChange" />
 
 								<!-- <div class="report-upload">
 									<h4>檢測報告上傳區</h4>
@@ -321,6 +321,10 @@ const props = defineProps({
 	embeddedMode: {
 		type: Boolean,
 		default: false
+	},
+	selectedCode: {
+		type: String,
+		default: ''
 	}
 })
 

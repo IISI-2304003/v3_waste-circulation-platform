@@ -83,14 +83,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Plus, Delete, Search } from '@element-plus/icons-vue'
 import {
 	getParameterOptions,
 	getOperatorOptions,
-	getUnitOptions,
 	searchByStandards
 } from '@/api/wasteCode'
 
@@ -101,6 +100,10 @@ const props = defineProps({
 	initialStandards: {
 		type: Array,
 		default: () => []
+	},
+	wastecode: {
+		type: String,
+		default: ''
 	}
 })
 
@@ -136,10 +139,25 @@ const searchResults = ref([])
 const hasSearched = ref(false)
 let isUpdatingFromProp = false
 
-// 選項資料
-const parameterOptions = Array.from(new Set([...getParameterOptions(), '外觀']))
+// 選項資料（參數選項依 wastecode 從 API 載入）
+const parameterOptions = ref(['外觀'])
 const operatorOptions = getOperatorOptions()
-const unitOptions = getUnitOptions()
+const unitOptions = ref(['%', 'mg/kg', 'ppm', '°C', 'g/L', ''])
+// 參數 → 單位的對映表
+const parameterUnitMap = ref({})
+
+onMounted(async () => {
+	try {
+		const properties = await getParameterOptions(props.wastecode)
+		parameterOptions.value = [...properties.map((p) => p.test_item), '外觀']
+		parameterUnitMap.value = Object.fromEntries(properties.map((p) => [p.test_item, p.unit || '']))
+		// 單位選單使用 API 回傳的唯一單位列表
+		const apiUnits = [...new Set(properties.map((p) => p.unit).filter(Boolean)), '']
+		if (apiUnits.length > 1) unitOptions.value = apiUnits
+	} catch {
+		// API 失敗時保持預設值
+	}
+})
 
 // 說明：由使用者互動觸發；執行「handle Parameter Change」流程並同步更新相關狀態。
 const handleParameterChange = (standard) => {
@@ -152,6 +170,12 @@ const handleParameterChange = (standard) => {
 			standard.value = ''
 		}
 		return
+	}
+
+	// 自動帶入對應單位
+	const mappedUnit = parameterUnitMap.value[standard.parameter]
+	if (mappedUnit !== undefined) {
+		standard.unit = mappedUnit
 	}
 
 	if (typeof standard.value === 'string') {

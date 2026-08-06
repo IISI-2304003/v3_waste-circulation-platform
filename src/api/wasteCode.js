@@ -233,10 +233,16 @@ export function parseSemanticInput(text) {
 
 /**
  * 取得參數選項清單（用於下拉選單）
+ * @param {string} wastecode - 廢棄物代碼，例如 C-0202
+ * @returns {Array<{test_item: string, unit: string}>}
  */
-// 說明：回傳「get Parameter Options」資料供畫面渲染或後續商業規則使用。
-export function getParameterOptions() {
-    return ['pH', '含水率', '硫酸濃度', '比重', '外觀', '雙氧水', 'HF濃度', '鐵', '灼熱殘渣', '總汞', '六價鉻', '總砷', '總鉛', '總鎘', '總鉻', '總銅', '總硒', '總鋇', '總銀'];
+// 說明：依廢棄物代碼從 API 取得參數選項及對應單位。
+export async function getParameterOptions(wastecode) {
+    const result = await request.get('/wastedetail/property', {
+        params: { wastecode },
+    });
+    if (!Array.isArray(result)) return [];
+    return result.filter((item) => item.test_item);
 }
 
 /**
@@ -255,9 +261,50 @@ export function getOperatorOptions() {
 }
 
 /**
- * 取得單位選項清單
+ * 取得廠商清單
  */
-// 說明：回傳「get Unit Options」資料供畫面渲染或後續商業規則使用。
-export function getUnitOptions() {
-    return ['%', 'mg/kg', 'ppm', '°C', 'g/L', ''];
+// 說明：從 API 取得可合作的廠商資料，並轉換為前端顯示格式。
+export async function getCompanyList() {
+    const result = await request.get('/company');
+    if (!Array.isArray(result)) return [];
+    console.log('getCompanyList', result);
+    return result;
+
+    // return result.map((item) => {
+    //     // 解析許可總量數字，例如 "400公噸/月" → 400
+    //     const capacityNum = parseInt(String(item.permitted_quantity || '0').replace(/[^0-9]/g, ''), 10) || 0;
+
+    //     // 格式化日期，例如 "2028/5/17 上午 12:00:00" → "2028-05-17"
+    //     const formatDate = (dateStr) => {
+    //         if (!dateStr) return '';
+    //         const match = String(dateStr).match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+    //         if (!match) return dateStr;
+    //         return `${match[1]}-${String(match[2]).padStart(2, '0')}-${String(match[3]).padStart(2, '0')}`;
+    //     };
+
+    //     return {
+    //         id: item.id,
+    //         name: item.company_name || '',
+    //         category: item.case_type || '',
+    //         wasteReuse: item.waste_code || '',
+    //         isReuseOrg: item.is_reuse_company === '是',
+    //         location: item.region || '',
+    //         distance: 0,
+    //         product: item.waste_name || '',
+    //         capacity: capacityNum,
+    //         score: 0,
+    //         controlNo: item.control_number || '',
+    //         validityPeriod: formatDate(item.permit_end_date),
+    //         image: '',
+    //         reasons: [],
+    //         capacityLevel: 0,
+    //         capacityLevelText: '',
+    //         contactPhone: item.phone || '',
+    //         factoryAddress: item.address || '',
+    //         acceptanceStandards: [],
+    //         permitNumber: item.permit_number || '',
+    //         permitStartDate: formatDate(item.permit_start_date),
+    //         contactPerson: item.contact_person || '',
+    //     };
+    // });
 }

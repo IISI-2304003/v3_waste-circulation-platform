@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="technology-match-page">
 		<div class="page-header">
 			<el-row :gutter="24" align="middle" class="header-row">
@@ -83,16 +83,14 @@
 							</div>
 						</template>
 					</div>
-					<!-- <div class="mode-flow">
-						<div v-for="(node, index) in modeFlow" :key="node.title" class="flow-node">
-							<div class="node-icon">
-								<el-icon>
-									<component :is="node.icon" />
-								</el-icon></div>
-							<p class="node-title">{{ node.title }}</p>
-							<span v-if="index < modeFlow.length - 1" class="flow-arrow">→</span>
-						</div>
-					</div> -->
+					<div class="matching-method" v-if="!['廠內模式1', '廠內模式2', '廠內模式3'].includes(normalizeModeName(selectedMode.modeName))">
+						<span>媒合方式：外部技術單位協作</span>
+						<span class="match-description">實際合作對象須依允收條件及合作關係進一步確認</span>
+					</div>
+					<div class="matching-method" v-else>
+						<span>執行主體：產源事業</span>
+						<span class="match-description">須確認廠內設備、製程及操作條件</span>
+					</div>
 				</section>
 			</div>
 
@@ -135,14 +133,14 @@
 								<div class="supplier-main">
 									<!-- 頂部：標籤列 -->
 									<div class="card-tags">
-										<span class="meta-chip ann_category">{{ vendor.category }}</span>
-										<span v-if="vendor.isReuseOrg && vendor.category !== '再利用機構'" class="meta-chip ann_reuse">再利用機構</span>
+										<span class="meta-chip ann_category">{{ vendor.announcement_category_name }}</span>
+										<span v-if="vendor.is_reuse_company && vendor.announcement_category_name !== '再利用機構'" class="meta-chip ann_reuse">再利用機構</span>
 									</div>
 
 									<!-- 名稱 +  前月收受能力 -->
 									<div class="card-header-row">
 										<div class="name-match">
-											<h3>{{ vendor.name }}</h3>
+											<h3>{{ vendor.company_name }}</h3>
 
 										</div>
 									</div>
@@ -155,7 +153,7 @@
 												</el-icon></span>
 											<div>
 												<p class="meta-title">再利用廢棄物</p>
-												<p class="meta-text">{{ vendor.wasteReuse }}</p>
+												<p class="meta-text">{{ vendor.waste_name }}</p>
 											</div>
 										</div>
 										<div class="meta-item">
@@ -164,10 +162,10 @@
 												</el-icon></span>
 											<div>
 												<p class="meta-title">所在地</p>
-												<p class="meta-text">{{ vendor.location }}</p>
+												<p class="meta-text">{{ vendor.region }}</p>
 											</div>
 										</div>
-										<div class="meta-item">
+										<!-- <div class="meta-item">
 											<span class="meta-icon"><el-icon>
 													<Position />
 												</el-icon></span>
@@ -175,7 +173,7 @@
 												<p class="meta-title">距離</p>
 												<p class="meta-text">{{ vendor.distance }} km</p>
 											</div>
-										</div>
+										</div> -->
 										<div class="meta-item">
 											<span class="meta-icon"><el-icon>
 													<Box />
@@ -191,7 +189,7 @@
 												</el-icon></span>
 											<div>
 												<p class="meta-title">許可總量</p>
-												<p class="meta-text">{{ vendor.capacity }} 噸/月</p>
+												<p class="meta-text">{{ vendor.permitted_quantity }} </p>
 											</div>
 										</div>
 										<div class="meta-item">
@@ -217,7 +215,7 @@
 												</el-icon></span>
 											<div>
 												<p class="meta-title">事業管制編號</p>
-												<p class="meta-text">{{ vendor.controlNo }}</p>
+												<p class="meta-text">{{ vendor.control_number }}</p>
 											</div>
 										</div>
 										<div class="meta-item">
@@ -226,7 +224,7 @@
 												</el-icon></span>
 											<div>
 												<p class="meta-title">有效許可期限</p>
-												<p class="meta-text">{{ vendor.validityPeriod }}</p>
+												<p class="meta-text">{{ vendor.permit_end_date }}</p>
 											</div>
 										</div>
 									</div>
@@ -302,7 +300,7 @@
 							</template>
 						</div>
 						<div class="alternative-meta-row">
-							<span class="alternative-vendor-count">推薦廠商數<span class="vendor-count">{{ getRecommendedVendorCount(path.modeName) }} </span>家</span>
+							<!-- <span class="alternative-vendor-count">推薦廠商數<span class="vendor-count">{{ getRecommendedVendorCount(path.modeName) }} </span>家</span> -->
 							<el-button type="primary" class="detail-btn" @click="switchToAlternativePath(path)">
 								查看此方案
 								<el-icon class="el-icon--right">
@@ -321,7 +319,7 @@
 						<div class="top-header-main">
 							<div class="top-left-copy">
 								<span class="vendor-tag">{{ activeVendor.isReuseOrg ? '再利用廠商' : '處理機構' }}</span>
-								<h3>{{ activeVendor.name }}</h3>
+								<h3>{{ activeVendor.company_name }}</h3>
 								<!-- <p class="dialog-specialty">專長：{{ activeVendor.reuseTech }}</p> -->
 								<div class="mode-title-row">
 									<span class="mode-badge">{{ selectedMode.modeName }}</span>
@@ -363,7 +361,7 @@
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Location />
 									</el-icon><span>所在地</span></div>
-								<strong>{{ activeVendor.location }}</strong>
+								<strong>{{ activeVendor.region }}</strong>
 							</div>
 						</el-col>
 						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
@@ -387,7 +385,7 @@
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<DataAnalysis />
 									</el-icon><span>許可總量</span></div>
-								<strong>{{ activeVendor.capacity }} 噸/月</strong>
+								<strong>{{ activeVendor.permitted_quantity }}</strong>
 							</div>
 						</el-col>
 						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
@@ -395,7 +393,7 @@
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Finished />
 									</el-icon><span>有效許可期限</span></div>
-								<strong>{{ activeVendor.validityPeriod }}</strong>
+								<strong>{{ activeVendor.permit_end_date }}</strong>
 							</div>
 						</el-col>
 						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
@@ -403,7 +401,7 @@
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Files />
 									</el-icon><span>事業管制編號</span></div>
-								<strong>{{ activeVendor.controlNo }}</strong>
+								<strong>{{ activeVendor.control_number }}</strong>
 							</div>
 						</el-col>
 					</el-row>
@@ -470,8 +468,8 @@
 						<section class="detail-card contact-card wide-card">
 							<p class="detail-title">聯絡資訊</p>
 							<div class="contact-row">
-								<div class="contact-item"><span>聯絡電話</span><strong>{{ activeVendor.contactPhone }}</strong></div>
-								<div class="contact-item"><span>工廠地址</span><strong>{{ activeVendor.factoryAddress }}</strong></div>
+								<div class="contact-item"><span>聯絡電話</span><strong>{{ activeVendor.phone }}</strong></div>
+								<div class="contact-item"><span>工廠地址</span><strong>{{ activeVendor.address }}</strong></div>
 							</div>
 						</section>
 					</div>
@@ -515,11 +513,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import CirculationModal from '@/components/CirculationModal.vue'
 import circulationModesData from '@/data/circulationModes.json'
+import { getCompanyList } from '@/api/wasteCode'
 import {
 	ArrowLeft, ArrowRight, Monitor,
 	Connection, DataAnalysis, Files, Finished,
@@ -548,13 +547,6 @@ const pageSize = 4
 const detailDialogVisible = ref(false)
 const activeVendor = ref(null)
 const modeDialogVisible = ref(false)
-
-const industryLabelMap = {
-	semiconductor: '電子與半導體',
-	steel: '鋼鐵冶金',
-	chemical: '化工製程',
-	food: '食品加工'
-}
 
 // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const extractCountyCity = (address = '') => {
@@ -619,74 +611,9 @@ const visibleDemandSummary = computed(() => demandSummary.value.filter((item) =>
 // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
 
-const baseExternalPaths = [
-	{
-		modeName: '廠外模式 4',
-		title: '廠外純化回原製程',
-		summary: '原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。',
-		gradient: 'linear-gradient(160deg,var(--ds-primary-green),var(--ds-primary-green-dark))',
-		accentColor: 'var(--ds-primary-green)',
-		steps: [
-			{ label: '原料購入', icon: Goods },
-			{ label: '純化(再製)', icon: Operation },
-			{ label: '調整成分', icon: SetUp },
-			{ label: '返回原製程', icon: Promotion }
-		]
-	},
-	{
-		modeName: '廠外模式 6',
-		title: '同法人體系前處理再回用',
-		summary: '送至同一法人前處理，再送至其他公司純化（再製）、調整成分與濃度，再返回原廠使用。',
-		gradient: 'linear-gradient(160deg,var(--ds-secondary-teal),var(--ds-secondary-cyan-dark))',
-		accentColor: 'var(--ds-secondary-teal)',
-		steps: [
-			{ label: '原料購入', icon: Goods },
-			{ label: '前處理', icon: Files },
-			{ label: '純化(再製)', icon: Operation },
-			{ label: '調整成分', icon: SetUp },
-			{ label: '返回原製程', icon: Promotion }
-		]
-	},
-	{
-		modeName: '廠外模式 2',
-		title: '跨廠區再利用',
-		summary: '送至同一法人不同廠區處理及再利用。',
-		gradient: 'linear-gradient(160deg,var(--ds-accent-orange),var(--ds-accent-orange-dark))',
-		accentColor: 'var(--ds-accent-orange)',
-		steps: [
-			{ label: '原料購入', icon: Goods },
-			{ label: '異業處理', icon: Connection },
-			{ label: '再利用', icon: Finished }
-		]
-	}
-]
 
-const baseInternalPath = {
-	modeName: '廠內模式 1',
-	title: '物料製程內未排出，逕自循環使用',
-	summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。',
-	gradient: 'linear-gradient(160deg,var(--ds-accent-orange),var(--ds-accent-orange-dark))',
-	accentColor: 'var(--ds-primary-green)',
-	steps: [
-		{ label: '原料購入', icon: Goods },
-		{ label: '廠內前處理', icon: Files },
-		{ label: '純化(再製)', icon: Operation },
-		{ label: '返回原製程', icon: Promotion }
-	]
-}
 
-const allRecommendedPaths = computed(() => {
-	// 優先使用 CompanyMatch 評分計算出的推薦路徑
-	if (conditionStore.recommendedPaths?.length > 0) {
-		return conditionStore.recommendedPaths
-	}
-	// 後備：舊邏輯
-	const hasReuseSpace = conditionStore.siteConditions.hasReuseSpace === true
-	if (hasReuseSpace) {
-		return [baseInternalPath, ...baseExternalPaths.slice(0, 2)]
-	}
-	return baseExternalPaths
-})
+const allRecommendedPaths = computed(() => conditionStore.recommendedPaths || [])
 
 // 說明：依目前條件即時計算「selected Mode」內容，提供畫面顯示與決策判斷使用。
 const selectedMode = computed(() => {
@@ -780,42 +707,24 @@ const getDotClass = (level, dotIndex) => {
 	if (level === 3) return 'active red'
 }
 
-const modeFlow = [
-	{ icon: 'Location', title: '原料入廠', sub: '供應商' },
-	{ icon: 'OfficeBuilding', title: '純化處理', sub: '純化廠' },
-	{ icon: 'Goods', title: '成分調整', sub: '再製廠' },
-	{ icon: 'Van', title: '返回原製程', sub: '需求端' }
-]
 
-const vendors = [
-	{ id: 1, name: '鴻成科技有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 12, product: '稀硫酸(65%以下)', capacity: 3200, score: 95, controlNo: 'D2876543', location: '桃園市', reuseTech: '酸洗廢液純化、濃縮再製與循環回用', acceptanceStandards: ['pH 2.0 - 6.0', '含固量 < 15%', '金屬雜質符合批次規範'], processUnits: ['前處理槽', '蒸餾純化單元', '濃縮再製單元'], qualityStandards: ['批次檢驗報告', '出貨前抽驗', 'ISO 14001 流程管理'], salesTargetIndustries: ['化學材料製造業', '化學製品製造業'], contactPhone: '03-1234-5678', factoryAddress: '桃園市觀音區工業路 88 號', image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=960&q=80', previousMonthReceived: 3000, validityPeriod: '2026-12-31', reasons: ['允收條件符合', '距離最近', '具再利用機構資格'], reasonText: '本公司具備高純化能力與穩定出貨紀錄，適合依現有允收條件直接導入。', capacityLevel: 1, capacityLevelText: '低' },
-	{ id: 2, name: '盈昌科技工業股份有限公司', category: '再利用機構', wasteReuse: 'C-0202', isReuseOrg: true, distance: 18, product: '工業用稀硫酸(50~60%)', capacity: 2400, score: 91, controlNo: 'D3209843', location: '台南市', reuseTech: '稀硫酸回收、再生濃縮與品質調整', acceptanceStandards: ['酸鹼值符合回收規格', '含水率 < 20%', '雜質含量低於上限'], processUnits: ['收料暫存槽', '再生處理單元', '品質調整單元'], qualityStandards: ['批次分析報告', '檢驗留樣制度', '製程參數紀錄'], salesTargetIndustries: ['化學材料製造業', '化學製品製造業'], contactPhone: '06-2345-6789', factoryAddress: '台南市永康區環工路 12 號', image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '具備穩定批次控制能力，適合需要持續供應與快速補貨的情境。', previousMonthReceived: 2000, validityPeriod: '2028-06-30', capacityLevel: 2, capacityLevelText: '中' },
-	{ id: 3, name: '貝民股份有限公司台中港廠', category: '化學材料製造業', wasteReuse: 'C-0202', isReuseOrg: true, distance: 26, product: '電子級硫酸', capacity: 3200, score: 93, controlNo: 'D3209843', location: '台中市', reuseTech: '高純度硫酸再生、分級純化與電子級製程支援', acceptanceStandards: ['水份<55', '硫酸≧45', '比重>1.3', '外觀無懸浮顆粒'], processUnits: ['精餾單元', '分子篩純化單元', '終端過濾單元'], qualityStandards: ['電子級檢測報告', '進料與出貨雙向查核', '製程 SOP 管控'], salesTargetIndustries: ['化學材料製造業', '紡織業', '化學製品製造業', '紙漿、紙及紙製品製造業'], contactPhone: '04-2468-1357', factoryAddress: '台中市梧棲區港埠路 101 號', image: 'https://images.unsplash.com/photo-1513828742140-ccaa28f3eda0?auto=format&fit=crop&w=960&q=80', reasons: ['最大再利用量', '距離最近'], reasonText: '能承接較大量且高純度需求，適合對電子級品質要求較高的製程。', previousMonthReceived: 2500, validityPeriod: '2027-03-31', capacityLevel: 1, capacityLevelText: '低' },
-	{ id: 4, name: '光宇應用材料股份有限公司', category: '公民營廢棄物處理及清理機構', wasteReuse: 'C-0202', isReuseOrg: false, distance: 34, product: '稀硫酸', capacity: 2200, score: 86, controlNo: 'D9202688', location: '高雄市', reuseTech: '稀硫酸回收與濃度微調再製', acceptanceStandards: ['收受太陽能切片廠以及半導體廠等相關工廠產出之廢硫酸', 'Ph(≦2)', '廢硫酸濃度(≧25％)', '雙氧水(≦15％)'], processUnits: ['前處理區', '濃縮回收區', '成品調整區'], qualityStandards: ['化驗報告追蹤', '批次標示管理', '出貨前複檢'], salesTargetIndustries: ['化學原料批發業', '化學原料製造業'], contactPhone: '07-3698-2584', factoryAddress: '高雄市小港區海工一路 36 號', image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合', '距離最近'], reasonText: '可作為中距離備援供應來源，適合兼顧成本與供應穩定性。', previousMonthReceived: 1800, validityPeriod: '2028-11-30', capacityLevel: 2, capacityLevelText: '中' },
-	{ id: 5, name: '佶鼎科技股份有限公司觀音廠', category: '材料再製', wasteReuse: 'C-0202', isReuseOrg: false, distance: 42, product: '再生鹽類原料', capacity: 700, score: 80, controlNo: 'D8801122', location: '桃園市', reuseTech: '再生鹽類回收、濃縮與再製供應', acceptanceStandards: ['pH值小(等)於2', 'Cu小於100pm'], processUnits: ['蒸發濃縮單元', '結晶分離單元', '乾燥包裝單元'], qualityStandards: ['批次純度檢驗', '留樣保存制度', '出貨文件齊備'], salesTargetIndustries: ['化學材料製造業'], contactPhone: '07-7788-9900', factoryAddress: '桃園市大社區再生路 18 號', image: 'https://images.unsplash.com/photo-1567789884554-0b844b597180?auto=format&fit=crop&w=960&q=80', reasons: ['允收條件符合'], reasonText: '適合中長距離供應與多樣化客戶銷售配置，具備擴量潛力。', previousMonthReceived: 600, validityPeriod: '2029-05-31', capacityLevel: 3, capacityLevelText: '高' }
-]
 
-const modeVendorIdsMap = {
-	'廠內模式 1': [1, 3, 5],
-	'廠外模式 4': [1, 2, 3],
-	'廠外模式 6': [2, 3, 4, 5],
-	'廠外模式 2': [1, 4, 5]
-}
+// 廠商資料從 API 載入（舊有寫死資料保留為初始值備用）
+const vendors = ref([])
 
-const getRecommendedVendorIds = (modeName = '') => modeVendorIdsMap[modeName] || []
-
-const getRecommendedVendorCount = (modeName = '') => getRecommendedVendorIds(modeName).length
-
-const recommendedVendors = computed(() => {
-	const ids = getRecommendedVendorIds(selectedMode.value?.modeName)
-	if (!ids.length) return [...vendors]
-	const idSet = new Set(ids)
-	return vendors.filter((vendor) => idSet.has(vendor.id))
+onMounted(async () => {
+	try {
+		const data = await getCompanyList()
+		if (data.length > 0) vendors.value = data
+	} catch {
+		console.error('載入廠商資料失敗')
+	}
 })
+
 
 // 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
-	let result = [...recommendedVendors.value]
+	let result = vendors.value;
 
 	// 依地區篩選
 	if (sortType.value === 'distance' && selectedRegions.value.length > 0) {
@@ -831,6 +740,7 @@ const sortedVendors = computed(() => {
 const totalPages = computed(() => Math.ceil(sortedVendors.value.length / pageSize))
 // 說明：依目前條件即時計算「paged Vendors」內容，提供畫面顯示與決策判斷使用。
 const pagedVendors = computed(() => sortedVendors.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize))
+console.log('pagedVendors', pagedVendors.value)
 
 watch(sortType, () => {
 	currentPage.value = 1
@@ -1332,10 +1242,17 @@ const goBackHome = () => {
 	line-height: 1.7;
 }
 
-.mode-flow {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 10px;
+.matching-method {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	font-size: 22px;
+	font-weight: 600;
+
+	.match-description {
+		font-size: 18px;
+		color: #858585;
+	}
 }
 
 .flow-node {
@@ -2238,13 +2155,7 @@ const goBackHome = () => {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
-	.mode-flow {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
 
-	// .flow-arrow {
-	// 	display: none;
-	// }
 
 	.supplier-card {
 		.card-left {
@@ -2338,7 +2249,7 @@ const goBackHome = () => {
 	}
 
 	.summary-grid,
-	.mode-flow,
+
 	.detail-grid-v2 {
 		grid-template-columns: 1fr;
 	}

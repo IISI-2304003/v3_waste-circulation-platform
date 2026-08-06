@@ -20,16 +20,17 @@
 
     </div>
 
-    <ConditionSetupWorkspace @next="goCompanyMatch" />
+    <ConditionSetupWorkspace :selected-code="route.query.code || ''" @next="goCompanyMatch" />
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import ConditionSetupWorkspace from '@/components/condition-setup/ConditionSetupWorkspace.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
 
 const router = useRouter()
+const route = useRoute()
 const conditionStore = useConditionSetupStore()
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。

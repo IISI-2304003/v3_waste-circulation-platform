@@ -89,7 +89,7 @@
         <div class="section-title-group">
           <div class="section-bar"></div>
           <div>
-            <span class="section-title">推薦循環路徑</span>
+            <span class="section-title">推薦循環模式</span>
             <span class="section-desc">依據您的條件，為您推薦最適合的三種循環路徑</span>
           </div>
         </div>
@@ -140,11 +140,10 @@
 
                 <!-- 統計數字區 -->
                 <div class="path-stats">
-                  <div class="stat-item">
-                    <span class="stat-label">符合廠商總數</span>
-                    <span class="stat-value" :style="{ color: path.accentColor }">
+                  <div class="stat-item" >
+                    <!-- <span class="stat-value" :style="{ color: path.accentColor }">
                       {{ path.matchRate }} <span class="stat-unit" :style="{ color: path.accentColor }">家</span>
-                    </span>
+                    </span> -->
                   </div>
                   <el-button type="primary" class="detail-btn" @click="goNext(path)">
                     技術決策推薦
@@ -1273,6 +1272,7 @@ onBeforeUnmount(() => {
   border-top: 1px solid #f0f0f0;
   padding-top: 12px;
   margin-bottom: 12px;
+  justify-content: end; //暫時移除廠商數
 
   .stat-item {
     flex: 1;
