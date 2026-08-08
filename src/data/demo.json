@@ -1,0 +1,937 @@
+[
+    {
+        "id": 32,
+        "control_number": "D3209843",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/6/6 上午 12:00:00",
+        "contact_person": "陳雅玲",
+        "phone": "(06)3840198",
+        "permitted_quantity": "2300",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "盈昌科技工業股份有限公司",
+        "region": "臺南市",
+        "address": "(709)臺南市安南區鹽田里工業五路三○號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 19,
+        "control_number": "D8400126",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/7/8 上午 12:00:00",
+        "contact_person": "丁榮慶",
+        "phone": "06-6520013",
+        "permitted_quantity": "1290",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(氫氟酸廢液)",
+        "company_name": "達穎應材股份有限公司",
+        "region": "臺南市",
+        "address": "(730)臺南市新營區嘉芳里嘉芳街一六八號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "氟離子濃度:\u003E= 5.5%"
+            }
+        ]
+    },
+    {
+        "id": 21,
+        "control_number": "D8400126",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/7/5 上午 12:00:00",
+        "contact_person": "丁榮慶",
+        "phone": "06-6520013",
+        "permitted_quantity": "195",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(含氨之氫氟酸廢液)",
+        "company_name": "達穎應材股份有限公司",
+        "region": "臺南市",
+        "address": "(730)臺南市新營區嘉芳里嘉芳街一六八號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 36,
+        "control_number": "D9700018",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/6/6 上午 12:00:00",
+        "contact_person": "吳志勳",
+        "phone": "06-6935268",
+        "permitted_quantity": "1200",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(氫氟酸廢液)",
+        "company_name": "廉捷科技股份有限公司",
+        "region": "臺南市",
+        "address": "(720)臺南市官田區二鎮里成功街六八號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "氟離子濃度≧6%且\u003C40%"
+            },
+            {
+                "source_text": "外觀:透明或白色混濁"
+            }
+        ]
+    },
+    {
+        "id": 1,
+        "control_number": "E2000090",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/5/26 上午 12:00:00",
+        "contact_person": "洪惠銘",
+        "phone": "07-7879499",
+        "permitted_quantity": "321.2",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(貴金屬廢液)",
+        "company_name": "晙捷科技有限公司",
+        "region": "高雄市",
+        "address": "(831)高雄市大寮區潮寮里建民街五號、富民街六之一號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 20,
+        "control_number": "E2000107",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/6/25 上午 12:00:00",
+        "contact_person": "黃建銘",
+        "phone": "07-7886125",
+        "permitted_quantity": "2400",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "淨寶化工股份有限公司二廠",
+        "region": "高雄市",
+        "address": "(831)高雄市大寮區大業街六之一號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "硫酸濃度:\u003E=40%"
+            },
+            {
+                "source_text": "比重:\u003E=1.300"
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "control_number": "E2004678",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/12/31 上午 12:00:00",
+        "contact_person": "陳許金鑾",
+        "phone": "07-7886767",
+        "permitted_quantity": "900",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢盛裝容器)",
+        "company_name": "旻聖股份有限公司大發廠",
+        "region": "高雄市",
+        "address": "(831)高雄市大寮區潮寮里華東路一一號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 8,
+        "control_number": "E2601186",
+        "case_type": "通案審查",
+        "permit_end_date": "2026/11/30 上午 12:00:00",
+        "contact_person": "葉慧茹",
+        "phone": "07-6160808#14",
+        "permitted_quantity": "2450",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "鴻成科技有限公司",
+        "region": "高雄市",
+        "address": "(824)高雄市燕巢區瓊林里安招路七二六號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "pH值:\u003C2"
+            },
+            {
+                "source_text": "外觀 : 無懸浮顆粒"
+            },
+            {
+                "source_text": "含水率 : \u003C55"
+            },
+            {
+                "source_text": "硫酸濃度 : \u003E=45%"
+            },
+            {
+                "source_text": "比重 : \u003E1.345"
+            }
+        ]
+    },
+    {
+        "id": 43,
+        "control_number": "H43A5978",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/1/15 上午 12:00:00",
+        "contact_person": "葉高濃",
+        "phone": "03-4985858",
+        "permitted_quantity": "2000",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "成加環保科技股份有限公司",
+        "region": "桃園市",
+        "address": "(320)桃園市中壢區過嶺里福祥路三四六巷一二號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 35,
+        "control_number": "H43C7938",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/7/18 上午 12:00:00",
+        "contact_person": "林錦聰",
+        "phone": "03-4982997",
+        "permitted_quantity": "300",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢塑膠空桶)",
+        "company_name": "傑冠環保有限公司",
+        "region": "桃園市",
+        "address": "(320)桃園市中壢區福祥路三九○巷一、三、五號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 28,
+        "control_number": "H45B3098",
+        "case_type": "通案審查",
+        "permit_end_date": "2026/7/23 上午 12:00:00",
+        "contact_person": "林享泉",
+        "phone": "03-4312688",
+        "permitted_quantity": "600",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢盛裝容器)",
+        "company_name": "迪耐環保有限公司",
+        "region": "桃園市",
+        "address": "(326)桃園市楊梅區永平里新農街二段二○九巷六二弄二一號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 47,
+        "control_number": "H4611456",
+        "case_type": "通案審查",
+        "permit_end_date": "2029/3/27 上午 12:00:00",
+        "contact_person": "張元霖",
+        "phone": "03-3541009#286",
+        "permitted_quantity": "2785",
+        "waste_code": "C-0202",
+        "waste_name": "廢硫酸",
+        "company_name": "昶昕實業股份有限公司蘆竹廠",
+        "region": "桃園市",
+        "address": "(338)桃園市蘆竹區海湖里海湖北路三○九巷一八號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 25,
+        "control_number": "H46B7104",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/12/30 上午 12:00:00",
+        "contact_person": "陶柏光",
+        "phone": "03-3542606",
+        "permitted_quantity": "900",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "浤鎰股份有限公司",
+        "region": "桃園市",
+        "address": "(338)桃園市蘆竹區中圳街一八巷一二號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 33,
+        "control_number": "H4707779",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/6/15 上午 12:00:00",
+        "contact_person": "陳家銘",
+        "phone": "03-3860601分機175",
+        "permitted_quantity": "2600",
+        "waste_code": "C-0202",
+        "waste_name": "印刷電路板製造程序之廢剝錫鉛液",
+        "company_name": "昶昕實業股份有限公司大園廠",
+        "region": "桃園市",
+        "address": "(337)桃園市大園區北港里大工路二三號",
+        "announcement_category_name": "化學製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 34,
+        "control_number": "H47A0463",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/5/17 上午 12:00:00",
+        "contact_person": "陳家銘",
+        "phone": "03-3860601分機175",
+        "permitted_quantity": "400",
+        "waste_code": "C-0202",
+        "waste_name": "廢硫酸",
+        "company_name": "昶昕實業股份有限公司大園一廠",
+        "region": "桃園市",
+        "address": "(337)桃園市大園區北港里大工路一九號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "硫酸含量:\u003E=50%"
+            },
+            {
+                "source_text": "比重:\u003E=1.4"
+            },
+            {
+                "source_text": "外觀:無色透明液體"
+            }
+        ]
+    },
+    {
+        "id": 27,
+        "control_number": "H5008346",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/12/9 上午 12:00:00",
+        "contact_person": "連育晟",
+        "phone": "03-4716088",
+        "permitted_quantity": "1290",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "生揚化工原料股份有限公司龍潭廠",
+        "region": "桃園市",
+        "address": "(325)桃園市龍潭區高平里龍源路六○號一樓",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 11,
+        "control_number": "H51A9469",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/3/19 上午 12:00:00",
+        "contact_person": "徐瑞宏",
+        "phone": "03-4191219",
+        "permitted_quantity": "1800",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(氫氟酸廢液)",
+        "company_name": "立盈環保科技股份有限公司一廠",
+        "region": "桃園市",
+        "address": "(324)桃園市平鎮區湧豐里工業二路七號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "氫氟酸濃度:\u003E=6%"
+            },
+            {
+                "source_text": "外觀:透明無色且未夾雜異物"
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "control_number": "H5308154",
+        "case_type": "通案審查",
+        "permit_end_date": "2026/11/16 上午 12:00:00",
+        "contact_person": "陳秀香",
+        "phone": "03-4160018",
+        "permitted_quantity": "150",
+        "waste_code": "C-0202",
+        "waste_name": "廢氫氟酸",
+        "company_name": "雙慶化工股份有限公司",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區樹林里國光路一○號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 24,
+        "control_number": "H5308154",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/11/28 上午 12:00:00",
+        "contact_person": "陳秀香",
+        "phone": "03-4160018",
+        "permitted_quantity": "350",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢氫氟酸)",
+        "company_name": "雙慶化工股份有限公司",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區樹林里國光路一○號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 29,
+        "control_number": "H5308154",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/4/19 上午 12:00:00",
+        "contact_person": "陳秀香",
+        "phone": "03-4160018",
+        "permitted_quantity": "2450",
+        "waste_code": "C-0202",
+        "waste_name": "廢氫氟酸",
+        "company_name": "雙慶化工股份有限公司",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區樹林里國光路一○號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 13,
+        "control_number": "H5389720",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/3/24 上午 12:00:00",
+        "contact_person": "溫子瑩",
+        "phone": "03-4833455",
+        "permitted_quantity": "950",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "普森環保科技股份有限公司觀音廠",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區國建二路三之一、三之二號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "硫酸濃度 : \u003E=40%"
+            },
+            {
+                "source_text": "pH值:\u003C= 2ppm"
+            },
+            {
+                "source_text": "含水率 : \u003C 60%"
+            },
+            {
+                "source_text": "雙氧水:8%"
+            },
+            {
+                "source_text": "外觀顏色:無雜物及異色"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "control_number": "H53A0922",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/5/16 上午 12:00:00",
+        "contact_person": "高詮卿",
+        "phone": "03-4833027",
+        "permitted_quantity": "1200",
+        "waste_code": "C-0202",
+        "waste_name": "鋁蝕刻廢液、廢磷酸",
+        "company_name": "立光化工股份有限公司觀音廠",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區樹林里經建四路五號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "磷酸:\u003E30%"
+            },
+            {
+                "source_text": "比重:\u003E1.18"
+            }
+        ]
+    },
+    {
+        "id": 54,
+        "control_number": "H53A0942",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/7/8 上午 12:00:00",
+        "contact_person": "羅琪兆",
+        "phone": "03-4838978#681",
+        "permitted_quantity": "180",
+        "waste_code": "C-0202",
+        "waste_name": "氫氟酸廢液",
+        "company_name": "僑力化工股份有限公司觀音廠",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區樹林里工業五路一一號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 15,
+        "control_number": "H53A2156",
+        "case_type": "通案審查",
+        "permit_end_date": "2026/9/18 上午 12:00:00",
+        "contact_person": "蕭輔勻",
+        "phone": "03-4389149",
+        "permitted_quantity": "120",
+        "waste_code": "C-0202",
+        "waste_name": "廢剝錫液",
+        "company_name": "泓泰環保科技股份有限公司大同廠",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區草漯里大同二路二五號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 38,
+        "control_number": "H53A3758",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/7/31 上午 12:00:00",
+        "contact_person": "朱乃文",
+        "phone": "03-4837645",
+        "permitted_quantity": "300",
+        "waste_code": "C-0202",
+        "waste_name": "氫氟酸廢液",
+        "company_name": "廣銘化工股份有限公司",
+        "region": "桃園市",
+        "address": "(328)桃園市觀音區經建三路四八號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 48,
+        "control_number": "J5901998",
+        "case_type": "通案審查",
+        "permit_end_date": "2029/3/16 上午 12:00:00",
+        "contact_person": "蔡維謙",
+        "phone": "03-5981591",
+        "permitted_quantity": "900",
+        "waste_code": "C-0202",
+        "waste_name": "蝕刻廢液",
+        "company_name": "友發化工股份有限公司新竹廠",
+        "region": "新竹縣",
+        "address": "(303)新竹縣湖口鄉鳳山村仁政路二號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 2,
+        "control_number": "J5902815",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/3/25 上午 12:00:00",
+        "contact_person": "吳重和",
+        "phone": "03-5983355",
+        "permitted_quantity": "410.5",
+        "waste_code": "C-0202",
+        "waste_name": "廢磷酸",
+        "company_name": "惠豐化工廠股份有限公司",
+        "region": "新竹縣",
+        "address": "(303)新竹縣湖口鄉鳳山村復興路六號",
+        "announcement_category_name": "化學製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "磷酸濃度:\u003E=65%"
+            },
+            {
+                "source_text": "硫鹽酸:\u003C= 2%"
+            },
+            {
+                "source_text": "比重:1.480(25度C)"
+            },
+            {
+                "source_text": "異物:無異物"
+            }
+        ]
+    },
+    {
+        "id": 39,
+        "control_number": "J5902815",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/9/3 上午 12:00:00",
+        "contact_person": "吳重和",
+        "phone": "03-5983355",
+        "permitted_quantity": "1578",
+        "waste_code": "C-0202",
+        "waste_name": "pH值小(等)於2.0(氫氟酸廢液)",
+        "company_name": "惠豐化工廠股份有限公司",
+        "region": "新竹縣",
+        "address": "(303)新竹縣湖口鄉鳳山村復興路六號",
+        "announcement_category_name": "化學製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "氫氟酸及氟矽酸總濃度:\u003E=6%"
+            },
+            {
+                "source_text": "硝酸濃度:\u003C4%"
+            },
+            {
+                "source_text": "水分含量:\u003C=94%"
+            },
+            {
+                "source_text": "異物:無異物"
+            },
+            {
+                "source_text": "顏色:透明至淡黃色"
+            },
+            {
+                "source_text": "氫氟酸及氟矽酸總濃度:\u003E=6%"
+            },
+            {
+                "source_text": "其中氫氟酸濃度:\u003E=2.21%"
+            },
+            {
+                "source_text": "硝酸濃度:\u003E=4%"
+            },
+            {
+                "source_text": "水分含量:\u003C=90%"
+            },
+            {
+                "source_text": "異物:無異物"
+            },
+            {
+                "source_text": "顏色:透明至淡黃色"
+            }
+        ]
+    },
+    {
+        "id": 10,
+        "control_number": "J59A0113",
+        "case_type": "通案審查",
+        "permit_end_date": "2029/1/2 上午 12:00:00",
+        "contact_person": "黑澤豐",
+        "phone": "03-5983708分機205",
+        "permitted_quantity": "51.12",
+        "waste_code": "C-0202",
+        "waste_name": "含貴金屬(金、鈀、鉑、銠、銥、銀)廢液",
+        "company_name": "台灣田中貴金屬工業股份有限公司湖口工廠",
+        "region": "新竹縣",
+        "address": "(303)新竹縣湖口鄉湖南村光復北路二五號",
+        "announcement_category_name": "金屬製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 31,
+        "control_number": "J59A0113",
+        "case_type": "通案審查",
+        "permit_end_date": "2030/4/22 上午 12:00:00",
+        "contact_person": "黑澤豐",
+        "phone": "03-5983708分機205",
+        "permitted_quantity": "50.72",
+        "waste_code": "C-0202",
+        "waste_name": "含貴金屬(金、鈀、鉑、銠、銥、銀)廢液",
+        "company_name": "台灣田中貴金屬工業股份有限公司湖口工廠",
+        "region": "新竹縣",
+        "address": "(303)新竹縣湖口鄉湖南村光復北路二五號",
+        "announcement_category_name": "金屬製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 6,
+        "control_number": "K6801098",
+        "case_type": "通案審查",
+        "permit_end_date": "2026/8/29 上午 12:00:00",
+        "contact_person": "林金忠",
+        "phone": "037-260601",
+        "permitted_quantity": "1600",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(鋁蝕刻廢液、廢磷酸)",
+        "company_name": "台灣肥料股份有限公司苗栗廠",
+        "region": "苗栗縣",
+        "address": "(360)苗栗縣苗栗市福安里福星二一○號",
+        "announcement_category_name": "100CMD以上之事業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 23,
+        "control_number": "K7200924",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/7/26 上午 12:00:00",
+        "contact_person": "吳信榮",
+        "phone": "037-623396分機177",
+        "permitted_quantity": "1470",
+        "waste_code": "C-0202",
+        "waste_name": "廢硫酸",
+        "company_name": "恆誼化工股份有限公司",
+        "region": "苗栗縣",
+        "address": "(351)苗栗縣頭份市蘆竹里中華路四四○、四四○之一號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "硫酸濃度:\u003E=46%(46%~75%)"
+            }
+        ]
+    },
+    {
+        "id": 40,
+        "control_number": "L91A2853",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/9/4 上午 12:00:00",
+        "contact_person": "柯憲志",
+        "phone": "04-26380651#331",
+        "permitted_quantity": "6000",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "貝民股份有限公司台中港廠",
+        "region": "臺中市",
+        "address": "(435)臺中市梧棲區草湳里南堤路二段八五號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "pH\u003C2"
+            },
+            {
+                "source_text": "外觀 : 無懸浮顆粒"
+            },
+            {
+                "source_text": "含水率 : \u003C55%"
+            },
+            {
+                "source_text": "硫酸濃度 : \u003E=45%"
+            },
+            {
+                "source_text": "比重 : \u003E1.345"
+            },
+            {
+                "source_text": "灼熱殘渣:\u003C 0.05%"
+            }
+        ]
+    },
+    {
+        "id": 44,
+        "control_number": "N08B2439",
+        "case_type": "通案審查",
+        "permit_end_date": "2030/12/31 上午 12:00:00",
+        "contact_person": "沈聰偉",
+        "phone": "04-7033700",
+        "permitted_quantity": "772",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2",
+        "company_name": "環氧科技有限公司",
+        "region": "彰化縣",
+        "address": "(505)彰化縣鹿港鎮東石里環工十路一號",
+        "announcement_category_name": "化學製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 16,
+        "control_number": "N15A2223",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/5/21 上午 12:00:00",
+        "contact_person": "劉蓉袖",
+        "phone": "0910266705",
+        "permitted_quantity": "630",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(氫氟酸廢液)",
+        "company_name": "綠升國際股份有限公司",
+        "region": "彰化縣",
+        "address": "(507)彰化縣線西鄉線西村線工路一八號",
+        "announcement_category_name": "化學製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 41,
+        "control_number": "N15A2223",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/10/2 上午 12:00:00",
+        "contact_person": "劉蓉袖",
+        "phone": "0910266705",
+        "permitted_quantity": "900",
+        "waste_code": "C-0202",
+        "waste_name": "廢氫氟酸",
+        "company_name": "綠升國際股份有限公司",
+        "region": "彰化縣",
+        "address": "(507)彰化縣線西鄉線西村線工路一八號",
+        "announcement_category_name": "化學製品製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 30,
+        "control_number": "N16A1636",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/5/27 上午 12:00:00",
+        "contact_person": "陳怡惠",
+        "phone": "04-7978809",
+        "permitted_quantity": "725",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢盛裝容器)",
+        "company_name": "旻聖股份有限公司",
+        "region": "彰化縣",
+        "address": "(509)彰化縣伸港鄉溪底村工東二路二二號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 18,
+        "control_number": "O1703020",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/5/9 上午 12:00:00",
+        "contact_person": "吳榮斌",
+        "phone": "03-5371111分機351",
+        "permitted_quantity": "6000",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "貝民股份有限公司香山廠",
+        "region": "新竹市",
+        "address": "(300)新竹市中隘里中華路六段六六八號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 26,
+        "control_number": "O1703020",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/11/6 上午 12:00:00",
+        "contact_person": "吳榮斌",
+        "phone": "03-5371111分機351",
+        "permitted_quantity": "10000",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
+        "company_name": "貝民股份有限公司香山廠",
+        "region": "新竹市",
+        "address": "(300)新竹市中隘里中華路六段六六八號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "外觀 : 無雜質"
+            },
+            {
+                "source_text": "硫酸濃度 : \u003E=30%"
+            },
+            {
+                "source_text": "含水率 : \u003C70%"
+            },
+            {
+                "source_text": "比重 :\u003E1.21"
+            },
+            {
+                "source_text": "灼熱殘渣:\u003C 0.05%"
+            }
+        ]
+    },
+    {
+        "id": 49,
+        "control_number": "O1703020",
+        "case_type": "通案審查",
+        "permit_end_date": "2029/4/29 上午 12:00:00",
+        "contact_person": "吳榮斌",
+        "phone": "03-5371111分機351",
+        "permitted_quantity": "1200",
+        "waste_code": "C-0202",
+        "waste_name": "廢硫酸",
+        "company_name": "貝民股份有限公司香山廠",
+        "region": "新竹市",
+        "address": "(300)新竹市中隘里中華路六段六六八號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 67,
+        "control_number": "P6189081",
+        "case_type": "通案審查",
+        "permit_end_date": "2040/11/16 上午 12:00:00",
+        "contact_person": "大全聯",
+        "phone": "01-9284001",
+        "permitted_quantity": "150",
+        "waste_code": "C-0202",
+        "waste_name": "廢氫氟酸",
+        "company_name": "XXXXXXX股份有限公司",
+        "region": "一拳市",
+        "address": "(999)一拳市宇宙區怪物里英雄路一○號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 68,
+        "control_number": "P6189081",
+        "case_type": "通案審查",
+        "permit_end_date": "2043/11/28 上午 12:00:00",
+        "contact_person": "大全聯",
+        "phone": "01-9284001",
+        "permitted_quantity": "350",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(廢氫氟酸)",
+        "company_name": "XXXXXXX股份有限公司",
+        "region": "一拳市",
+        "address": "(999)一拳市宇宙區怪物里英雄路一○號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 46,
+        "control_number": "Q7400615",
+        "case_type": "通案審查",
+        "permit_end_date": "2029/2/11 上午 12:00:00",
+        "contact_person": "蔡宜廷",
+        "phone": "05-23578031",
+        "permitted_quantity": "250",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(氯化鋅廢液)",
+        "company_name": "鋅安工業股份有限公司",
+        "region": "嘉義縣",
+        "address": "(624)嘉義縣義竹鄉龍蛟村義工二路一七、一五、一三、一一號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 45,
+        "control_number": "R9000394",
+        "case_type": "通案審查",
+        "permit_end_date": "2028/12/18 上午 12:00:00",
+        "contact_person": "黃鈺甯",
+        "phone": "06-5837608#758",
+        "permitted_quantity": "3760",
+        "waste_code": "C-0202",
+        "waste_name": "廢液pH值小(等)於2.0(四甲基銨硫酸鹽)",
+        "company_name": "三福化工股份有限公司善化廠",
+        "region": "臺南市",
+        "address": "(741)臺南市善化區小新里小新營三四○號",
+        "announcement_category_name": "再利用機構",
+        "is_reuse_company": "是",
+        "acceptance_standard": []
+    },
+    {
+        "id": 12,
+        "control_number": "S20A2670",
+        "case_type": "通案審查",
+        "permit_end_date": "2027/2/26 上午 12:00:00",
+        "contact_person": "許憶珊",
+        "phone": "07-7875899",
+        "permitted_quantity": "2400",
+        "waste_code": "C-0202",
+        "waste_name": "廢硫酸",
+        "company_name": "揚達化工股份有限公司",
+        "region": "高雄市",
+        "address": "(831)高雄市大寮區大寮里利民街三七號",
+        "announcement_category_name": "化學材料製造業",
+        "is_reuse_company": "是",
+        "acceptance_standard": [
+            {
+                "source_text": "硫酸濃度:61~90%"
+            },
+            {
+                "source_text": "硫酸濃度:51~60%"
+            },
+            {
+                "source_text": "硫酸濃度:46~50%"
+            }
+        ]
+    }
+]

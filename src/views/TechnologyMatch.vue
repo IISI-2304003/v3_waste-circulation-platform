@@ -180,7 +180,7 @@
 												</el-icon></span>
 											<div>
 												<p class="meta-title">再生產品</p>
-												<p class="meta-text">{{ vendor.product }}</p>
+												<p class="meta-text"><span v-for="(item, idx) in vendor.product" :key="idx">{{ item }}<template v-if="idx < vendor.product.length - 1">、</template></span></p>
 											</div>
 										</div>
 										<div class="meta-item">
@@ -204,7 +204,7 @@
 														<span class="dot" :class="getDotClass(vendor.capacityLevel, 2)"></span>
 														<span class="dot" :class="getDotClass(vendor.capacityLevel, 3)"></span>
 													</div>
-													<span class="capacity-text">{{ vendor.capacityLevelText }}</span>
+													<span class="capacity-text">{{ vendor.capacityLevel === 1 ? '低' : vendor.capacityLevel === 2 ? '中' : '高' }} </span>
 												</div>
 
 											</div>
@@ -377,7 +377,7 @@
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Goods />
 									</el-icon><span>再生產品</span></div>
-								<strong>{{ activeVendor.product }}</strong>
+								<strong><span v-for="(item, idx) in activeVendor.product" :key="idx">{{ item }}<template v-if="idx < activeVendor.product.length - 1">、</template></span></strong>
 							</div>
 						</el-col>
 						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
@@ -411,7 +411,7 @@
 							<p class="detail-title">允收條件</p>
 							<el-divider />
 							<ul class="condition-list">
-								<li v-for="item in activeVendor.acceptanceStandards" :key="item">{{ item }}</li>
+								<li v-for="(item, idx) in activeVendor.acceptance_standard" :key="idx">{{ item.source_text }}</li>
 							</ul>
 						</section>
 
@@ -425,9 +425,9 @@
 										<span class="dot" :class="getDotClass(activeVendor.capacityLevel, 2)"></span>
 										<span class="dot" :class="getDotClass(activeVendor.capacityLevel, 3)"></span>
 									</div>
-									<span class="capacity-text">{{ activeVendor.capacityLevelText }}</span>
+									<span class="capacity-text">{{ activeVendor.capacityLevel === 1 ? '低' : activeVendor.capacityLevel === 2 ? '中' : '高' }}</span>
 								</div>
-								<p class="capacity-note">（{{ activeVendor.capacityLevelText }}）收受能力充足，可立即決策合作。</p>
+								<p class="capacity-note" v-if="activeVendor.capacityLevel === 1">收受能力充足，可立即決策合作。</p>
 							</div>
 						</section>
 
@@ -531,6 +531,7 @@ import factory2 from '@/assets/factory/factory-2.png'
 import factory3 from '@/assets/factory/factory-3.png'
 import factory4 from '@/assets/factory/factory-4.png'
 import factory5 from '@/assets/factory/factory-5.png'
+import demoApi from '@/data/demo.json'
 
 const factoryImages = [factory1, factory2, factory3, factory4, factory5] // 用於隨機分配廠商圖片
 
@@ -758,22 +759,151 @@ onMounted(async () => {
 	try {
 		const data = await getCompanyList()
 		if (data.length > 0) {
-			vendors.value = data.map((item) => ({
-				...item,
-				image: factoryImages[item.id % factoryImages.length]
-			}))
+			vendors.value = data.map((item) => {
+				const demo = demoVendorDataMap[item.control_number] || {}
+				return {
+					...item,
+					image: factoryImages[item.id % factoryImages.length],
+					// 只在後端沒給值的時候才用 demo 資料補上
+					product: item.product || demo.product || '',
+					acceptance_standard: item.acceptance_standard?.length ? item.acceptance_standard : (demo.acceptance_standard || []),
+					capacityLevel: item.capacityLevel ?? demo.capacityLevel ?? 0,
+					capacityLevelText: item.capacityLevelText || demo.capacityLevelText || '',
+					reasons: item.reasons?.length ? item.reasons : (demo.reasons || [])
+				}
+			})
 		}
 	} catch {
-		console.error('載入廠商資料失敗')
+		console.error('載入廠商資料失敗，改用 demo 資料')
+
 	}
+	vendors.value = demoApi.map((item) => {
+		const demo = demoVendorDataMap[item.control_number] || {}
+		return {
+			...item,
+			image: factoryImages[item.id % factoryImages.length],
+			// 只在後端沒給值的時候才用 demo 資料補上
+			product: item.product || demo.product || '',
+			acceptance_standard: item.acceptance_standard?.length ? item.acceptance_standard : (demo.acceptance_standard || []),
+			capacityLevel: item.capacityLevel ?? demo.capacityLevel ?? 0,
+			capacityLevelText: item.capacityLevelText || demo.capacityLevelText || '',
+			reasons: item.reasons?.length ? item.reasons : (demo.reasons || [])
+		}
+	})
 })
 
 // ⚠️ 暫時性 demo 用途：後端推薦邏輯完成後移除
 // 依「事業名稱」關鍵字，指定要顯示的廠商 id 清單
 const demoCompanyVendorMap = {
-	'聯華電子股份有限公司': [8,39,40,49,12],
-	'台灣美光 (台中一廠)': [36,49,45,9,24,29,8,13,20,23,34,11,19,21,3,2,39]
+	'聯華電子股份有限公司': [
+		'E2601186',
+		'L91A2853',
+		'O1703020',
+		'S20A2670'
+	],
+
+	'台灣美光 (台中一廠)': [
+		'D9700018',
+		'O1703020',
+		'R9000394',
+		'H5308154',
+		'E2601186',
+		'H5389720',
+		'E2000107',
+		'K7200924',
+		'H47A0463',
+	]
 	// 之後如果還要加其他 demo 公司，繼續往下加
+}
+
+// ⚠️ 暫時性 demo 用途：後端補齊 product / 允收條件 / 前月收受總量 / 適合原因 後移除
+const demoVendorDataMap = {
+	'E2601186': {
+		product: ['稀硫酸'],
+		acceptance_standard: ['pH ≤ 2.0', '外觀 : 無懸浮顆粒', '含水率 : <55%', '硫酸濃度 : ≧45%', '比重 : >1.345'],
+		capacityLevel: 2,           // 1=綠 2=黃 3=紅
+		capacityLevelText: '中等',
+		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
+	},
+	'J5902815': {
+		product: ['工業用氣矽酸鈉', 'HF+HNO,混合液', '硝酸鈣', '硝酸', '硝酸鈉', '氟矽酸'],
+
+		capacityLevel: 2,           // 1=綠 2=黃 3=紅
+		capacityLevelText: '中等',
+		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
+	},
+	'L91A2853': {
+		product: [
+			'稀酸B',
+			'硫酸B'
+		],
+
+		capacityLevel: 1, // 1=綠 2=黃 3=紅
+		capacityLevelText: '中等',
+		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
+	},
+
+	'O1703020': {
+		product: [
+			'發煙硫酸B',
+			'硫酸B',
+			'稀硫酸B',
+			'稀酸B'
+		],
+		capacityLevel: 1, // 1=綠 2=黃 3=紅
+		capacityLevelText: '中等',
+		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
+	},
+
+	'S20A2670': {
+		product: [
+			'工業級稀硫酸（40%）',
+			'工業級稀硫酸（45%）',
+			'工業級稀硫酸（50%）',
+			'工業級稀硫酸（60%）'
+		],
+
+		capacityLevel: 3, // 1=綠 2=黃 3=紅
+		capacityLevelText: '中等',
+		reasons: ['允收條件相符', '再利用產品明確', '許可量充足']
+	},
+	'D9700018': {
+		product: ['稀硫酸'],
+		capacityLevel: 2, // 1=綠 2=黃 3=紅
+		capacityLevelText: '中等',
+		reasons: ['允收條件相符', '許可量充足']
+	},
+	'R9000394': {
+		product: ['稀硫酸'],
+		capacityLevel: 3, // 1=綠 2=黃 3=紅
+		reasons: ['允收條件相符']
+	},
+	'H5308154': {
+		product: ['稀硫酸'],
+		capacityLevel: 2, // 1=綠 2=黃 3=紅
+		reasons: ['允收條件相符']
+	},
+	'H5389720': {
+		product: ['稀硫酸'],
+		capacityLevel: 1, // 1=綠 2=黃 3=紅
+		reasons: ['許可量充足']
+	},
+	'E2000107': {
+		product: ['工業級稀硫酸', '工業級稀硫酸-除雙氧水'],
+		capacityLevel: 1, // 1=綠 2=黃 3=紅
+		reasons: ['允收條件相符', '許可量充足']
+	},
+	'K7200924': {
+		product: ['稀硫酸'],
+		capacityLevel: 2, // 1=綠 2=黃 3=紅
+		reasons: ['允收條件相符', '許可量充足']
+	},
+	'H47A0463': {
+		product: ['硫酸銅'],
+		capacityLevel: 3, // 1=綠 2=黃 3=紅
+		reasons: ['允收條件相符']
+	},
+	// 其他公司照這個格式加下去...
 }
 
 // 說明：依目前輸入的事業名稱，找出對應的假推薦廠商 id 清單
@@ -786,14 +916,23 @@ const getDemoVendorIds = (businessName = '') => {
 // 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
 	let result = vendors.value;
-	console.log('目前輸入的事業名稱：', JSON.stringify(conditionStore.businessConditions.businessName))
+	// ⚠️ demo 用途：若尚未設定事業名稱（例如直接進本頁測試），先假填一組公司名稱以便展示
+	const businessNameForDemo = conditionStore.businessConditions.businessName || ''
+	//台灣美光 (台中一廠) //聯華電子股份有限公司
 	// ⚠️ demo 用途：依公司名稱做假篩選
-	const demoIds = getDemoVendorIds(conditionStore.businessConditions.businessName)
-	console.log('比對到的 demoIds：', demoIds)
-	if (demoIds) {
-		const idSet = new Set(demoIds)
-		result = result.filter((v) => idSet.has(v.id))
+	const demoControlNumbers = getDemoVendorIds(businessNameForDemo)
+	if (demoControlNumbers) {
+		const controlNumberSet = new Set(demoControlNumbers)
+		result = result.filter((v) => controlNumberSet.has(v.control_number))
 	}
+
+	// ⚠️ demo 用途：同一 control_number 底下若有多筆列，只保留第一筆代表該公司
+	const seen = new Set()
+	result = result.filter((v) => {
+		if (seen.has(v.control_number)) return false
+		seen.add(v.control_number)
+		return true
+	})
 
 	// 依地區篩選
 	if (sortType.value === 'distance' && selectedRegions.value.length > 0) {
@@ -914,7 +1053,7 @@ const exportVendorPdf = () => {
 			<p>${escapeHtml(vendor.reuseTech)}</p>
 
 			<h2>允收標準</h2>
-			<div>${tags(vendor.acceptanceStandards)}</div>
+			<div>${tags(vendor.acceptance_standard)}</div>
 
 			<h2>製程單元</h2>
 			<div>${tags(vendor.processUnits)}</div>
@@ -2027,13 +2166,17 @@ const goBackHome = () => {
 
 .top-metrics-row {
 	margin-bottom: 14px;
+	align-items: stretch; // 讓每個 el-col 等高
 
 	:deep(.el-col) {
 		margin-bottom: 12px;
+		display: flex; // 讓 el-col 內部的 hero-stat 也能撐滿
 	}
 }
 
 .hero-stat {
+	width: 100%; // ← 補上這行,解決寬度不一致
+	height: 100%; // ← 補上這行,讓卡片撐滿被拉高的 el-col
 	padding: 12px 14px;
 	border-radius: 16px;
 	background: #FFF;
