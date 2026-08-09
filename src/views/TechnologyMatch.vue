@@ -911,19 +911,28 @@ const getDemoVendorIds = (businessName = '') => {
 	const matchedKey = Object.keys(demoCompanyVendorMap).find((keyword) => businessName.includes(keyword))
 	return matchedKey ? demoCompanyVendorMap[matchedKey] : null
 }
-
-
+// 說明：判斷目前選擇的循環模式是否為「廠內模式」(執行主體為產源事業自己)
+const isInternalMode = computed(() => {
+	return ['廠內模式1', '廠內模式2', '廠內模式3'].includes(normalizeModeName(selectedMode.value?.modeName))
+})
 // 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
+
 	let result = vendors.value;
 	// ⚠️ demo 用途：若尚未設定事業名稱（例如直接進本頁測試），先假填一組公司名稱以便展示
 	const businessNameForDemo = conditionStore.businessConditions.businessName || ''
 	//台灣美光 (台中一廠) //聯華電子股份有限公司
-	// ⚠️ demo 用途：依公司名稱做假篩選
-	const demoControlNumbers = getDemoVendorIds(businessNameForDemo)
-	if (demoControlNumbers) {
-		const controlNumberSet = new Set(demoControlNumbers)
-		result = result.filter((v) => controlNumberSet.has(v.control_number))
+	if (isInternalMode.value) {
+		// ⚠️ demo 用途：廠內模式時，執行主體是產源事業自己，僅顯示自己公司的資料
+		result = result.filter((v) => v.company_name === businessNameForDemo)
+	} else {
+
+		// ⚠️ demo 用途：依公司名稱做假篩選
+		const demoControlNumbers = getDemoVendorIds(businessNameForDemo)
+		if (demoControlNumbers) {
+			const controlNumberSet = new Set(demoControlNumbers)
+			result = result.filter((v) => controlNumberSet.has(v.control_number))
+		}
 	}
 
 	// ⚠️ demo 用途：同一 control_number 底下若有多筆列，只保留第一筆代表該公司
