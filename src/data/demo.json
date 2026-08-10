@@ -933,22 +933,5 @@
                 "source_text": "硫酸濃度:46~50%"
             }
         ]
-    },
-    {
-        "id": 999,
-        "control_number": "D0302141",
-        "case_type": "通案審查",
-        "permit_end_date": "2031/5/25",
-        "contact_person": "吳宗賢",
-        "phone": "06-5054888",
-        "permitted_quantity": "1200",
-        "waste_code": "C-0202",
-        "waste_name": "廢液pH值小(等)於2.0(廢硫酸)",
-        "company_name": "聯華電子股份有限公司",
-        "region": "台南市",
-        "address": "(744)台南市新市區南科三路五七號",
-        "announcement_category_name": "電子零組件製造業",
-        "is_reuse_company": "是",
-        "acceptance_standard": []
     }
 ]
