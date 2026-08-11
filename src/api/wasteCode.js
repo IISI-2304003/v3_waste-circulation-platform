@@ -15,6 +15,33 @@ export function getWasteDetailList() {
     })
 }
 
+export async function getWasteCodeProperties(wasteCode) {
+    const endpointCandidates = ['/wastedetail/property', '/wastedetail/property']
+    const paramCandidates = [
+        { wasteCode },
+        { waste_code: wasteCode },
+        { code: wasteCode },
+    ]
+
+    let lastError = null
+
+    for (const url of endpointCandidates) {
+        for (const params of paramCandidates) {
+            try {
+                return await request({
+                    url,
+                    method: 'get',
+                    params,
+                })
+            } catch (error) {
+                lastError = error
+            }
+        }
+    }
+
+    throw lastError || new Error('無法取得廢棄物物化特性參數')
+}
+
 
 /**
  * 取得所有類別

@@ -35,7 +35,7 @@
 
 					<!-- 單位 -->
 					<el-select v-model="standard.unit" placeholder="單位" class="unit-select">
-						<el-option v-for="unit in unitOptions" :key="unit" :label="unit || '無單位'" :value="unit" />
+						<el-option v-for="unit in dynamicUnitOptions" :key="unit" :label="unit || '無單位'" :value="unit" />
 					</el-select>
 				</template>
 
@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Plus, Delete, Search } from '@element-plus/icons-vue'
@@ -99,6 +99,10 @@ const router = useRouter()
 // Props
 const props = defineProps({
 	initialStandards: {
+		type: Array,
+		default: () => []
+	},
+	propertyOptions: {
 		type: Array,
 		default: () => []
 	}
@@ -123,7 +127,7 @@ function createEmptyStandard() {
 		value: null,
 		valueMin: null,
 		valueMax: null,
-		unit: '%',
+		unit: '',
 		condition: '需'
 	}
 }
@@ -136,9 +140,87 @@ const searchResults = ref([])
 const hasSearched = ref(false)
 
 // 選項資料
-const parameterOptions = Array.from(new Set([...getParameterOptions(), '外觀']))
+const propertyMeta = computed(() => props.propertyOptions
+	.map((item) => {
+		if (typeof item === 'string') {
+			const name = item.trim()
+			return name ? { name, unit: '' } : null
+		}
+
+		const name = String(
+			item?.name ||
+			item?.parameter ||
+			item?.property ||
+			item?.propertyName ||
+			item?.property_name ||
+			item?.test_item ||
+			item?.label ||
+			''
+		).trim()
+
+		if (!name) return null
+
+		return {
+			name,
+			unit: String(item?.unit || item?.test_unit || '').trim()
+		}
+	})
+	.filter(Boolean))
+
+const parameterOptions = computed(() => Array.from(new Set([
+	...getParameterOptions(),
+	...propertyMeta.value.map((item) => item.name),
+	'外觀'
+])))
+
+const parameterUnitMap = computed(() => {
+	const unitMap = new Map()
+
+	for (const item of propertyMeta.value) {
+		if (!item?.name) continue
+		if (!unitMap.has(item.name)) {
+			unitMap.set(item.name, item.unit || '')
+		}
+	}
+
+	return unitMap
+})
+
+// 說明：將參數名稱做寬鬆正規化，讓 pH / pH值 / pH(氫離子濃度指數) 可互相匹配。
+const normalizeParameterKey = (value = '') => String(value)
+	.toLowerCase()
+	.replace(/\s+/g, '')
+	.replace(/[()（）\[\]【】]/g, '')
+	.replace(/氫離子濃度指數/g, '')
+	.replace(/值/g, '')
+	.replace(/[^\p{L}\p{N}%/]+/gu, '')
+
+const findPreferredUnit = (parameter) => {
+	if (!parameter) return undefined
+
+	if (parameterUnitMap.value.has(parameter)) {
+		return parameterUnitMap.value.get(parameter)
+	}
+
+	const normalizedParameter = normalizeParameterKey(parameter)
+	if (!normalizedParameter) return undefined
+
+	for (const [name, unit] of parameterUnitMap.value.entries()) {
+		const normalizedName = normalizeParameterKey(name)
+		if (!normalizedName) continue
+
+		if (normalizedName === normalizedParameter) return unit
+		if (normalizedName.includes(normalizedParameter) || normalizedParameter.includes(normalizedName)) return unit
+	}
+
+	return undefined
+}
 const operatorOptions = getOperatorOptions()
 const unitOptions = getUnitOptions()
+const dynamicUnitOptions = computed(() => Array.from(new Set([
+	...unitOptions,
+	...propertyMeta.value.map((item) => item.unit).filter(Boolean)
+])))
 
 // 說明：由使用者互動觸發；執行「handle Parameter Change」流程並同步更新相關狀態。
 const handleParameterChange = (standard) => {
@@ -155,6 +237,11 @@ const handleParameterChange = (standard) => {
 
 	if (typeof standard.value === 'string') {
 		standard.value = null
+	}
+
+	const preferredUnit = findPreferredUnit(standard.parameter)
+	if (preferredUnit !== undefined) {
+		standard.unit = preferredUnit || ''
 	}
 }
 

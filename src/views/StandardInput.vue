@@ -20,17 +20,93 @@
 
     </div>
 
-    <ConditionSetupWorkspace @next="goCompanyMatch" />
+    <ConditionSetupWorkspace :property-options="propertyOptions" @next="goCompanyMatch" />
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import ConditionSetupWorkspace from '@/components/condition-setup/ConditionSetupWorkspace.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import { getWasteCodeProperties } from '@/api/wasteCode'
 
 const router = useRouter()
+const route = useRoute()
 const conditionStore = useConditionSetupStore()
+const propertyOptions = ref([])
+
+const normalizePropertyOptions = (payload) => {
+  const items = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.data)
+      ? payload.data
+      : Array.isArray(payload?.items)
+        ? payload.items
+        : []
+
+  const normalizedItems = items
+    .map((item) => {
+      if (typeof item === 'string') {
+        const name = item.trim()
+        return name ? { name, unit: '' } : null
+      }
+
+      const name = String(
+        item?.test_item ||
+        item?.parameter ||
+        item?.property ||
+        item?.propertyName ||
+        item?.property_name ||
+        item?.name ||
+        item?.label ||
+        ''
+      ).trim()
+
+      if (!name) return null
+
+      const unit = String(item?.unit || item?.test_unit || '').trim()
+      return { name, unit }
+    })
+    .filter(Boolean)
+
+  const propertyMap = new Map()
+  for (const item of normalizedItems) {
+    if (!propertyMap.has(item.name)) {
+      propertyMap.set(item.name, item)
+      continue
+    }
+
+    const existing = propertyMap.get(item.name)
+    if (!existing.unit && item.unit) {
+      propertyMap.set(item.name, item)
+    }
+  }
+
+  return Array.from(propertyMap.values())
+}
+
+const loadWasteCodeProperties = async () => {
+  const code = String(route.query.code || '').trim()
+  if (!code) return
+
+  try {
+    const data = await getWasteCodeProperties(code)
+    propertyOptions.value = normalizePropertyOptions(data)
+
+    if (propertyOptions.value.length === 0) {
+      ElMessage.warning('已取得資料，但該廢棄物目前沒有可用的物化特性參數')
+    }
+  } catch (error) {
+    console.error('取得廢棄物物化特性參數失敗', error)
+    const statusCode = error?.response?.status
+    const backendMessage = error?.response?.data?.message || error?.response?.data?.error
+    ElMessage.warning(`無法載入該廢棄物的物化特性參數（${statusCode || '網路錯誤'}${backendMessage ? `: ${backendMessage}` : ''}），已改用預設選項`)
+  }
+}
+
+onMounted(loadWasteCodeProperties)
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goCompanyMatch = () => {

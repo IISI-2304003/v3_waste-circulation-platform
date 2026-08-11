@@ -66,7 +66,7 @@
 									</el-button>
 								</div>
 
-								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="initialStandards" @change="handleStandardsChange" />
+								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="initialStandards" :property-options="propertyOptions" @change="handleStandardsChange" />
 
 								<!-- <div class="report-upload">
 									<h4>檢測報告上傳區</h4>
@@ -312,6 +312,10 @@ import { getProcessList } from '@/api/process'
 
 const props = defineProps({
 	initialStandards: {
+		type: Array,
+		default: () => []
+	},
+	propertyOptions: {
 		type: Array,
 		default: () => []
 	},
