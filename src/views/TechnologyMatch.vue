@@ -189,7 +189,7 @@
 												</el-icon></span>
 											<div>
 												<p class="meta-title">許可總量</p>
-												<p class="meta-text">{{ vendor.permitted_quantity }} </p>
+												<p class="meta-text">{{ vendor.permitted_quantity }} 噸/月</p>
 											</div>
 										</div>
 										<div class="meta-item">
