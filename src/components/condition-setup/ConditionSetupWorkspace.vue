@@ -29,7 +29,9 @@
 												</template>
 												<el-input v-model="businessName" :class="{ 'is-invalid': shouldMarkInvalid('businessName') }" placeholder="輸入事業名稱" />
 											</el-form-item>
+
 										</el-col>
+
 
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
@@ -53,6 +55,12 @@
 										</el-col>
 									</el-row>
 								</el-form>
+								<div class="info-hint-bar">
+									<span class="info-hint-icon">ⓘ</span>
+									<span class="info-hint-text">
+										<span class="strong">填寫說明</span>　以下條件請依<span class="strong">本事業</span>目前實際情形進行設定。
+									</span>
+								</div>
 							</div>
 
 
@@ -737,6 +745,8 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+// @use "@/styles/variables.scss" as *;
+
 .condition-setup-shell {
 	padding: 24px;
 	margin-top: 50px;
@@ -857,6 +867,38 @@ defineExpose({
 	padding: 14px 0 18px;
 	margin-bottom: 14px;
 	border-bottom: 1px solid rgba(76, 175, 80, 0.15);
+}
+
+.info-hint-bar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: 50px;
+	padding: 20px 14px;
+	margin-top: 12px;
+	border-radius: 10px;
+	background: linear-gradient(135deg, rgba(204, 232, 250, 0.623), rgba(232, 240, 250, 0.5));
+	border: 1px solid rgba(38, 166, 154, 0.12);
+
+	.info-hint-icon {
+		flex-shrink: 0;
+		font-size: 18px;
+		color: #7a9c97;
+		line-height: 2;
+	}
+
+	.info-hint-text {
+		font-size: 18px;
+		color: #607d8b;
+		line-height: 1.4;
+		font-weight: 600;
+
+		.strong {
+			font-weight: 700;
+			color: #234a5e;
+			font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+		}
+	}
 }
 
 .section-subtitle-row {
@@ -1162,6 +1204,17 @@ defineExpose({
 		padding: 10px 0 14px;
 		margin-bottom: 12px;
 	}
+
+	.info-hint-bar {
+		height: auto;
+		min-height: 40px;
+		padding: 8px 12px;
+
+		.info-hint-text {
+			font-size: 15px;
+		}
+	}
+
 
 	.section-subtitle-row {
 		flex-direction: column;

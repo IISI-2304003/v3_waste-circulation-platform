@@ -35,7 +35,7 @@
                 <div>
                   <h2>分析結果</h2>
                   <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
-                  <p class="reminder-text">貼心提醒: 本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
+                  <!-- <p class="reminder-text">貼心提醒: 本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p> -->
                 </div>
               </div>
 
@@ -168,6 +168,20 @@
         </el-icon>
         上一步：條件設定
       </el-button>
+      <!-- Help card -->
+      <div class="help-card">
+        <div class="help-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3" />
+          </svg>
+        </div>
+        <div class="help-text">
+          <p class="help-title">貼心提醒</p>
+          <p class="help-sub">本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
+        </div>
+      </div>
       <div class="footer-hint">請先點選上方任一推薦路徑卡片的「技術決策推薦」，即可進入下一步。</div>
       <!-- <el-button type="primary" @click="goNext">
         下一步：技術決策推薦
@@ -177,52 +191,7 @@
       </el-button> -->
     </div>
 
-    <el-dialog v-model="modesDialogVisible" class="top-modes-dialog" width="min(1080px, 94vw)" align-center destroy-on-close :modal="true" append-to-body>
-      <template #header>
-        <div class="modes-dialog-header">
-          <h3>十大循環模式說明</h3>
-        </div>
-      </template>
-
-      <div class="modes-dialog-body" v-if="activeMode">
-        <aside class="modes-dialog-list">
-          <button v-for="mode in allCirculationModes" :key="mode.id" type="button" class="mode-list-item" :class="{ active: mode.id === activeModeId }" @click="activeModeId = mode.id">
-            <span class="mode-dot" :style="{ background: mode.color || '#26a69a' }"></span>
-            <span class="mode-list-name">{{ mode.name }}</span>
-          </button>
-        </aside>
-
-        <section class="modes-dialog-detail">
-          <div class="detail-title-row">
-            <span class="detail-mode-name">{{ activeMode.name }}</span>
-          </div>
-
-          <div class="detail-section">
-            <h4>模式說明</h4>
-            <p>{{ activeMode.description || '尚無說明資料。' }}</p>
-          </div>
-
-          <div class="detail-section" v-if="activeMode.flowchartUrl">
-            <h4>循環流程圖</h4>
-            <div class="flowchart-box">
-              <img :src="activeMode.flowchartUrl" :alt="activeMode.flowchartAlt || activeMode.name" />
-            </div>
-          </div>
-
-          <!-- <div class="detail-section" v-if="activeModeSteps.length">
-            <h4>流程節點</h4>
-            <div class="steps-wrap">
-              <span v-for="step in activeModeSteps" :key="step.label" class="step-tag">{{ step.label }}</span>
-            </div>
-          </div> -->
-
-          <div class="detail-section">
-            <h4>填報注意事項</h4>
-            <p class="notices-text">{{ activeMode.notices || '尚無注意事項資料。' }}</p>
-          </div>
-        </section>
-      </div>
-    </el-dialog>
+    <TopModesDialog v-model="modesDialogVisible" :preferred-mode-name="recommendedPaths?.[0]?.modeName || ''" />
   </div>
 </template>
 
@@ -248,6 +217,7 @@ import {
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import TopModesDialog from '@/components/TopModesDialog.vue'
 import { getAnnouncementCategoryOptions } from '@/api/wasteCode'
 import circulationModes from '@/data/circulationModes.json'
 // import { b } from 'vue-router/dist/index-CzEDAlw7.js'
@@ -255,7 +225,6 @@ import circulationModes from '@/data/circulationModes.json'
 const router = useRouter()
 const store = useConditionSetupStore()
 const modesDialogVisible = ref(false)
-const activeModeId = ref(1)
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1440)
 const industryOptions = ref([])
 
@@ -679,28 +648,8 @@ const recommendedPaths = computed(() => {
 // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim()
 
-// 說明：依目前條件即時計算「all Circulation Modes」內容，提供畫面顯示與決策判斷使用。
-const allCirculationModes = computed(() => circulationModes)
-
-// 說明：依目前條件即時計算「preferred Mode Id」內容，提供畫面顯示與決策判斷使用。
-const preferredModeId = computed(() => {
-  const currentModeName = normalizeModeName(recommendedPaths.value?.[0]?.modeName)
-  // 說明：封裝「matched」商業邏輯，供目前流程重複使用。
-  const matched = allCirculationModes.value.find((mode) => normalizeModeName(mode.name) === currentModeName)
-  return matched?.id || allCirculationModes.value?.[0]?.id || 1
-})
-
-// 說明：依目前條件即時計算「active Mode」內容，提供畫面顯示與決策判斷使用。
-const activeMode = computed(() => {
-  return allCirculationModes.value.find((mode) => mode.id === activeModeId.value) || allCirculationModes.value[0] || null
-})
-
-// 說明：依目前條件即時計算「active Mode Steps」內容，提供畫面顯示與決策判斷使用。
-const activeModeSteps = computed(() => activeMode.value?.steps || activeMode.value?.step || [])
-
 // 說明：由「查看十大循環模式說明」按鈕觸發；切換對話框為開啟狀態。
 const openModesDialog = () => {
-  activeModeId.value = preferredModeId.value
   modesDialogVisible.value = true
 }
 
@@ -1392,6 +1341,60 @@ onBeforeUnmount(() => {
   box-shadow: 0 14px 34px rgba(53, 93, 83, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(16px);
   border-radius: 20px;
+
+  .help-card {
+    // margin-top: 20px;
+    background: linear-gradient(135deg, #fdf0f0, #f8fafc);
+    border: 1px solid #f7bbbb;
+    border-radius: 16px;
+    padding: 10px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto;
+
+    .help-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(197, 34, 34, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      svg {
+        width: 18px;
+        height: 18px;
+        stroke: #c52222;
+      }
+    }
+
+    .help-text {
+      flex: 1;
+      min-width: 0;
+
+      .help-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #af3737;
+        margin: 0;
+        line-height: 1.3;
+      }
+
+      .help-sub {
+        font-size: 15px;
+        color: #2e2e2e;
+        margin: 0;
+        line-height: 1.3;
+      }
+    }
+
+    @media (max-width: 992px) {
+      display: none;
+    }
+  }
 }
 
 .footer-hint {

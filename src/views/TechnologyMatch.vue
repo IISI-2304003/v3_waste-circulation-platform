@@ -56,7 +56,7 @@
 								<Orange />
 							</el-icon></div>
 						<h2>推薦循環模式</h2>
-						<a class="mode-explain-link" @click.prevent="openModeExplainDialog">查看模式說明 ›</a>
+						<a class="mode-explain-link" style=" margin-left: auto" @click.prevent="openModeExplainDialog">查看模式說明 ›</a>
 					</div>
 					<div class="mode-title-row">
 						<span class="mode-badge">{{ selectedMode.modeName }}</span>
@@ -121,11 +121,10 @@
 
 				<div class="supplier-list">
 					<el-row :gutter="16">
-						<el-col v-for="(vendor, index) in pagedVendors" :key="vendor.id" style="margin-bottom: 16px" :xs="24" :sm="24">
+						<el-col v-for="(vendor) in pagedVendors" :key="vendor.id" style="margin-bottom: 16px" :xs="24" :sm="24">
 							<article class="supplier-card" role="button" tabindex="0">
 								<!-- 左側：排名 + 圖片 -->
 								<div class="card-left">
-									<div class="rank-badge">{{ (currentPage - 1) * pageSize + index + 1 }}</div>
 									<img class="supplier-photo" :src="vendor.image" :alt="vendor.name" />
 								</div>
 
@@ -320,7 +319,6 @@
 							<div class="top-left-copy">
 								<span class="vendor-tag">{{ activeVendor.isReuseOrg ? '再利用廠商' : '處理機構' }}</span>
 								<h3>{{ activeVendor.company_name }}</h3>
-								<!-- <p class="dialog-specialty">專長：{{ activeVendor.reuseTech }}</p> -->
 								<div class="mode-title-row">
 									<span class="mode-badge">{{ selectedMode.modeName }}</span>
 								</div>
@@ -468,8 +466,30 @@
 						<section class="detail-card contact-card wide-card">
 							<p class="detail-title">聯絡資訊</p>
 							<div class="contact-row">
-								<div class="contact-item"><span>聯絡電話</span><strong>{{ activeVendor.phone }}</strong></div>
-								<div class="contact-item"><span>工廠地址</span><strong>{{ activeVendor.address }}</strong></div>
+								<div class="contact-item">
+									<span class="contact-label">聯絡電話</span>
+									<div class="contact-value-row">
+										<strong class="contact-value">{{ activeVendor.phone }}</strong>
+										<a :href="`tel:${activeVendor.phone}`" class="contact-action">
+											<el-icon>
+												<Phone />
+											</el-icon>
+											電話聯繫
+										</a>
+									</div>
+								</div>
+								<div class="contact-item">
+									<span class="contact-label">工廠地址</span>
+									<div class="contact-value-row">
+										<strong class="contact-value">{{ activeVendor.address }}</strong>
+										<a class="contact-action" @click="openMap(activeVendor.address)">
+											<el-icon>
+												<LocationFilled />
+											</el-icon>
+											查看位置
+										</a>
+									</div>
+								</div>
 							</div>
 						</section>
 					</div>
@@ -481,12 +501,12 @@
 							</el-icon>
 							下載綜合報告
 						</el-button>
-						<el-button class="contact-vendor-btn" type="success" @click="contactVendor">
+						<!-- <el-button class="contact-vendor-btn" type="success" @click="contactVendor">
 							<el-icon class="el-icon--left">
 								<Promotion />
 							</el-icon>
 							聯絡廠商
-						</el-button>
+						</el-button> -->
 					</div>
 				</div>
 			</el-dialog>
@@ -498,6 +518,20 @@
 					</el-icon>
 					上一步 : 循環路徑推薦
 				</el-button>
+				<!-- Help card -->
+				<div class="help-card">
+					<div class="help-icon">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10" />
+							<path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+							<line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3" />
+						</svg>
+					</div>
+					<div class="help-text">
+						<p class="help-title">貼心提醒</p>
+						<p class="help-sub">本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
+					</div>
+				</div>
 				<!-- //下載完整報告 -->
 				<el-button size="large" type="primary" class="export-btn" @click="exportFullReportPdf">
 					<el-icon class="el-icon--left">
@@ -507,7 +541,7 @@
 				</el-button>
 			</div>
 
-			<CirculationModal v-model="modeDialogVisible" :mode="selectedModeDetail" />
+			<TopModesDialog v-model="modeDialogVisible" :preferred-mode-name="selectedMode.modeName" />
 		</div>
 	</div>
 </template>
@@ -516,13 +550,12 @@
 import { computed, ref, watch, onMounted, markRaw } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import CirculationModal from '@/components/CirculationModal.vue'
-import circulationModesData from '@/data/circulationModes.json'
+import TopModesDialog from '@/components/TopModesDialog.vue'
 import { getCompanyList } from '@/api/wasteCode'
 import {
 	ArrowLeft, ArrowRight, Monitor,
 	Connection, DataAnalysis, Files, Finished,
-	Goods, Location, Money, Operation, Promotion, SetUp
+	Goods, Location, Money, Operation, Promotion, SetUp, LocationFilled
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
@@ -729,12 +762,6 @@ const goNextAlternative = () => {
 	if (alternativePage.value >= alternativeTotalPages.value - 1) return
 	alternativePage.value += 1
 }
-
-// 說明：依目前條件即時計算「selected Mode Detail」內容，提供畫面顯示與決策判斷使用。
-const selectedModeDetail = computed(() => {
-	const targetModeName = normalizeModeName(selectedMode.value?.modeName)
-	return circulationModesData.find((mode) => normalizeModeName(mode.name) === targetModeName) || null
-})
 
 // 說明：由模式說明入口觸發；開啟模式解說彈窗供使用者查看細節。
 const openModeExplainDialog = () => {
@@ -1002,6 +1029,12 @@ const closeVendorDetail = () => {
 const contactVendor = () => {
 	if (!activeVendor.value) return
 	ElMessage.info(`請洽 ${activeVendor.value.contactPhone} 進一步聯絡合作細節`)
+}
+
+// 說明：由地址「查看位置」觸發；開啟 Google 地圖搜尋該地址。
+const openMap = (address) => {
+	if (!address) return
+	window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank')
 }
 
 // 說明：封裝「escape Html」商業邏輯，供目前流程重複使用。
@@ -1291,6 +1324,16 @@ const goBackHome = () => {
 	overflow: hidden;
 }
 
+.actions {
+	position: sticky;
+	bottom: 14px; // 或 bottom: 0，依您想要的留白調整
+	// z-index: 10;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+
 .panel-card {
 	padding: 22px;
 	border-radius: 22px;
@@ -1298,6 +1341,62 @@ const goBackHome = () => {
 	background: rgba($bg-primary, 0.8);
 	backdrop-filter: blur(16px);
 	box-shadow: 0 14px 34px rgba(47, 91, 114, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.84);
+	gap: 16px;
+
+	.help-card {
+		// margin-top: 20px;
+		background: linear-gradient(135deg, #fdf0f0, #f8fafc);
+		border: 1px solid #f7bbbb;
+		border-radius: 16px;
+		padding: 10px 12px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+		margin-right: auto;
+
+		.help-icon {
+			width: 34px;
+			height: 34px;
+			border-radius: 50%;
+			background: rgba(197, 34, 34, 0.12);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+
+			svg {
+				width: 18px;
+				height: 18px;
+				stroke: #c52222;
+			}
+		}
+
+		.help-text {
+			flex: 1;
+			min-width: 0;
+
+			.help-title {
+				font-size: 16px;
+				font-weight: 700;
+				color: #af3737;
+				margin: 0;
+				line-height: 1.3;
+			}
+
+			.help-sub {
+				font-size: 15px;
+				color: #2e2e2e;
+				margin: 0;
+				line-height: 1.3;
+			}
+		}
+
+		@media (max-width: 992px) {
+			display: none;
+		}
+	}
+
 }
 
 .summary-mode-row {
@@ -1328,21 +1427,7 @@ const goBackHome = () => {
 }
 
 .mode-panel-inner {
-	.mode-explain-link {
-		margin-left: auto;
-		align-self: center;
-		display: inline-flex;
-		margin-top: 0;
-		margin-bottom: 0;
-		font-size: 16px;
-		color: #3a8fd8;
-		cursor: pointer;
-		white-space: nowrap;
 
-		&:hover {
-			text-decoration: underline;
-		}
-	}
 
 	.mode-title-row {
 		margin-bottom: 16px;
@@ -1354,6 +1439,23 @@ const goBackHome = () => {
 
 
 
+}
+
+.mode-explain-link {
+	// margin-left: auto;
+	align-self: center;
+	display: inline-flex;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: 16px;
+	color: #3a8fd8;
+	cursor: pointer;
+	white-space: nowrap;
+	margin-left: 12px; // 改成固定小間距，不要 auto
+
+	&:hover {
+		text-decoration: underline;
+	}
 }
 
 /* 流程圖 */
@@ -2380,24 +2482,45 @@ const goBackHome = () => {
 
 .contact-item {
 	display: flex;
-	justify-content: space-between;
+	flex-direction: column;
 	gap: 12px;
 	padding: 12px 14px;
 	border-radius: 14px;
 	background: rgba(246, 250, 255, 0.96);
 	border: 1px solid rgba(161, 198, 229, 0.28);
 
-	span {
-		font-size: 15px;
+	.contact-label {
+		font-size: 13px;
 		font-weight: 700;
 		color: #5d7994;
+		white-space: nowrap; // 標籤永遠不換行
 	}
 
-	strong {
-		font-size: 15px;
-		color: #1e476b;
-		text-align: right;
+	.contact-value-row {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 8px 12px;
+
+		.contact-value {
+			flex: 1;
+			min-width: 140px; // 保底寬度，避免地址被壓得太窄
+			font-size: 15px;
+			color: #1e476b;
+			line-height: 1.5;
+			word-break: break-word; // 地址過長時正常斷行，不是逐字硬擠
+		}
+
+		.contact-action {
+			cursor: pointer; // ← 補上這行，確保兩種用法都會顯示手指
+			font-size: 16px;
+		}
 	}
+
+
+
+
 }
 
 .dialog-actions {
@@ -2762,6 +2885,8 @@ const goBackHome = () => {
 		flex-direction: column;
 		gap: 10px;
 		justify-content: flex-start;
+		position: sticky;
+		bottom: 14px;
 
 		:deep(.el-button) {
 			width: 100%;
