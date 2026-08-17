@@ -35,7 +35,7 @@
                 <div>
                   <h2>分析結果</h2>
                   <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
-                  <!-- <p class="reminder-text">貼心提醒: 本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p> -->
+                  <!-- <p class="reminder-text">貼心提醒: 本系統提供決策參考，實際合作仍應依相關條件評估。</p> -->
                 </div>
               </div>
 
@@ -179,7 +179,7 @@
         </div>
         <div class="help-text">
           <p class="help-title">貼心提醒</p>
-          <p class="help-sub">本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
+          <p class="help-sub">本系統提供決策參考，實際合作仍應依相關條件評估。</p>
         </div>
       </div>
       <div class="footer-hint">請先點選上方任一推薦路徑卡片的「技術決策推薦」，即可進入下一步。</div>

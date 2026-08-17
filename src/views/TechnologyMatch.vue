@@ -56,7 +56,7 @@
 								<Orange />
 							</el-icon></div>
 						<h2>推薦循環模式</h2>
-						<a class="mode-explain-link" style=" margin-left: auto" @click.prevent="openModeExplainDialog">查看模式說明 ›</a>
+						<a class="mode-explain-link" style=" margin-left: auto" @click.prevent="openModeExplainDialog">十大循環模式說明 ›</a>
 					</div>
 					<div class="mode-title-row">
 						<span class="mode-badge">{{ selectedMode.modeName }}</span>
@@ -529,7 +529,7 @@
 					</div>
 					<div class="help-text">
 						<p class="help-title">貼心提醒</p>
-						<p class="help-sub">本系統僅提供建議，最終決策仍需依據實際情況進行判斷。</p>
+						<p class="help-sub">本系統提供決策參考，實際合作仍應依相關條件評估。</p>
 					</div>
 				</div>
 				<!-- //下載完整報告 -->
@@ -1509,7 +1509,7 @@ const goBackHome = () => {
 	.panel-divider {
 		width: auto;
 		height: 1px;
-		margin: 16px 0;
+		margin: 8px 0;
 		background: linear-gradient(to right,
 				transparent,
 				rgba(120, 190, 180, 0.35) 20%,
@@ -2336,6 +2336,10 @@ const goBackHome = () => {
 	background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(241, 248, 255, 0.9));
 	border: 1px solid rgba(168, 201, 231, 0.28);
 	box-shadow: 0 8px 18px rgba(70, 110, 150, 0.08);
+
+	:deep(.el-divider) {
+		margin: 8px 0;
+	}
 }
 
 .wide-card,
