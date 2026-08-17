@@ -592,13 +592,12 @@ const getMissingRequiredFields = () => {
 		missingFields.push({ sectionId: 'physical', label: '事業地址' })
 	}
 
-	// if (!store.sourceConditions.industry) {
-	// 	missingFields.push({ sectionId: 'source', label: '來源產業' })
-	// }
-
-	// if (!store.sourceConditions.process) {
-	// 	missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
-	// }
+	if (!store.sourceConditions.industry) {
+		missingFields.push({ sectionId: 'source', label: '來源產業' })
+	}
+	if (!store.sourceConditions.process) {
+		missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
+	}
 
 	if (store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined) {
 		missingFields.push({ sectionId: 'source', label: '月產出量 (公噸)' })
@@ -653,8 +652,8 @@ const shouldMarkInvalid = (fieldKey) => {
 	const fieldCheckMap = {
 		businessName: () => !String(store.businessConditions.businessName || '').trim(),
 		businessAddress: () => !String(store.businessConditions.businessAddress || '').trim(),
-		// sourceIndustry: () => !store.sourceConditions.industry,
-		// sourceProcess: () => !store.sourceConditions.process,
+		sourceIndustry: () => !store.sourceConditions.industry,
+		sourceProcess: () => !store.sourceConditions.process,
 		sourceOutputAmount: () => store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined,
 		sourceFrequency: () => !store.sourceConditions.frequency,
 		hasReuseSpace: () => store.siteConditions.hasReuseSpace === null,
