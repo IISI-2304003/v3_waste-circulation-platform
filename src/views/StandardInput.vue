@@ -25,16 +25,91 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import ConditionSetupWorkspace from '@/components/condition-setup/ConditionSetupWorkspace.vue'
+import { postCompanyData } from '@/api/company'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
 
 const router = useRouter()
 const conditionStore = useConditionSetupStore()
+const isSubmitting = ref(false)
+
+const buildCompanyPayload = () => ({
+  // 目前使用者停留的條件區塊 ID（例如 physical/source/site）
+  activeSection: conditionStore.activeSection,
+  sourceConditions: {
+    // 來源產業 ID（下拉選單 value）
+    industry: conditionStore.sourceConditions.industry,
+    // 來源產業名稱（下拉選單 label）
+    industryLabel: conditionStore.sourceConditions.industryLabel,
+    // 來源製程 ID
+    process: conditionStore.sourceConditions.process,
+    // 產出量（公噸）
+    outputAmount: conditionStore.sourceConditions.outputAmount,
+    // 產出頻率（daily/weekly/monthly/quarterly）
+    frequency: conditionStore.sourceConditions.frequency,
+  },
+  siteConditions: {
+    // 場地區域（可複選，陣列）
+    region: Array.isArray(conditionStore.siteConditions.region) ? [...conditionStore.siteConditions.region] : [],
+    // 是否有再利用空間（true/false/null）
+    hasReuseSpace: conditionStore.siteConditions.hasReuseSpace,
+    // 是否有產生衍生廢棄物（true/false/null）
+    hasSecondaryWaste: conditionStore.siteConditions.hasSecondaryWaste,
+  },
+  businessConditions: {
+    // 事業名稱
+    businessName: conditionStore.businessConditions.businessName,
+    // 事業地址
+    businessAddress: conditionStore.businessConditions.businessAddress,
+    // 資本額區間代碼
+    capitalAmount: conditionStore.businessConditions.capitalAmount,
+    // 清除頻率（daily/weekly/monthly/quarterly/yearly）
+    clearanceFrequency: conditionStore.businessConditions.clearanceFrequency,
+    // 清除量（公噸）
+    clearanceAmount: conditionStore.businessConditions.clearanceAmount,
+    // 清除費用（元/公噸）
+    clearanceCost: conditionStore.businessConditions.clearanceCost,
+    // 處理量（公噸）
+    processingAmount: conditionStore.businessConditions.processingAmount,
+    // 處理費用（元/公噸）
+    processingCost: conditionStore.businessConditions.processingCost,
+    // 技術成熟度分數/等級值
+    technologyMaturity: conditionStore.businessConditions.technologyMaturity,
+    // 再生產品需求描述
+    recycledProductDemand: conditionStore.businessConditions.recycledProductDemand,
+  },
+  // 允收條件清單（每筆包含 parameter/operator/value/unit/condition 等）
+  acceptanceConditions: Array.isArray(conditionStore.acceptanceConditions)
+    ? conditionStore.acceptanceConditions.map((condition) => ({ ...condition }))
+    : [],
+  // 上傳報告清單（目前若有接檔案會放在此）
+  uploadedReports: Array.isArray(conditionStore.uploadedReports)
+    ? conditionStore.uploadedReports.map((file) => ({ ...file }))
+    : [],
+  // 技術成熟度選項（複選值陣列）
+  technologySelections: [...conditionStore.technologySelections],
+  // 再生產品使用者需求選項（複選值陣列）
+  demandSelections: [...conditionStore.demandSelections],
+})
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
-const goCompanyMatch = () => {
-  router.push('/company-match')
+const goCompanyMatch = async () => {
+  if (isSubmitting.value) return
+
+  isSubmitting.value = true
+
+  try {
+    await postCompanyData(buildCompanyPayload())
+    router.push('/company-match')
+  } catch (error) {
+    const errorMessage = error?.response?.data?.message || '資料送出失敗，請稍後再試'
+    ElMessage.error(errorMessage)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
