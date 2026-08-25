@@ -1,5 +1,5 @@
 <template>
-	<div class="acceptance-standard-form">
+	<div class="acceptance-standard-form" :class="{ 'is-invalid': props.invalid }">
 		<!-- 表單說明 -->
 		<div class="form-description">
 			<p>請依照廢棄物特性設定允收標準參數，以進行匹配查詢。</p>
@@ -19,7 +19,7 @@
 
 				<template v-else>
 					<!-- 操作符 -->
-					<el-select v-model="standard.operator" placeholder="選擇條件" class="operator-select">
+					<el-select v-model="standard.operator" placeholder="選擇條件" class="operator-select" @change="handleOperatorChange(standard)">
 						<el-option v-for="op in operatorOptions" :key="op.value" :label="op.label" :value="op.value" />
 					</el-select>
 
@@ -104,6 +104,10 @@ const props = defineProps({
 	wastecode: {
 		type: String,
 		default: ''
+	},
+	invalid: {
+		type: Boolean,
+		default: false
 	}
 })
 
@@ -126,8 +130,7 @@ function createEmptyStandard() {
 		value: null,
 		valueMin: null,
 		valueMax: null,
-		unit: '%',
-		condition: '需'
+		unit: '%'
 	}
 }
 
@@ -162,13 +165,11 @@ onMounted(async () => {
 // 說明：由使用者互動觸發；執行「handle Parameter Change」流程並同步更新相關狀態。
 const handleParameterChange = (standard) => {
 	if (standard.parameter === '外觀') {
-		standard.operator = '等於'
-		standard.unit = ''
+		standard.value = standard.value ?? ''
+		standard.operator = ''
 		standard.valueMin = null
 		standard.valueMax = null
-		if (standard.value === null || standard.value === undefined) {
-			standard.value = ''
-		}
+		standard.unit = ''
 		return
 	}
 
@@ -183,15 +184,41 @@ const handleParameterChange = (standard) => {
 	}
 }
 
+const handleOperatorChange = (standard) => {
+	if (standard.operator === '範圍') {
+		standard.value = null
+	} else {
+		standard.valueMin = null
+		standard.valueMax = null
+	}
+}
+
+const normalizeStandards = (items) => items
+	.filter(s => s.parameter && String(s.parameter).trim())
+	.map((standard) => {
+		if (standard.parameter === '外觀') {
+			return { parameter: standard.parameter, value: standard.value }
+		}
+
+		const result = {
+			parameter: standard.parameter,
+			operator: standard.operator,
+		}
+		if (standard.operator === '範圍') {
+			if (standard.valueMin != null && standard.valueMin !== '') result.valueMin = standard.valueMin
+			if (standard.valueMax != null && standard.valueMax !== '') result.valueMax = standard.valueMax
+		} else if (standard.value != null && standard.value !== '') {
+			result.value = standard.value
+		}
+		if (standard.unit) result.unit = standard.unit
+		return result
+	})
+
 // 監聽初始資料
 watch(() => props.initialStandards, (newVal) => {
 	if (newVal && newVal.length > 0) {
 		// 只比對已填寫 parameter 的項目，避免使用者剛新增的空白列被誤判為「有變化」而覆蓋掉
-		const hasActualChange = JSON.stringify(newVal) !== JSON.stringify(
-			standards.value
-				.filter(s => s.parameter && String(s.parameter).trim())
-				.map(({ id, ...rest }) => ({ ...rest }))
-		)
+		const hasActualChange = JSON.stringify(normalizeStandards(newVal)) !== JSON.stringify(normalizeStandards(standards.value))
 		if (hasActualChange) {
 			isUpdatingFromProp = true
 			standards.value = newVal.map(std => ({
@@ -251,9 +278,7 @@ watch(standards, (value) => {
 
 	// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 	// 過濾掉空條件（parameter 為空的不提交）
-	const normalized = value
-		.filter(s => s.parameter && String(s.parameter).trim())
-		.map(({ id, ...rest }) => ({ ...rest }))
+	const normalized = normalizeStandards(value)
 	emit('change', normalized)
 }, { deep: true })
 
@@ -268,6 +293,15 @@ defineExpose({
 
 .acceptance-standard-form {
 	width: 100%;
+
+	&.is-invalid {
+
+		:deep(.el-input__wrapper),
+		:deep(.el-select__wrapper) {
+			box-shadow: 0 0 0 1px #f56c6c inset !important;
+			border-color: #f56c6c !important;
+		}
+	}
 }
 
 .form-description {

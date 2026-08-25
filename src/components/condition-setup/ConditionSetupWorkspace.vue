@@ -67,6 +67,7 @@
 							<ConditionAccordionSection id="physical" ref="physicalRef" title="物化特性" theme="green" :expanded="expandedMap.physical" @toggle="toggleSection">
 								<div class="section-subtitle-row">
 									<div class="section-subtitle">
+										<span class="required-mark">*</span>
 										依據檢測數據設定允收條件，支援自由新增條件組合。
 									</div>
 									<el-button class="semantic-button" type="primary" plain :icon="Search" @click="openSemanticModal">
@@ -74,7 +75,7 @@
 									</el-button>
 								</div>
 
-								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" :wastecode="props.selectedCode" @change="handleStandardsChange" />
+								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" :wastecode="props.selectedCode" :invalid="shouldMarkInvalid('acceptance')" @change="handleStandardsChange" />
 
 								<!-- <div class="report-upload">
 									<h4>檢測報告上傳區</h4>
@@ -469,6 +470,15 @@ const demandOptions = [
 
 const hasValidationAttempted = ref(false)
 
+const hasCompleteAcceptanceCondition = () => store.acceptanceConditions.some((condition) => {
+	if (!condition?.parameter || !String(condition.parameter).trim()) return false
+	if (condition.parameter === '外觀') return String(condition.value || '').trim().length > 0
+	if (condition.operator === '範圍') {
+		return condition.valueMin != null && condition.valueMin !== '' && condition.valueMax != null && condition.valueMax !== ''
+	}
+	return condition.value != null && condition.value !== ''
+})
+
 const sectionRefMap = {
 	physical: physicalRef,
 	source: sourceRef,
@@ -584,6 +594,10 @@ const resetAll = () => {
 const getMissingRequiredFields = () => {
 	const missingFields = []
 
+	if (!hasCompleteAcceptanceCondition()) {
+		missingFields.push({ sectionId: 'physical', label: '物化特性（至少填寫一項完整條件）' })
+	}
+
 	if (!String(store.businessConditions.businessName || '').trim()) {
 		missingFields.push({ sectionId: 'physical', label: '事業名稱' })
 	}
@@ -659,7 +673,8 @@ const shouldMarkInvalid = (fieldKey) => {
 		hasReuseSpace: () => store.siteConditions.hasReuseSpace === null,
 		hasSecondaryWaste: () => store.siteConditions.hasSecondaryWaste === null,
 		capitalAmount: () => !store.businessConditions.capitalAmount,
-		clearanceFrequency: () => !store.businessConditions.clearanceFrequency
+		clearanceFrequency: () => !store.businessConditions.clearanceFrequency,
+		acceptance: () => !hasCompleteAcceptanceCondition()
 	}
 
 	return fieldCheckMap[fieldKey]?.() || false
@@ -681,7 +696,6 @@ const handleSemanticConfirm = (parsedData) => {
 // 說明：由使用者互動觸發；執行「handle Standards Change」流程並同步更新相關狀態。
 const handleStandardsChange = (standards) => {
 	store.setAcceptanceConditions(standards)
-	console.log(store.acceptanceConditions)
 }
 
 // 說明：由「定位」按鈕觸發；取得瀏覽器座標並回填事業地址欄位。

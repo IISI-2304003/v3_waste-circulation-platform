@@ -183,7 +183,6 @@ export function parseSemanticInput(text) {
                 valueMin,
                 valueMax,
                 unit: normalizeUnitOutput(unitRaw),
-                condition: '需',
             });
             continue;
         }
@@ -198,7 +197,6 @@ export function parseSemanticInput(text) {
                 operator: operator || '等於',
                 value: parseFloat(valueRaw),
                 unit: normalizeUnitOutput(unitRaw),
-                condition: '需',
             });
             continue;
         }
@@ -212,7 +210,6 @@ export function parseSemanticInput(text) {
                 operator: '等於',
                 value: parseFloat(valueRaw),
                 unit: normalizeUnitOutput(unitRaw),
-                condition: '需',
             });
             continue;
         }
