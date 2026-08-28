@@ -153,18 +153,18 @@
           <div v-if="displayCodes.length > 0" class="codes-panel">
             <div class="codes-panel-header">
               <h3 class="list-title">
-                <span class="list-title-badge" :style="{ background: getCategoryColor(currentCategory) }">{{ currentCategory?.id }}類</span>
-                {{ getCategoryShortName(currentCategory) }}
+                <span class="list-title-badge" :style="{ background: getCategoryColor(currentCategory) }">{{ searchKeyword.trim() ? '搜尋' : `${currentCategory?.id}類` }}</span>
+                {{ searchKeyword.trim() ? '搜尋結果' : getCategoryShortName(currentCategory) }}
               </h3>
               <span class="list-count" :style="{ background: getCategoryColor(currentCategory) + '18', color: getCategoryColor(currentCategory) }">共 {{ displayCodes.length }} 項</span>
             </div>
 
             <transition-group v-if="currentPageCodes.length > 0" name="card-list" tag="div" class="codes-grid">
-              <button v-for="(code, pageIndex) in currentPageCodes" :key="`${code.code}-${currentPage}`" type="button" class="code-card" :style="{ '--card-color': getCategoryColor(currentCategory), borderLeftColor: getCategoryColor(currentCategory) }" @click="handleCardClick(code.code)">
+              <button v-for="(code, pageIndex) in currentPageCodes" :key="`${code.code}-${currentPage}`" type="button" class="code-card" :style="{ '--card-color': getCategoryColorById(code.categoryId), borderLeftColor: getCategoryColorById(code.categoryId) }" @click="handleCardClick(code.code, code.categoryId)">
                 <div class="code-card-top">
-                  <span class="code-chip" :style="{ background: getCategoryColor(currentCategory) + '15', color: getCategoryColor(currentCategory), border: `1px solid ${getCategoryColor(currentCategory)}30` }">{{ code.code }}</span>
-                  <span class="code-card-top-icon" aria-hidden="true" :style="{ color: getCategoryColor(currentCategory) }">
-                    <span v-html="getCodeCardTopIcon(currentCategory?.id, (currentPage - 1) * pageSize + pageIndex)"></span>
+                  <span class="code-chip" :style="{ background: getCategoryColorById(code.categoryId) + '15', color: getCategoryColorById(code.categoryId), border: `1px solid ${getCategoryColorById(code.categoryId)}30` }">{{ code.code }}</span>
+                  <span class="code-card-top-icon" aria-hidden="true" :style="{ color: getCategoryColorById(code.categoryId) }">
+                    <span v-html="getCodeCardTopIcon(code.categoryId, (currentPage - 1) * pageSize + pageIndex)"></span>
                   </span>
                 </div>
                 <h4 class="code-card-title">{{ code.name }}</h4>
@@ -490,10 +490,12 @@ const filteredCategoryCodes = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
   if (!keyword) return currentCategoryCodes.value
 
+  const searchableCodes = categories.value.flatMap((category) => category.codes || [])
+
   // 移除連字號，讓 C-0202 與 C0202 都能比對到
   const normalizedKeyword = keyword.replace(/-/g, '')
 
-  return currentCategoryCodes.value.filter((code) => {
+  return searchableCodes.filter((code) => {
     const targetText = `${code.code} ${code.name} ${code.description || ''}`.toLowerCase()
     const normalizedTargetText = targetText.replace(/-/g, '')
     return targetText.includes(keyword) || normalizedTargetText.includes(normalizedKeyword)
@@ -515,6 +517,8 @@ const getCategoryColor = (category) => {
   const visual = categoryVisuals[category?.id] || fallbackVisual
   return visual.color
 }
+
+const getCategoryColorById = (categoryId) => getCategoryColor({ id: categoryId })
 
 // 說明：回傳「get Code Card Top Icon」資料供畫面渲染或後續商業規則使用。
 const getCodeCardTopIcon = (categoryId, cardIndex) => {
@@ -556,8 +560,8 @@ const navigateToEntry = (action, { code, category, page }) => {
   }
 }
 
-const handleCardClick = (code) => {
-  pendingEntry.value = { code, category: selectedCategory.value, page: currentPage.value }
+const handleCardClick = (code, category = selectedCategory.value) => {
+  pendingEntry.value = { code, category, page: currentPage.value }
   entryModalVisible.value = true
 }
 
