@@ -20,7 +20,7 @@
 
     </div>
 
-    <ConditionSetupWorkspace :selected-code="route.query.code || ''" @next="goCompanyMatch" />
+    <ConditionSetupWorkspace :selected-code="route.query.code || ''" :waste-detail="route.query.wasteDetail || ''" @next="goCompanyMatch" />
   </div>
 </template>
 

@@ -63,6 +63,19 @@
 								</div>
 							</div>
 
+							<div v-if="props.wasteDetail" class="selected-waste-detail">
+								<strong class="selected-waste-detail-title">{{ props.selectedCode || 'C-0202' }}｜廢液 pH值小（等）於 2.0</strong>
+								<div class="selected-waste-detail-row">
+									<span class="selected-waste-detail-label">分析廢液：</span>
+									<strong v-if="!isWasteDetailEditing">{{ selectedWasteDetail }}</strong>
+									<el-select v-else v-model="selectedWasteDetail" class="selected-waste-detail-select">
+										<el-option v-for="item in wasteDetailOptions" :key="item.value" :label="item.label" :value="item.value" />
+									</el-select>
+									<button type="button" class="selected-waste-detail-change" @click="isWasteDetailEditing = !isWasteDetailEditing">
+										{{ isWasteDetailEditing ? '完成' : '變更' }}
+									</button>
+								</div>
+							</div>
 
 							<ConditionAccordionSection id="physical" ref="physicalRef" title="物化特性" theme="green" :expanded="expandedMap.physical" @toggle="toggleSection">
 								<div class="section-subtitle-row">
@@ -71,7 +84,7 @@
 										依據檢測數據設定允收條件，支援自由新增條件組合。
 									</div>
 									<el-button class="semantic-button" type="primary" plain :icon="Search" @click="openSemanticModal">
-										語意化搜尋
+										語意化輸入
 									</el-button>
 								</div>
 
@@ -289,7 +302,7 @@
 				</div>
 				<div class="help-text">
 					<p class="help-title">貼心提醒</p>
-					<p class="help-sub">各項條件設定將影響分析結果，請務必確實填寫，已獲得最佳建議循環路徑!</p>
+					<p class="help-sub">各項條件設定將影響分析結果，請務必確實填寫，以獲得最佳建議循環路徑!</p>
 				</div>
 			</div>
 			<div class="action-buttons">
@@ -334,8 +347,20 @@ const props = defineProps({
 	selectedCode: {
 		type: String,
 		default: ''
+	},
+	wasteDetail: {
+		type: String,
+		default: ''
 	}
 })
+
+const wasteDetailOptions = [
+	{ value: '廢硫酸', label: '廢硫酸' },
+	{ value: '廢氫氟酸', label: '廢氫氟酸' },
+	{ value: '廢磷酸', label: '廢磷酸' }
+]
+const selectedWasteDetail = ref(props.wasteDetail || wasteDetailOptions[0].value)
+const isWasteDetailEditing = ref(false)
 
 const emits = defineEmits(['next'])
 
@@ -680,7 +705,7 @@ const shouldMarkInvalid = (fieldKey) => {
 	return fieldCheckMap[fieldKey]?.() || false
 }
 
-// 說明：由「語意化搜尋」按鈕觸發；開啟語意輸入對話框。
+// 說明：由「語意化輸入」按鈕觸發；開啟語意輸入對話框。
 const openSemanticModal = () => {
 	showSemanticModal.value = true
 }
@@ -880,6 +905,54 @@ defineExpose({
 	padding: 14px 0 18px;
 	margin-bottom: 14px;
 	border-bottom: 1px solid rgba(76, 175, 80, 0.15);
+}
+
+.selected-waste-detail {
+	padding: 14px 16px;
+	border: 1px solid rgba(76, 175, 80, 0.2);
+	border-radius: 12px;
+	background: rgba(240, 253, 244, 0.72);
+}
+
+.selected-waste-detail-title {
+	display: block;
+	margin-bottom: 10px;
+	font-size: 18px;
+	line-height: 1.5;
+	color: #285943;
+}
+
+.selected-waste-detail-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 16px;
+	color: #426b64;
+}
+
+.selected-waste-detail-label {
+	flex-shrink: 0;
+	font-weight: 700;
+}
+
+.selected-waste-detail-select {
+	width: min(180px, 100%);
+	flex: 0 1 180px;
+
+	:deep(.el-select__wrapper) {
+		min-height: 38px;
+	}
+}
+
+.selected-waste-detail-change {
+	padding: 2px 4px;
+	border: 0;
+	background: transparent;
+	color: #2f8f5b;
+	font: inherit;
+	font-weight: 700;
+	text-decoration: underline;
+	cursor: pointer;
 }
 
 .info-hint-bar {
@@ -1226,6 +1299,23 @@ defineExpose({
 		.info-hint-text {
 			font-size: 15px;
 		}
+	}
+
+	.selected-waste-detail {
+		padding: 12px;
+	}
+
+	.selected-waste-detail-title {
+		font-size: 16px;
+	}
+
+	.selected-waste-detail-row {
+		flex-wrap: wrap;
+	}
+
+	.selected-waste-detail-select {
+		flex: 0 1 180px;
+		width: min(180px, 100%);
 	}
 
 

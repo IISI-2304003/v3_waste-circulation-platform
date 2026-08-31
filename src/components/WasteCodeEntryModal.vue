@@ -1,5 +1,5 @@
 <template>
-	<el-dialog v-model="visible" width="640px" class="waste-entry-dialog" modal-class="waste-entry-overlay" :modal="true" append-to-body align-center :show-close="true" @close="handleCancel">
+	<el-dialog v-model="visible" width="560px" class="waste-entry-dialog" modal-class="waste-entry-overlay" :modal="true" append-to-body align-center :show-close="true" @close="handleCancel">
 		<div class="entry-header">
 			<div class="entry-header-icon">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -11,6 +11,12 @@
 			<span class="entry-code-chip" :style="chipStyle">{{ code }}</span>
 			<p class="entry-code-name">{{ list.name }}</p>
 			<p class="entry-code-description">{{ list.description }}</p>
+			<div class="entry-detail-field">
+				<label class="entry-detail-label" for="waste-detail-select">分析廢液細項</label>
+				<el-select id="waste-detail-select" v-model="selectedWasteDetail" class="entry-detail-select" placeholder="選擇廢液細項">
+					<el-option v-for="item in wasteDetailOptions" :key="item.value" :label="item.label" :value="item.value" />
+				</el-select>
+			</div>
 			<p class="entry-subtitle">請選擇您要進行的操作</p>
 		</div>
 
@@ -64,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
 	modelValue: { type: Boolean, default: false },
@@ -73,6 +79,13 @@ const props = defineProps({
 	color: { type: String, default: '#22c55e' }
 })
 
+const wasteDetailOptions = [
+	{ value: '廢硫酸', label: '廢硫酸' },
+	{ value: '廢氫氟酸', label: '廢氫氟酸' },
+	{ value: '廢磷酸', label: '廢磷酸' }
+]
+const selectedWasteDetail = ref(wasteDetailOptions[0].value)
+
 const emit = defineEmits(['update:modelValue', 'lookup', 'analysis', 'cancel'])
 
 const visible = computed({
@@ -80,13 +93,11 @@ const visible = computed({
 	set: (val) => emit('update:modelValue', val)
 })
 
-
 const chipStyle = computed(() => ({
 	background: `${props.color}15`,
 	color: props.color,
 	border: `1px solid ${props.color}30`,
 }))
-
 
 const handleCancel = () => {
 	visible.value = false
@@ -94,7 +105,7 @@ const handleCancel = () => {
 }
 const choose = (type) => {
 	visible.value = false
-	emit(type) // type 是 'lookup' 或 'analysis'
+	emit(type, type === 'analysis' ? selectedWasteDetail.value : undefined)
 }
 </script>
 
@@ -103,7 +114,7 @@ const choose = (type) => {
 
 :deep(.waste-entry-dialog) {
 	border-radius: 28px;
-	padding: 40px 44px 32px;
+	padding: 28px 32px 24px;
 
 	.el-dialog__header {
 		padding: 0;
@@ -111,8 +122,8 @@ const choose = (type) => {
 	}
 
 	.el-dialog__headerbtn {
-		top: 20px;
-		right: 20px;
+		top: 16px;
+		right: 16px;
 		width: 32px;
 		height: 32px;
 
@@ -129,13 +140,13 @@ const choose = (type) => {
 
 .entry-header {
 	text-align: center;
-	margin-bottom: 28px;
+	margin-bottom: 20px;
 }
 
 .entry-header-icon {
-	width: 64px;
-	height: 64px;
-	margin: 0 auto 16px;
+	width: 56px;
+	height: 56px;
+	margin: 0 auto 12px;
 	border-radius: 999px;
 	display: inline-flex;
 	align-items: center;
@@ -150,16 +161,15 @@ const choose = (type) => {
 }
 
 .entry-title {
-	margin: 0 0 14px;
+	margin: 0 0 10px;
 	font-size: 24px;
-	font-weight: 800;
 	color: $text-primary;
 }
 
 
 
 .entry-code-chip {
-	font-size: 15px;
+	font-size: 16px;
 	font-weight: 700;
 	padding: 4px 12px;
 	border-radius: 8px;
@@ -170,18 +180,49 @@ const choose = (type) => {
 	font-size: 18px;
 	font-weight: 700;
 	color: $text-primary;
-	margin-top: 10px;
+	margin: 8px 0 0;
 }
 
 .entry-code-description {
-	font-size: 15px;
+	font-size: 16px;
 	font-weight: 600;
 	color: #8d8d8d;
 }
 
+.entry-detail-field {
+	width: min(100%, 360px);
+	margin: 12px auto 14px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.entry-detail-label {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 700;
+	color: $text-primary;
+	white-space: nowrap;
+}
+
+.entry-detail-select {
+	flex: 1;
+	min-width: 0;
+	width: 100%;
+
+	:deep(.el-select__wrapper) {
+		min-height: 42px;
+		border-radius: 10px;
+	}
+
+	:deep(.el-select__selected-item) {
+		font-size: 16px;
+	}
+}
+
 .entry-subtitle {
 	margin: 0;
-	font-size: 15px;
+	font-size: 16px;
 	color: $text-secondary;
 	font-weight: 600;
 }
@@ -189,14 +230,14 @@ const choose = (type) => {
 .entry-options {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 20px;
-	margin-bottom: 24px;
+	gap: 14px;
+	margin-bottom: 18px;
 }
 
 .entry-option {
 	border: 1px solid $border-color;
 	border-radius: 20px;
-	padding: 26px 20px 22px;
+	padding: 20px 16px 18px;
 	background: $bg-section;
 	display: flex;
 	flex-direction: column;
@@ -222,8 +263,8 @@ const choose = (type) => {
 }
 
 .entry-option-icon {
-	width: 56px;
-	height: 56px;
+	width: 50px;
+	height: 50px;
 	border-radius: 999px;
 	display: inline-flex;
 	align-items: center;
@@ -246,7 +287,7 @@ const choose = (type) => {
 }
 
 .entry-option-title {
-	margin: 4px 0 0;
+	margin: 2px 0 0;
 	font-size: 18px;
 	font-weight: 800;
 	color: $text-primary;
@@ -254,7 +295,7 @@ const choose = (type) => {
 
 .entry-option-desc {
 	margin: 0;
-	font-size: 14px;
+	font-size: 16px;
 	line-height: 1.6;
 	color: $text-secondary;
 	font-weight: 600;
@@ -267,9 +308,9 @@ const choose = (type) => {
 	justify-content: center;
 	gap: 6px;
 	width: 100%;
-	padding: 10px 0;
+	padding: 8px 0;
 	border-radius: 10px;
-	font-size: 15px;
+	font-size: 16px;
 	font-weight: 700;
 	color: #fff;
 	margin-top: 4px;
@@ -313,6 +354,7 @@ const choose = (type) => {
 
 .entry-cancel-btn {
 	min-width: 88px;
+	font-size: 16px;
 	border-radius: 10px;
 	font-weight: 700;
 	background: $bg-section;
@@ -320,9 +362,13 @@ const choose = (type) => {
 	color: $text-secondary;
 }
 
+:deep(.el-select-dropdown__item) {
+	font-size: 16px;
+}
+
 @media (max-width: 576px) {
 	:deep(.waste-entry-dialog) {
-		padding: 28px 20px 24px;
+		padding: 24px 16px 20px;
 		width: 92vw !important;
 	}
 
