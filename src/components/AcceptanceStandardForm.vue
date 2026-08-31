@@ -121,23 +121,24 @@ function generateId() {
 }
 
 // 建立空白標準列
+const DEFAULT_PARAMETERS = ['硫酸濃度', '比重', '含水率']
 // 說明：建立初始化資料或執行初始化流程，供後續操作使用。
-function createEmptyStandard() {
+function createEmptyStandard(parameter = '') {
 	return {
 		id: generateId(),
-		parameter: '',
+		parameter,
 		operator: '等於',
 		value: null,
 		valueMin: null,
 		valueMax: null,
-		unit: '%'
+		unit: ''
 	}
 }
 
 // 元件初始化時的預設值
-const standards = ref([
-	createEmptyStandard()
-])
+const standards = ref(
+	DEFAULT_PARAMETERS.map((parameter) => createEmptyStandard(parameter))
+)
 const searchResults = ref([])
 const hasSearched = ref(false)
 let isUpdatingFromProp = false
@@ -149,6 +150,12 @@ const unitOptions = ref(['%', 'mg/kg', 'ppm', '°C', 'g/L', ''])
 // 參數 → 單位的對映表
 const parameterUnitMap = ref({})
 
+const applyMappedUnit = (standard) => {
+	const mappedUnit = parameterUnitMap.value[standard.parameter]
+	if (mappedUnit !== undefined) standard.unit = mappedUnit
+	return standard
+}
+
 onMounted(async () => {
 	try {
 		const properties = await getParameterOptions(props.wastecode)
@@ -157,6 +164,7 @@ onMounted(async () => {
 		// 單位選單使用 API 回傳的唯一單位列表
 		const apiUnits = [...new Set(properties.map((p) => p.unit).filter(Boolean)), '']
 		if (apiUnits.length > 1) unitOptions.value = apiUnits
+		standards.value.forEach(applyMappedUnit)
 	} catch {
 		// API 失敗時保持預設值
 	}
@@ -174,10 +182,7 @@ const handleParameterChange = (standard) => {
 	}
 
 	// 自動帶入對應單位
-	const mappedUnit = parameterUnitMap.value[standard.parameter]
-	if (mappedUnit !== undefined) {
-		standard.unit = mappedUnit
-	}
+	applyMappedUnit(standard)
 
 	if (typeof standard.value === 'string') {
 		standard.value = null
@@ -233,7 +238,7 @@ watch(() => props.initialStandards, (newVal) => {
 // 新增標準列
 // 說明：封裝「add Standard」商業邏輯，供目前流程重複使用。
 const addStandard = () => {
-	standards.value.push(createEmptyStandard())
+	standards.value.push(applyMappedUnit(createEmptyStandard()))
 }
 
 // 刪除標準列
@@ -247,7 +252,7 @@ const removeStandard = (index) => {
 // 重設表單
 // 說明：重置該模組資料回預設值，避免前次輸入影響新流程。
 const resetForm = () => {
-	standards.value = [createEmptyStandard()]
+	standards.value = DEFAULT_PARAMETERS.map((parameter) => applyMappedUnit(createEmptyStandard(parameter)))
 	searchResults.value = []
 	hasSearched.value = false
 }
@@ -263,16 +268,17 @@ const viewDetail = (code) => {
 // 說明：寫入「set Standards」到狀態管理，讓後續流程可直接取用。
 const setStandards = (parsedStandards) => {
 	if (parsedStandards && parsedStandards.length > 0) {
-		standards.value = parsedStandards.map(std => ({
+		const newStandards = parsedStandards.map(std => ({
 			...std,
 			id: generateId()
 		}))
+		standards.value.push(...newStandards)
 		searchResults.value = []
 		hasSearched.value = false
 	}
 }
 
-watch(standards, (value) => {
+watch(() => standards.value, (value) => {
 	// 避免 prop 更新導致的重複發射
 	if (isUpdatingFromProp) return
 

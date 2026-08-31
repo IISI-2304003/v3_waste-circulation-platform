@@ -6,13 +6,14 @@
 				<el-alert title="使用說明" type="info" :closable="false" show-icon>
 					<p>輸入廢棄物特性參數後，系統會自動解析為查詢條件。</p>
 					<p class="example-text">
-						請以頓號（、）分隔條件，例如：硫酸含量 &lt; 5%、重金屬含量 &lt; 100 mg/kg、pH值 &lt; 2</p>
+						請輸入檢測條件，可用頓號、逗號、分號或換行分隔。
+						例如：硫酸濃度 >= 40%、比重 >= 1.3、含水率 <= 60%</p>
 				</el-alert>
 			</div>
 
 			<!-- 輸入區域 -->
 			<div class="input-area">
-				<el-input v-model="inputText" type="textarea" :rows="3" placeholder="請輸入廢棄物特性參數，以頓號（、）分隔&#10;例如：水分 45%、硫酸含量 < 5%、重金屬含量 < 100 mg/kg、pH值 6~9" class="semantic-input" />
+				<el-input v-model="inputText" type="textarea" :rows="3" placeholder="請輸入檢測條件，可用頓號、逗號、分號或換行分隔。&#10;例如：硫酸濃度 >= 40%、比重 >= 1.3、含水率 <= 60%" class="semantic-input" />
 
 				<div class="char-count">
 					{{ inputText.length }} 字元
@@ -68,7 +69,7 @@ const parsing = ref(false)
 const examples = [
 	{
 		label: '化學品類',
-		text: '水分45%、硫酸含量<5%、氯離子1-6%、pH值 6~9'
+		text: '硫酸濃度至少 40%、比重 1.3 以上、含水率不超過 60%'
 	},
 	{
 		label: '重金屬類',
@@ -86,6 +87,27 @@ const fillExample = (text) => {
 	inputText.value = text
 }
 
+const parameterAliases = {
+	水分: '含水率',
+	水份: '含水率',
+	硫酸含量: '硫酸濃度',
+	酸鹼值: 'pH值',
+	pH: 'pH值'
+}
+
+const normalizeHumanInput = (text) => text
+	.replace(/不超過|至多|以下|不得高於/g, '<=')
+	.replace(/至少|以上|不得低於/g, '>=')
+	.replace(/小於|低於|少於/g, '<')
+	.replace(/大於|高於|超過/g, '>')
+	.replace(/等於|為/g, '=')
+	.replace(/[，,、；;]/g, '\n')
+	.replace(/(.+?)\s*(-?\d+(?:\.\d+)?)\s*([%a-zA-Z°/]+)?\s*(<=|>=|<|>)\s*$/gm, '$1$4$2$3')
+	.split('\n')
+	.map((item) => item.trim())
+	.filter(Boolean)
+	.join('\n')
+
 // 確認填入
 // 說明：由使用者互動觸發；執行「handle Confirm」流程並同步更新相關狀態。
 const handleConfirm = () => {
@@ -98,14 +120,10 @@ const handleConfirm = () => {
 
 	let parsedResult = []
 	try {
-		const normalizedText = inputText.value
-			.replace(/，/g, '、')
-			.split('、')
-			.map(item => item.trim())
-			.filter(Boolean)
-			.join('\n')
-
-		parsedResult = parseSemanticInput(normalizedText)
+		parsedResult = parseSemanticInput(normalizeHumanInput(inputText.value)).map((item) => ({
+			...item,
+			parameter: parameterAliases[item.parameter] || item.parameter
+		}))
 	} catch (error) {
 		console.error('解析失敗：', error)
 		ElMessage.error('解析失敗')

@@ -173,12 +173,22 @@
 							<ConditionAccordionSection id="environment" ref="environmentRef" title="環境影響" theme="orange" :expanded="expandedMap.environment" @toggle="toggleSection">
 								<el-form label-position="top" class="form-grid">
 									<el-row :gutter="24" class="form-row">
-										<el-col :xs="24" :sm="24" :md="12">
+										<el-col :xs="24" :sm="12" :md="12">
 											<el-form-item>
 												<template #label>
 													<span><span class="required-mark">*</span>是否有產生衍生廢棄物</span>
 												</template>
 												<el-select v-model="store.siteConditions.hasSecondaryWaste" :class="{ 'is-invalid': shouldMarkInvalid('hasSecondaryWaste') }" placeholder="選擇是否有產生衍生廢棄物" filterable>
+													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+										<el-col v-if="store.siteConditions.hasSecondaryWaste" :xs="24" :sm="12" :md="12">
+											<el-form-item>
+												<template #label>
+													<span><span class="required-mark">*</span>廢棄物代碼</span>
+												</template>
+												<el-select v-model="store.siteConditions.secondaryWasteCode" :class="{ 'is-invalid': shouldMarkInvalid('secondaryWasteCode') }" placeholder="選擇廢棄物代碼" filterable>
 													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
