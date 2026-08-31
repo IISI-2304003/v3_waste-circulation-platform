@@ -546,11 +546,11 @@ const getCodeNameByCode = (code) => {
   return list.find((item) => item.code === code) || ''
 }
 
-const navigateToEntry = (action, { code, category, page }) => {
+const navigateToEntry = (action, { code, category, page }, wasteDetail = '') => {
   if (action === 'analysis') {
     router.push({
       path: '/standard-input', // ← 換成你實際的路由
-      query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'full' }
+      query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'full', wasteDetail }
     })
   } else {
     router.push({
@@ -566,7 +566,7 @@ const handleCardClick = (code, category = selectedCategory.value) => {
 }
 
 const handleEntryLookup = () => navigateToEntry('lookup', pendingEntry.value)
-const handleEntryAnalysis = () => navigateToEntry('analysis', pendingEntry.value)
+const handleEntryAnalysis = (wasteDetail) => navigateToEntry('analysis', pendingEntry.value, wasteDetail)
 
 // 分類選擇彈窗(End)
 
