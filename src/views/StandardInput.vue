@@ -93,8 +93,8 @@ const buildCompanyPayload = () => ({
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goCompanyMatch = () => {
-  // router.push('/company-match')
   console.log('goCompanyMatch', buildCompanyPayload())
+  router.push('/company-match')
 }
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。

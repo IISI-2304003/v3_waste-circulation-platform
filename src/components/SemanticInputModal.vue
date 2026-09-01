@@ -7,13 +7,13 @@
 					<p>輸入廢棄物特性參數後，系統會自動解析為查詢條件。</p>
 					<p class="example-text">
 						請輸入檢測條件，可用頓號、逗號、分號或換行分隔。
-						例如：硫酸濃度 >= 40%、比重 >= 1.3、含水率 <= 60%</p>
+						例如：硫酸濃度 >= 40%、比重 >= 1.3、含水率 &lt;= 60%</p>
 				</el-alert>
 			</div>
 
 			<!-- 輸入區域 -->
 			<div class="input-area">
-				<el-input v-model="inputText" type="textarea" :rows="3" placeholder="請輸入檢測條件，可用頓號、逗號、分號或換行分隔。&#10;例如：硫酸濃度 >= 40%、比重 >= 1.3、含水率 <= 60%" class="semantic-input" />
+				<el-input v-model="inputText" type="textarea" :rows="3" placeholder="請輸入檢測條件，可用頓號、逗號、分號或換行分隔。&#10;例如：硫酸濃度 >= 40%、比重 >= 1.3、含水率 &lt;= 60%" class="semantic-input" />
 
 				<div class="char-count">
 					{{ inputText.length }} 字元
