@@ -13,11 +13,17 @@
 
           <div class="hero-actions">
             <el-button type="primary" size="large" round @click="scrollToSearch">
-              開始探索決策
+              開始循環路徑分析
               <el-icon class="el-icon--right">
                 <Search />
               </el-icon>
             </el-button>
+            <p class="hero-action-hint">
+              <el-icon>
+                <Opportunity />
+              </el-icon>
+              <span>不知道循環模式也沒關係，從您的廢棄物開始</span>
+            </p>
           </div>
 
           <div class="hero-bottom-left">
@@ -89,20 +95,20 @@
         <div class="search-header">
           <h2 class="section-title">廢棄物類別搜尋</h2>
           <p class="section-description">
-            點選六大廢棄物類別快速瀏覽，或輸入關鍵字精準查詢各項廢棄物資訊。
+            快速找到您要查詢的廢棄物項目。
           </p>
         </div>
 
         <!-- 搜尋卡片 -->
         <div class="search-card">
+          <div class="search-card-label">
+            <el-icon>
+              <Search />
+            </el-icon>
+            <span>知道代碼或名稱? 直接搜尋</span>
+          </div>
           <div class="search-card-input-group">
-            <div class="search-card-label">
-              <el-icon>
-                <Search />
-              </el-icon>
-              <span>關鍵字搜尋</span>
-            </div>
-            <el-input v-model="searchKeyword" clearable placeholder="請輸入關鍵字（例如：pH值、含水率、廢酸、重金屬）" class="search-input-field" @input="currentPage = 1" @keyup.enter="currentPage = 1">
+            <el-input v-model="searchKeyword" clearable placeholder="輸入代碼或關鍵字，例如：C-0202、廢硫酸" class="search-input-field" @input="currentPage = 1" @keyup.enter="currentPage = 1">
               <template #prefix>
                 <el-icon>
                   <Search />
@@ -128,6 +134,12 @@
         </div>
 
         <el-divider style="margin: 24px 0" />
+        <div class="search-card-label" style="padding-bottom: 15px;">
+          <el-icon>
+            <Menu />
+          </el-icon>
+          <span>不確定廢棄物名稱？ 從廢棄物類別開始查找</span>
+        </div>
         <!-- 六大類分類卡片 -->
         <div class="category-card-grid">
           <button v-for="cat in categoryCards" :key="cat.id" :class="['category-card', { 'category-card--active': isActiveCategory(cat.id) }]" :style="isActiveCategory(cat.id) ? activeCardStyle(cat.color) : {}" @click="selectCategory(cat.id)">
@@ -353,7 +365,7 @@ const codeCardTopIconPools = {
 
 
 
-const hotTags = ref(['pH值', '廢液', '廢鹼', '污泥', '事業廢棄物'])
+const hotTags = ref(['pH值', '廢硫酸', '廢酸', '污泥'])
 
 const footerHighlights = [
   {
@@ -819,10 +831,28 @@ onBeforeUnmount(() => {
 
 .hero-actions {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 16px;
   justify-content: flex-start;
   animation: fadeInUp 0.8s ease-out 0.4s backwards;
   order: 3;
+}
+
+.hero-action-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: -6px 0 0;
+  color: #315b72;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+
+  .el-icon {
+    color: #d99b17;
+    font-size: 21px;
+  }
 }
 
 .hero-bottom-left {
@@ -1077,8 +1107,8 @@ onBeforeUnmount(() => {
 
 .process-step-subtitle {
   margin: 0;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: #64748b;
   line-height: 1.3;
   white-space: nowrap;
@@ -1494,13 +1524,29 @@ onBeforeUnmount(() => {
       display: flex;
       flex-direction: column;
       gap: 14px;
+
+      .search-card-note {
+        font-size: 15px;
+        color: $text-secondary;
+      }
+    }
+
+    .search-category-title {
+      // text-align: center;
+
+      .search-category-note {
+        font-size: 22px;
+        color: $text-secondary;
+        padding-bottom: 20px;
+
+      }
     }
 
     .search-card-label {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 700;
       color: $text-primary;
 
@@ -1518,6 +1564,7 @@ onBeforeUnmount(() => {
       :deep(.el-button + .el-button) {
         margin-left: 0;
       }
+
     }
 
     .search-input-field {
@@ -2281,6 +2328,7 @@ onBeforeUnmount(() => {
 
   .hero-actions {
     justify-content: center;
+    align-items: center;
   }
 
   .search-shell {
@@ -2445,6 +2493,7 @@ onBeforeUnmount(() => {
     justify-content: center;
     gap: 6px;
     margin-top: 4px;
+
   }
 
   .process-dot {
@@ -2556,7 +2605,7 @@ onBeforeUnmount(() => {
   }
 
   .process-step-subtitle {
-    font-size: 14px;
+    font-size: 15px;
     white-space: normal;
   }
 

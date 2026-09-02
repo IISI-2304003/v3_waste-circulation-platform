@@ -40,14 +40,25 @@
 				</div>
 			</div>
 
-			<!-- 點選後顯示的卡片區塊內容 -->
-			<div v-if="selectedMode" class="mode-detail-card" @mouseenter="handleCardEnter" @mouseleave="handleModeLeave">
-				<h3>{{ selectedMode.name }}</h3>
-				<p>{{ selectedMode.description || '尚未提供模式說明。' }}</p>
-				<p class="mode-text">點擊圖示查看完整流程</p>
-				<!-- <el-button type="primary" round class="explore-btn" @click="handleExploreMode">
-					探索此模式
-				</el-button> -->
+			<!-- 固定顯示的模式導覽說明，以及 Hover 後顯示的模式卡片 -->
+			<div class="mode-detail-popover">
+				<div class="mode-explore-intro">
+					<h2>
+						<el-icon class="explore-arrow-icon">
+							<DArrowLeft />
+						</el-icon>
+						探索十大循環模式
+					</h2>
+					<p>點選任一模式，查看模式說明、<br>製程流程與廢清書填報事項。</p>
+				</div>
+				<div v-if="selectedMode" class="mode-detail-card" @mouseenter="handleCardEnter" @mouseleave="handleModeLeave">
+					<h3>{{ selectedMode.name }}</h3>
+					<p>{{ selectedMode.description || '尚未提供模式說明。' }}</p>
+					<p class="mode-text">點擊圖示查看完整流程</p>
+					<!-- <el-button type="primary" round class="explore-btn" @click="handleExploreMode">
+						探索此模式
+					</el-button> -->
+				</div>
 			</div>
 
 		</div>
@@ -61,6 +72,7 @@ import {
 	Connection,
 	OfficeBuilding,
 	Link,
+	DArrowLeft,
 	Share,
 	Lightning,
 	Coin,
@@ -490,19 +502,75 @@ onBeforeUnmount(() => {
 	animation: pulse-ring 3s ease-in-out infinite 0.5s;
 }
 
+/* Hover 模式說明 */
+.mode-detail-popover {
+	position: absolute;
+	right: -180px;
+	top: 0%;
+	z-index: 5;
+	animation: fadeInUp 0.5s ease-out;
+}
+
+.mode-explore-intro {
+	width: 280px;
+	padding: 16px 18px;
+	margin-bottom: 18px;
+	border: 1px solid rgba(255, 255, 255, 0.7);
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.5);
+	// box-shadow: 0 8px 22px rgba(21, 68, 105, 0.18);
+	backdrop-filter: blur(5px);
+
+	h2,
+	p {
+		margin: 0;
+	}
+
+	h2 {
+		color: #1b72cf;
+		font-size: 22px;
+		font-weight: 800;
+		line-height: 1.4;
+	}
+
+	p {
+		margin-top: 6px;
+		color: #1e456d;
+		font-size: 17px;
+		font-weight: 700;
+		line-height: 1.55;
+	}
+}
+
+@keyframes explore-arrow-pulse {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+
+	50% {
+		transform: translateX(-7px);
+	}
+}
+
+.explore-arrow-icon {
+	animation: explore-arrow-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.explore-arrow-icon {
+		animation: none;
+	}
+}
+
 /* 卡片區塊內容 */
 .mode-detail-card {
-	position: absolute;
-	right: -120px;
-	top: 20%;
 	width: 200px;
 	min-height: 250px;
 	background: #fffff9f6;
 	border-radius: 16px;
 	padding: 20px;
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-	z-index: 5;
-	animation: fadeInUp 0.5s ease-out;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
@@ -713,6 +781,20 @@ onBeforeUnmount(() => {
 		left: -37%;
 	}
 
+	.mode-detail-popover {
+		top: -250px;
+		right: auto;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 30;
+	}
+
+	.mode-explore-intro {
+		width: min(280px, calc(100vw - 32px));
+		margin-bottom: 0;
+		text-align: center;
+	}
+
 	.mode-detail-card {
 		position: absolute;
 		right: auto;
@@ -793,11 +875,84 @@ onBeforeUnmount(() => {
 		}
 	}
 
+
+
+	.mode-explore-intro {
+		width: 280px;
+		padding: 16px 18px;
+		margin-bottom: 18px;
+		border: 1px solid rgba(255, 255, 255, 0.7);
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.5);
+		// box-shadow: 0 8px 22px rgba(21, 68, 105, 0.18);
+		backdrop-filter: blur(5px);
+
+		h2,
+		p {
+			margin: 0;
+		}
+
+		h2 {
+			color: #1b72cf;
+			font-size: 22px;
+			font-weight: 800;
+			line-height: 1.4;
+		}
+
+		p {
+			margin-top: 6px;
+			color: #1e456d;
+			font-size: 17px;
+			font-weight: 700;
+			line-height: 1.55;
+		}
+	}
+
 }
 
 @media (min-width: 1600px) {
 	.circulation-modes-grid {
 		min-height: 620px;
+	}
+
+	/* Hover 模式說明 */
+	.mode-detail-popover {
+		position: absolute;
+		right: -200px;
+		top: 0%;
+		z-index: 5;
+		animation: fadeInUp 0.5s ease-out;
+	}
+
+	.mode-explore-intro {
+		width: 280px;
+		padding: 16px 18px;
+		margin-bottom: 18px;
+		border: 1px solid rgba(255, 255, 255, 0.7);
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.5);
+		// box-shadow: 0 8px 22px rgba(21, 68, 105, 0.18);
+		backdrop-filter: blur(5px);
+
+		h2,
+		p {
+			margin: 0;
+		}
+
+		h2 {
+			color: #1b72cf;
+			font-size: 18px;
+			font-weight: 800;
+			line-height: 1.4;
+		}
+
+		p {
+			margin-top: 6px;
+			color: #1e456d;
+			font-size: 17px;
+			font-weight: 700;
+			line-height: 1.55;
+		}
 	}
 }
 
