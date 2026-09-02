@@ -132,12 +132,8 @@ const IconUsers = defineComponent({
 
 const items = [
 	{ id: 'physical', label: '物化特性', svgIcon: IconFlask },
-	{ id: 'source', label: '來源穩定性', svgIcon: IconBuilding },
-	{ id: 'site', label: '場地配置', svgIcon: IconMap },
-	{ id: 'environment', label: '環境影響', svgIcon: IconLeaf },
-	{ id: 'business', label: '經濟效益', svgIcon: IconCoin },
-	{ id: 'technology', label: '技術成熟度', svgIcon: IconCpu },
-	{ id: 'demand', label: '再生產品使用者需求', svgIcon: IconUsers },
+	{ id: 'source', label: '來源與場域條件', svgIcon: IconBuilding },
+	{ id: 'technology', label: '技術與產品條件', svgIcon: IconCpu },
 ]
 
 // 說明：回傳「get Step Status」資料供畫面渲染或後續商業規則使用。

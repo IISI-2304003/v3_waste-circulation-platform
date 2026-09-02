@@ -90,21 +90,9 @@
 
 								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" :wastecode="props.selectedCode" :invalid="shouldMarkInvalid('acceptance')" @change="handleStandardsChange" />
 
-								<!-- <div class="report-upload">
-									<h4>檢測報告上傳區</h4>
-									<el-upload drag multiple :auto-upload="false" :file-list="uploadFiles" :on-change="onFileChange" :on-remove="onFileRemove">
-										<el-icon class="upload-icon">
-											<UploadFilled />
-										</el-icon>
-										<div class="el-upload__text">拖曳檔案到此或 <em>點擊上傳</em></div>
-										<template #tip>
-											<div class="el-upload__tip">支援 PDF / XLSX / CSV，最多 20 MB</div>
-										</template>
-									</el-upload>
-								</div> -->
 							</ConditionAccordionSection>
 
-							<ConditionAccordionSection id="source" ref="sourceRef" title="料源穩定性" theme="cyan" :expanded="expandedMap.source" @toggle="toggleSection">
+							<ConditionAccordionSection id="source" ref="sourceRef" title="來源與場域條件" theme="cyan" :expanded="expandedMap.source" @toggle="toggleSection">
 								<el-form label-position="top">
 									<el-row :gutter="24" class="form-row">
 										<el-col :xs="24" :sm="24" :md="12" class="form-col">
@@ -131,9 +119,9 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>產出頻率</span>
+													<span>產出頻率</span>
 												</template>
-												<el-select v-model="store.sourceConditions.frequency" :class="{ 'is-invalid': shouldMarkInvalid('sourceFrequency') }" placeholder="選擇產出頻率" filterable>
+												<el-select v-model="store.sourceConditions.frequency" placeholder="選擇產出頻率" filterable>
 													<el-option v-for="item in sourceFrequencyOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -141,20 +129,11 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>產出量 (公噸)</span>
+													<span>產出量 (公噸)</span>
 												</template>
-												<el-input-number v-model="store.sourceConditions.outputAmount" :class="{ 'is-invalid': shouldMarkInvalid('sourceOutputAmount') }" :min="0" :max="100000" :step="1" controls-position="right" />
+												<el-input-number v-model="store.sourceConditions.outputAmount" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
 										</el-col>
-
-
-									</el-row>
-								</el-form>
-							</ConditionAccordionSection>
-
-							<ConditionAccordionSection id="site" ref="siteRef" title="場地配置" theme="violet" :expanded="expandedMap.site" @toggle="toggleSection">
-								<el-form label-position="top" class="form-grid">
-									<el-row :gutter="24" class="form-row">
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
@@ -165,14 +144,6 @@
 												</el-select>
 											</el-form-item>
 										</el-col>
-									</el-row>
-								</el-form>
-
-							</ConditionAccordionSection>
-
-							<ConditionAccordionSection id="environment" ref="environmentRef" title="環境影響" theme="orange" :expanded="expandedMap.environment" @toggle="toggleSection">
-								<el-form label-position="top" class="form-grid">
-									<el-row :gutter="24" class="form-row">
 										<el-col :xs="24" :sm="12" :md="12">
 											<el-form-item>
 												<template #label>
@@ -188,103 +159,40 @@
 												<template #label>
 													<span><span class="required-mark">*</span>廢棄物代碼</span>
 												</template>
-												<el-select v-model="store.siteConditions.secondaryWasteCode" :class="{ 'is-invalid': shouldMarkInvalid('secondaryWasteCode') }" placeholder="選擇廢棄物代碼" filterable>
+												<el-select v-model="store.siteConditions.secondaryWasteCode" :class="{ 'is-invalid': shouldMarkInvalid('hasSecondaryWaste') }" placeholder="選擇廢棄物代碼" filterable>
 													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
 										</el-col>
+
 									</el-row>
 								</el-form>
 							</ConditionAccordionSection>
 
-							<ConditionAccordionSection id="business" ref="businessRef" title="經濟效益" theme="violet" :expanded="expandedMap.business" @toggle="toggleSection">
-								<el-form label-position="top">
-									<el-row :gutter="24" class="form-row">
-										<el-col :xs="24" :sm="24" :md="12" class="form-col">
-											<el-form-item>
-												<template #label>
-													<span><span class="required-mark">*</span>資本額(元)</span>
-												</template>
-												<el-select v-model="store.businessConditions.capitalAmount" :class="{ 'is-invalid': shouldMarkInvalid('capitalAmount') }" placeholder="選擇資本額">
-													<el-option v-for="item in capitalAmountOptions" :key="item.value" :label="item.label" :value="item.value" />
-												</el-select>
-											</el-form-item>
-										</el-col>
-										<el-col :xs="24" :sm="24" :md="12" class="form-col">
-											<el-form-item>
-												<template #label>
-													<span><span class="required-mark">*</span>清除頻率</span>
-												</template>
-												<el-select v-model="store.businessConditions.clearanceFrequency" :class="{ 'is-invalid': shouldMarkInvalid('clearanceFrequency') }" placeholder="選擇清除頻率">
-													<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.label" />
-												</el-select>
-											</el-form-item>
-										</el-col>
-										<el-col :xs="24" :sm="24" :md="12">
-											<el-form-item>
-												<template #label>
-													<span>清除量（公噸）</span>
-												</template>
-												<el-input-number v-model="store.businessConditions.clearanceAmount" :min="0" :max="100000" :step="1" controls-position="right" />
-											</el-form-item>
-										</el-col>
-										<el-col :xs="24" :sm="24" :md="12">
-											<el-form-item>
-												<template #label>
-													<span>清除費用（元/公噸）</span>
-												</template>
-												<el-input-number v-model="store.businessConditions.clearanceCost" :min="0" :max="100000" :step="1" controls-position="right" />
-											</el-form-item>
-										</el-col>
-										<el-col :xs="24" :sm="24" :md="12">
-											<el-form-item>
-												<template #label>
-													<span>處理量（公噸）</span>
-												</template>
-												<el-input-number v-model="store.businessConditions.processingAmount" :min="0" :max="100000" :step="1" controls-position="right" />
-											</el-form-item>
-										</el-col>
-										<el-col :xs="24" :sm="24" :md="12">
-											<el-form-item>
-												<template #label>
-													<span>處理費用（元/公噸）</span>
-												</template>
-												<el-input-number v-model="store.businessConditions.processingCost" :min="0" :max="100000" :step="1" controls-position="right" />
-											</el-form-item>
-										</el-col>
-									</el-row>
-								</el-form>
-							</ConditionAccordionSection>
 
-							<ConditionAccordionSection id="technology" ref="technologyRef" title="技術成熟度" theme="violet" :expanded="expandedMap.technology" @toggle="toggleSection">
+							<ConditionAccordionSection id="technology" ref="technologyRef" title="技術與產品條件" theme="violet" :expanded="expandedMap.technology" @toggle="toggleSection">
 								<el-form label-position="top">
 									<el-row :gutter="24" class="form-row">
 										<el-col :xs="24" :sm="24" :md="24" class="form-col">
 											<el-form-item>
 												<template #label>
-													<span>請選擇符合之技術成熟度類型（可複選）</span>
+													<span><span class="required-mark">*</span>請選擇符合之技術成熟度類型（可複選）</span>
 												</template>
 
-												<el-checkbox-group v-model="technologySelections" class="option-checkbox-group">
+												<el-checkbox-group v-model="technologySelections" class="option-checkbox-group" :class="{ 'is-invalid': shouldMarkInvalid('technologySelections') }">
 													<el-checkbox v-for="item in technologyOptions" :key="item.value" :value="item.value">
 														{{ item.label }}
 													</el-checkbox>
 												</el-checkbox-group>
 											</el-form-item>
 										</el-col>
-									</el-row>
-								</el-form>
-							</ConditionAccordionSection>
-							<ConditionAccordionSection id="demand" ref="demandRef" title="再生產品使用者製程需求" theme="cyan" :expanded="expandedMap.demand" @toggle="toggleSection">
-								<el-form label-position="top">
-									<el-row :gutter="24" class="form-row">
 										<el-col :xs="24" :sm="24" :md="24" class="form-col">
 											<el-form-item>
 												<template #label>
-													<span>請選擇符合之使用者需求（可複選）</span>
+													<span><span class="required-mark">*</span>請選擇符合之使用者需求（可複選）</span>
 												</template>
 
-												<el-checkbox-group v-model="demandSelections" class="option-checkbox-group">
+												<el-checkbox-group v-model="demandSelections" class="option-checkbox-group" :class="{ 'is-invalid': shouldMarkInvalid('demandSelections') }">
 													<el-checkbox v-for="item in demandOptions" :key="item.value" :value="item.value">
 														{{ item.label }}
 													</el-checkbox>
@@ -425,22 +333,6 @@ const sourceFrequencyOptions = [
 	{ value: 'quarterly', label: '每季' }
 ]
 
-const clearanceFrequencyOptions = [
-	{ value: 'daily', label: '每日' },
-	{ value: 'weekly', label: '每週' },
-	{ value: 'monthly', label: '每月' },
-	{ value: 'quarterly', label: '每季' },
-	{ value: 'yearly', label: '每年' }
-]
-
-const capitalAmountOptions = [
-	{ value: '0-1000000', label: '0 ~ 1,000,000 元' },
-	{ value: '1000001-5000000', label: '1,000,001 ~ 5,000,000 元' },
-	{ value: '5000001-10000000', label: '5,000,001 ~ 10,000,000 元' },
-	{ value: '10000001-50000000', label: '10,000,001 ~ 50,000,000 元' },
-	{ value: '50000001-100000000', label: '50,000,001 ~ 100,000,000 元' },
-	{ value: '100000001+', label: '100,000,001 元以上' }
-]
 
 const technologySelections = computed({
 	get: () => store.technologySelections,
@@ -457,35 +349,18 @@ const configuredSections = computed(() => {
 	const result = []
 	const src = store.sourceConditions
 	const site = store.siteConditions
-	const biz = store.businessConditions
 
-	// 物化特性：有允收條件或上傳檔案
+	// 物化特性：有允收條件
 	if (store.acceptanceConditions.length > 0) {
 		result.push('physical')
 	}
-	// 來源穩定性：任一欄位有內容
-	if (src.industry || src.process || src.outputAmount || src.frequency) {
+	// 來源與場域條件：任一欄位有內容
+	if (src.industry || src.process || src.outputAmount || src.frequency || site.hasReuseSpace !== null || site.hasSecondaryWaste !== null) {
 		result.push('source')
 	}
-	// 場地配置：區域已選或包含再利用空間被設定
-	if ((site.region && site.region.length > 0) || site.hasReuseSpace !== null) {
-		result.push('site')
-	}
-	// 環境影響：衍生廢棄物設定被動進
-	if (site.hasSecondaryWaste !== null) {
-		result.push('environment')
-	}
-	// 經濟效益：清除頻率或清除量
-	if (biz.clearanceFrequency || biz.clearanceAmount) {
-		result.push('business')
-	}
-	// 技術成熟度：已勾選任一選項
-	if (technologySelections.value.length > 0) {
+	// 技術與產品條件：已勾選任一選項
+	if (technologySelections.value.length > 0 || demandSelections.value.length > 0) {
 		result.push('technology')
-	}
-	// 再生產品使用者需求：已勾選任一選項
-	if (demandSelections.value.length > 0) {
-		result.push('demand')
 	}
 
 	return result
@@ -517,11 +392,7 @@ const hasCompleteAcceptanceCondition = () => store.acceptanceConditions.some((co
 const sectionRefMap = {
 	physical: physicalRef,
 	source: sourceRef,
-	site: siteRef,
-	environment: environmentRef,
-	business: businessRef,
 	technology: technologyRef,
-	demand: demandRef
 }
 
 // 說明：初始化載入來源產業選項，供「來源產業」下拉使用。
@@ -648,14 +519,6 @@ const getMissingRequiredFields = () => {
 		missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
 	}
 
-	if (store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined) {
-		missingFields.push({ sectionId: 'source', label: '月產出量 (公噸)' })
-	}
-
-	if (!store.sourceConditions.frequency) {
-		missingFields.push({ sectionId: 'source', label: '產出頻率' })
-	}
-
 	if (store.siteConditions.hasReuseSpace === null) {
 		missingFields.push({ sectionId: 'site', label: '是否有再利用空間' })
 	}
@@ -663,20 +526,21 @@ const getMissingRequiredFields = () => {
 	if (store.siteConditions.hasSecondaryWaste === null) {
 		missingFields.push({ sectionId: 'environment', label: '是否有產生衍生廢棄物' })
 	}
-
-	if (!store.businessConditions.capitalAmount) {
-		missingFields.push({ sectionId: 'business', label: '資本額(元)' })
+	if (technologySelections.value.length === 0) {
+		missingFields.push({ sectionId: 'technology', label: '技術成熟度類型' })
 	}
 
-	if (!store.businessConditions.clearanceFrequency) {
-		missingFields.push({ sectionId: 'business', label: '清除頻率' })
+	if (demandSelections.value.length === 0) {
+		missingFields.push({ sectionId: 'technology', label: '使用者需求' })
 	}
+
 
 	return missingFields
 }
 
 // 說明：由「下一步：決策分析」按鈕觸發；先檢查必填欄位，通過後觸發 next 事件進入下一步。
 const handleNext = async () => {
+	console.log('store.acceptanceConditions', store.acceptanceConditions)
 	const missingFields = getMissingRequiredFields()
 	if (missingFields.length === 0) {
 		hasValidationAttempted.value = false
@@ -701,15 +565,15 @@ const shouldMarkInvalid = (fieldKey) => {
 	const fieldCheckMap = {
 		businessName: () => !String(store.businessConditions.businessName || '').trim(),
 		businessAddress: () => !String(store.businessConditions.businessAddress || '').trim(),
+		acceptance: () => !hasCompleteAcceptanceCondition(),
 		sourceIndustry: () => !store.sourceConditions.industry,
 		sourceProcess: () => !store.sourceConditions.process,
 		sourceOutputAmount: () => store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined,
 		sourceFrequency: () => !store.sourceConditions.frequency,
 		hasReuseSpace: () => store.siteConditions.hasReuseSpace === null,
 		hasSecondaryWaste: () => store.siteConditions.hasSecondaryWaste === null,
-		capitalAmount: () => !store.businessConditions.capitalAmount,
-		clearanceFrequency: () => !store.businessConditions.clearanceFrequency,
-		acceptance: () => !hasCompleteAcceptanceCondition()
+		technologySelections: () => technologySelections.value.length === 0,
+		demandSelections: () => demandSelections.value.length === 0,
 	}
 
 	return fieldCheckMap[fieldKey]?.() || false
@@ -1169,6 +1033,16 @@ defineExpose({
 		white-space: normal;
 		word-break: break-word;
 		font-size: 18px;
+	}
+}
+
+.option-checkbox-group.is-invalid {
+	:deep(.el-checkbox__inner) {
+		border-color: #f56c6c;
+	}
+
+	:deep(.el-checkbox:hover .el-checkbox__inner) {
+		border-color: #f56c6c;
 	}
 }
 
