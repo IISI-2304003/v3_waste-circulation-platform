@@ -350,7 +350,7 @@ const conditionSummary = computed(() => {
   const technologyScore = 50 // 默認中等影響度
 
   const demandScore = 50 // 默認中等影響度
-  console.log("store.businessConditions", store.businessConditions);
+  console.log("store", store);
 
   return [
     {

@@ -102,7 +102,9 @@ const goCompanyMatch = async () => {
   isSubmitting.value = true
 
   try {
-    await postCompanyData(buildCompanyPayload())
+    const response = await postCompanyData(buildCompanyPayload())
+
+    console.log('後端回傳資料：', response)
     router.push('/company-match')
   } catch (error) {
     const errorMessage = error?.response?.data?.message || '資料送出失敗，請稍後再試'
