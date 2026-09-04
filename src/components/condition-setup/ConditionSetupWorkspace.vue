@@ -540,7 +540,6 @@ const getMissingRequiredFields = () => {
 
 // 說明：由「下一步：決策分析」按鈕觸發；先檢查必填欄位，通過後觸發 next 事件進入下一步。
 const handleNext = async () => {
-	console.log('store.acceptanceConditions', store.acceptanceConditions)
 	const missingFields = getMissingRequiredFields()
 	if (missingFields.length === 0) {
 		hasValidationAttempted.value = false

@@ -25,13 +25,18 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import ConditionSetupWorkspace from '@/components/condition-setup/ConditionSetupWorkspace.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import { postCompanyData } from '@/api/wasteCode.js'
 
 const router = useRouter()
 const route = useRoute()
 const conditionStore = useConditionSetupStore()
+const isSubmitting = ref(false)
+
 
 const buildCompanyPayload = () => ({
   // 目前使用者停留的條件區塊 ID（例如 physical/source/site）
@@ -92,9 +97,21 @@ const buildCompanyPayload = () => ({
 
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
-const goCompanyMatch = () => {
-  console.log('goCompanyMatch', buildCompanyPayload())
-  router.push('/company-match')
+const goCompanyMatch = async () => {
+  if (isSubmitting.value) return
+  isSubmitting.value = true
+  try {
+    await postCompanyData(buildCompanyPayload())
+    console.log('goCompanyMatch', buildCompanyPayload())
+    router.push('/company-match')
+  } catch (error) {
+    console.error(error)
+    const errorMessage = error?.response?.data?.message || '資料送出失敗，請稍後再試'
+    ElMessage.error(errorMessage)
+  } finally {
+    isSubmitting.value = false
+  }
+
 }
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
