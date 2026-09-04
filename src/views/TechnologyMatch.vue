@@ -106,7 +106,7 @@
 					</div>
 					<div class="sort-controls">
 						<el-select v-model="sortType" class="sort-select" placeholder="排序條件">
-							<el-option label="綜合排序" value="overall" />
+							<el-option label="依事業管制編號" value="overall" />
 							<el-option label="依地區" value="distance" />
 							<el-option label="依再利用量" value="capacity" />
 						</el-select>
@@ -466,6 +466,13 @@
 						<section class="detail-card contact-card wide-card">
 							<p class="detail-title">聯絡資訊</p>
 							<div class="contact-row">
+								<div class="contact-item">
+									<span class="contact-label">聯絡人</span>
+									<div class="contact-value-row">
+										<strong class="contact-value">{{ activeVendor.contact_person }}</strong>
+										
+									</div>
+								</div>
 								<div class="contact-item">
 									<span class="contact-label">聯絡電話</span>
 									<div class="contact-value-row">
@@ -2480,7 +2487,7 @@ const goBackHome = () => {
 
 .contact-row {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 12px;
 }
 
