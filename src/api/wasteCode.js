@@ -268,7 +268,7 @@ export function postCompanyData(payload) {
 
 
 /**
- * 取得廠商清單
+ * 簡易模式取得廠商清單
  */
 // 說明：從 API 取得可合作的廠商資料，並轉換為前端顯示格式。
 export async function getCompanyList() {

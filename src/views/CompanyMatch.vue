@@ -146,7 +146,7 @@
                     </span> -->
                   </div>
                   <el-button type="primary" class="detail-btn" @click="goNext(path)">
-                    技術決策推薦
+                    執行方式與技術廠商
                     <el-icon class="el-icon--right">
                       <ArrowRight />
                     </el-icon>
@@ -182,7 +182,7 @@
           <p class="help-sub">本系統提供決策參考，實際合作仍應依相關條件評估。</p>
         </div>
       </div>
-      <div class="footer-hint">請先點選上方任一推薦路徑卡片的「技術決策推薦」，即可進入下一步。</div>
+      <div class="footer-hint">請先點選上方任一推薦路徑卡片的「執行方式與技術廠商」，即可進入下一步。</div>
       <!-- <el-button type="primary" @click="goNext">
         下一步：技術決策推薦
         <el-icon class="el-icon--right">

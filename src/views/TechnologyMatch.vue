@@ -102,15 +102,15 @@
 								<Opportunity />
 							</el-icon>
 						</div>
-						<h2>決策結果推薦</h2>
+						<h2>{{ isInternalMode ? '廠內自行執行' : '執行方式與技術廠商' }}</h2>
 					</div>
-					<div class="sort-controls">
+					<div v-if="!isInternalMode" class="sort-controls">
 						<el-select v-model="sortType" class="sort-select" placeholder="排序條件">
 							<el-option label="依事業管制編號" value="overall" />
-							<el-option label="依地區" value="distance" />
+							<el-option label="依地區" value="road_distance_km" />
 							<el-option label="依再利用量" value="capacity" />
 						</el-select>
-						<el-select v-if="sortType === 'distance'" v-model="selectedRegions" multiple collapse-tags collapse-tags-tooltip placeholder="篩選縣市" class="sort-select region-select">
+						<el-select v-if="sortType === 'road_distance_km'" v-model="selectedRegions" multiple collapse-tags collapse-tags-tooltip placeholder="篩選縣市" class="sort-select region-select">
 							<el-option v-for="city in taiwanCities" :key="city" :label="city" :value="city">
 								<el-checkbox :model-value="selectedRegions.includes(city)" style="pointer-events:none" />
 								<span style="margin-left:8px">{{ city }}</span>
@@ -118,131 +118,129 @@
 						</el-select>
 					</div>
 				</div>
-
-				<div class="supplier-list">
-					<el-row :gutter="16">
-						<el-col v-for="(vendor) in pagedVendors" :key="vendor.id" style="margin-bottom: 16px" :xs="24" :sm="24">
-							<article class="supplier-card" role="button" tabindex="0">
-								<!-- 左側：排名 + 圖片 -->
-								<div class="card-left">
-									<img class="supplier-photo" :src="vendor.image" :alt="vendor.name" />
-								</div>
-
-								<!-- 右側：內容 -->
-								<div class="supplier-main">
-									<!-- 頂部：標籤列 -->
-									<div class="card-tags">
-										<span class="meta-chip ann_category">{{ vendor.announcement_category_name }}</span>
-										<span v-if="vendor.is_reuse_company && vendor.announcement_category_name !== '再利用機構'" class="meta-chip ann_reuse">再利用機構</span>
+				<!-- 廠內模式：顯示提示文字，取代整個廠商清單區塊 -->
+				<template v-if="isInternalMode">
+					<p class="internal-execution-note">
+						此循環模式由產源事業於廠內自行執行，無須尋找外部技術廠商。
+					</p>
+				</template>
+				<template v-else>
+					<div class="supplier-list">
+						<el-row :gutter="16">
+							<el-col v-for="(vendor) in pagedVendors" :key="vendor.id" style="margin-bottom: 16px" :xs="24" :sm="24">
+								<article class="supplier-card" role="button" tabindex="0">
+									<!-- 左側：排名 + 圖片 -->
+									<div class="card-left">
+										<img class="supplier-photo" :src="vendor.image" :alt="vendor.name" />
 									</div>
 
-									<!-- 名稱 +  前月收受能力 -->
-									<div class="card-header-row">
-										<div class="name-match">
-											<h3>{{ vendor.company_name }}</h3>
+									<!-- 右側：內容 -->
+									<div class="supplier-main">
+										<!-- 頂部：標籤列 -->
+										<div class="card-tags">
+											<span class="meta-chip ann_category">{{ vendor.announcement_category_name }}</span>
+											<span v-if="vendor.is_reuse_company === '是' && vendor.announcement_category_name !== '再利用機構'" class="meta-chip ann_reuse">再利用機構</span>
+										</div>
 
-										</div>
-									</div>
+										<!-- 名稱 +  前月收受能力 -->
+										<div class="card-header-row">
+											<div class="name-match">
+												<h3>{{ vendor.company_name }}</h3>
 
-									<!-- Meta 資訊：3欄 grid -->
-									<div class="meta-grid">
-										<div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Location />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">再利用廢棄物</p>
-												<p class="meta-text">{{ vendor.waste_name }}</p>
 											</div>
 										</div>
-										<div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Location />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">所在地</p>
-												<p class="meta-text">{{ vendor.region }}</p>
-											</div>
-										</div>
-										<!-- <div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Position />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">距離</p>
-												<p class="meta-text">{{ vendor.distance }} km</p>
-											</div>
-										</div> -->
-										<div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Box />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">再生產品</p>
-												<p class="meta-text"><span v-for="(item, idx) in vendor.product" :key="idx">{{ item }}<template v-if="idx < vendor.product.length - 1">、</template></span></p>
-											</div>
-										</div>
-										<div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Box />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">許可總量</p>
-												<p class="meta-text">{{ vendor.permitted_quantity }} 噸/月</p>
-											</div>
-										</div>
-										<div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Box />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">前月收受總量</p>
-												<div class="capacity-dots">
-													<div class="dots-container">
-														<span class="dot" :class="getDotClass(vendor.capacityLevel, 1)"></span>
-														<span class="dot" :class="getDotClass(vendor.capacityLevel, 2)"></span>
-														<span class="dot" :class="getDotClass(vendor.capacityLevel, 3)"></span>
-													</div>
-													<span class="capacity-text">{{ vendor.capacityLevel === 1 ? '低' : vendor.capacityLevel === 2 ? '中' : '高' }} </span>
+
+										<!-- Meta 資訊：3欄 grid -->
+										<div class="meta-grid">
+											<div class="meta-item">
+												<span class="meta-icon"><el-icon>
+														<Location />
+													</el-icon></span>
+												<div>
+													<p class="meta-title">再利用廢棄物</p>
+													<p class="meta-text">{{ vendor.waste_name }}</p>
 												</div>
+											</div>
+											<div class="meta-item">
+												<span class="meta-icon"><el-icon>
+														<Location />
+													</el-icon></span>
+												<div>
+													<p class="meta-title">所在地</p>
+													<p class="meta-text">{{ vendor.region }}</p>
+												</div>
+											</div>
+											<div class="meta-item">
+												<span class="meta-icon"><el-icon>
+														<Position />
+													</el-icon></span>
+												<div>
+													<p class="meta-title">距離</p>
+													<p class="meta-text">{{ vendor.road_distance_km }} km</p>
+												</div>
+											</div>
+											<div class="meta-item">
+												<span class="meta-icon"><el-icon>
+														<Box />
+													</el-icon></span>
+												<div>
+													<p class="meta-title">許可總量</p>
+													<p class="meta-text">{{ vendor.permitted_quantity }} 噸/月</p>
+												</div>
+											</div>
+											<div class="meta-item">
+												<span class="meta-icon"><el-icon>
+														<Box />
+													</el-icon></span>
+												<div>
+													<p class="meta-title">前月收受總量</p>
+													<div class="capacity-dots">
+														<div class="dots-container">
+															<span class="dot" :class="getDotClass(vendor.capacityLevel, 1)"></span>
+															<span class="dot" :class="getDotClass(vendor.capacityLevel, 2)"></span>
+															<span class="dot" :class="getDotClass(vendor.capacityLevel, 3)"></span>
+														</div>
+														<span class="capacity-text">{{ vendor.capacityLevel === 1 ? '低' : vendor.capacityLevel === 2 ? '中' : '高' }} </span>
+													</div>
 
+												</div>
+											</div>
+											<div class="meta-item">
+												<span class="meta-icon"><el-icon>
+														<Box />
+													</el-icon></span>
+												<div>
+													<p class="meta-title">事業管制編號</p>
+													<p class="meta-text">{{ vendor.control_number }}</p>
+												</div>
+											</div>
+											<div class="meta-item">
+												<span class="meta-icon"><el-icon>
+														<Box />
+													</el-icon></span>
+												<div>
+													<p class="meta-title">有效許可期限</p>
+													<p class="meta-text">{{ vendor.permit_end_date }}</p>
+												</div>
 											</div>
 										</div>
-										<div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Box />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">事業管制編號</p>
-												<p class="meta-text">{{ vendor.control_number }}</p>
-											</div>
-										</div>
-										<div class="meta-item">
-											<span class="meta-icon"><el-icon>
-													<Box />
-												</el-icon></span>
-											<div>
-												<p class="meta-title">有效許可期限</p>
-												<p class="meta-text">{{ vendor.permit_end_date }}</p>
+
+										<!-- 底部：適合原因 + 查看詳情 -->
+										<div class="card-footer">
+											<span class="reason-label">適合原因</span>
+											<div class="footer-row">
+												<div class="reason-block">
+													<span v-for="reason in vendor.conditional_judgment" :key="reason" class="detail-tag yellow">{{ reason }}</span>
+												</div>
+												<button class="detail-btn" @click.stop="openVendorDetail(vendor)">查看詳情</button>
 											</div>
 										</div>
 									</div>
-
-									<!-- 底部：適合原因 + 查看詳情 -->
-									<div class="card-footer">
-										<span class="reason-label">適合原因</span>
-										<div class="footer-row">
-											<div class="reason-block">
-												<span v-for="reason in vendor.reasons" :key="reason" class="detail-tag yellow">{{ reason }}</span>
-											</div>
-											<button class="detail-btn" @click.stop="openVendorDetail(vendor)">查看詳情</button>
-										</div>
-									</div>
-								</div>
-							</article>
-						</el-col>
-					</el-row>
-				</div>
+								</article>
+							</el-col>
+						</el-row>
+					</div>
+				</template>
 
 				<div v-if="totalPages > 1" class="pagination-wrap">
 					<el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="sortedVendors.length" layout="prev, pager, next" />
@@ -299,7 +297,6 @@
 							</template>
 						</div>
 						<div class="alternative-meta-row">
-							<!-- <span class="alternative-vendor-count">推薦廠商數<span class="vendor-count">{{ getRecommendedVendorCount(path.modeName) }} </span>家</span> -->
 							<el-button type="primary" class="detail-btn" @click="switchToAlternativePath(path)">
 								查看此方案
 								<el-icon class="el-icon--right">
@@ -317,7 +314,8 @@
 					<div v-if="activeVendor" class="dialog-top-header">
 						<div class="top-header-main">
 							<div class="top-left-copy">
-								<span class="vendor-tag">{{ activeVendor.isReuseOrg ? '再利用廠商' : '處理機構' }}</span>
+								<span class="vendor-tag">{{ activeVendor.announcement_category_name }}</span>
+								<span class="vendor-tag" v-if="activeVendor.is_reuse_company === '是' && activeVendor.announcement_category_name !== '再利用機構'">再利用機構</span>
 								<h3>{{ activeVendor.company_name }}</h3>
 								<div class="mode-title-row">
 									<span class="mode-badge">{{ selectedMode.modeName }}</span>
@@ -367,15 +365,7 @@
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Promotion />
 									</el-icon><span>距離</span></div>
-								<strong>{{ activeVendor.distance }} km</strong>
-							</div>
-						</el-col>
-						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
-							<div class="hero-stat">
-								<div class="hero-stat-head"><el-icon class="stat-icon">
-										<Goods />
-									</el-icon><span>再生產品</span></div>
-								<strong><span v-for="(item, idx) in activeVendor.product" :key="idx">{{ item }}<template v-if="idx < activeVendor.product.length - 1">、</template></span></strong>
+								<strong>{{ activeVendor.road_distance_km }} km</strong>
 							</div>
 						</el-col>
 						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
@@ -386,7 +376,7 @@
 								<strong>{{ activeVendor.permitted_quantity }}噸/月</strong>
 							</div>
 						</el-col>
-						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+						<el-col :xs="12" :sm="8" :md="4" :lg="6" :xl="4">
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Finished />
@@ -428,32 +418,11 @@
 								<p class="capacity-note" v-if="activeVendor.capacityLevel === 1">收受能力充足，可立即決策合作。</p>
 							</div>
 						</section>
-
-						<!-- <section class="detail-card">
-							<p class="detail-title">再利用技術</p>
-							<el-divider />
-							<p class="detail-text">{{ activeVendor.reuseTech }}</p>
-						</section> -->
-						<!-- <section class="detail-card">
-							<p class="detail-title">製程單元</p>
-							<el-divider />
-							<div class="tag-wrap">
-								<span v-for="item in activeVendor.processUnits" :key="item" class="detail-tag green">{{ item }}</span>
-							</div>
-						</section>
-
-						<section class="detail-card">
-							<p class="detail-title">再生產品應用領域</p>
-							<el-divider />
-							<div class="tag-wrap">
-								<span v-for="item in activeVendor.salesTargetIndustries" :key="item" class="detail-tag green">{{ item }}</span>
-							</div>
-						</section> -->
 						<section class="detail-card">
 							<p class="detail-title">適合原因</p>
 							<el-divider />
 							<div class="tag-wrap">
-								<span v-for="item in activeVendor.reasons" :key="item" class="detail-tag yellow">{{ item }}</span>
+								<span v-for="item in activeVendor.conditional_judgment" :key="item" class="detail-tag yellow">{{ item }}</span>
 							</div>
 						</section>
 						<section class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
@@ -470,7 +439,7 @@
 									<span class="contact-label">聯絡人</span>
 									<div class="contact-value-row">
 										<strong class="contact-value">{{ activeVendor.contact_person }}</strong>
-										
+
 									</div>
 								</div>
 								<div class="contact-item">
@@ -508,12 +477,6 @@
 							</el-icon>
 							下載綜合報告
 						</el-button>
-						<!-- <el-button class="contact-vendor-btn" type="success" @click="contactVendor">
-							<el-icon class="el-icon--left">
-								<Promotion />
-							</el-icon>
-							聯絡廠商
-						</el-button> -->
 					</div>
 				</div>
 			</el-dialog>
@@ -565,14 +528,16 @@ import {
 	Goods, Location, Money, Operation, Promotion, SetUp, LocationFilled
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
-import { useConditionSetupStore } from '@/stores/conditionSetup'
 import factory1 from '@/assets/factory/factory-1.png'
 import factory2 from '@/assets/factory/factory-2.png'
 import factory3 from '@/assets/factory/factory-3.png'
 import factory4 from '@/assets/factory/factory-4.png'
 import factory5 from '@/assets/factory/factory-5.png'
-import demoApi from '@/data/demo.json'
+import { taiwanCities } from '@/data/taiwanCities'
+import { useCompanyMatchStore } from '@/stores/companyMatch'
+import { useConditionSetupStore } from '@/stores/conditionSetup'
 
+const companyMatchStore = useCompanyMatchStore()
 const factoryImages = [factory1, factory2, factory3, factory4, factory5] // 用於隨機分配廠商圖片
 
 const router = useRouter()
@@ -583,12 +548,7 @@ const conditionStore = useConditionSetupStore()
 const sortType = ref('overall')
 const selectedRegions = ref([])
 
-const taiwanCities = [
-	'基隆市', '臺北市', '新北市', '桃園市', '新竹市', '新竹縣',
-	'苗栗縣', '臺中市', '彰化縣', '南投縣', '雲林縣', '嘉義市',
-	'嘉義縣', '臺南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣',
-	'臺東縣', '澎湖縣', '金門縣', '連江縣'
-]
+
 const currentPage = ref(1)
 const pageSize = 4
 const detailDialogVisible = ref(false)
@@ -785,166 +745,66 @@ const getDotClass = (level, dotIndex) => {
 }
 
 
-
-// 廠商資料從 API 載入（舊有寫死資料保留為初始值備用）
+// 廠商資料從 API 載入
 const vendors = ref([])
+const isLoadingVendors = ref(false)
+const loadError = ref(false)
 
-onMounted(async () => {
-	try {
-		const data = await getCompanyList()
-		if (data.length > 0) {
-			vendors.value = data.map((item) => {
-				const demo = demoVendorDataMap[item.control_number] || {}
-				return {
-					...item,
-					image: factoryImages[item.id % factoryImages.length],
-					// 只在後端沒給值的時候才用 demo 資料補上
-					product: item.product || demo.product || '',
-					acceptance_standard: item.acceptance_standard?.length ? item.acceptance_standard : (demo.acceptance_standard || []),
-					capacityLevel: item.capacityLevel ?? demo.capacityLevel ?? 0,
-					capacityLevelText: item.capacityLevelText || demo.capacityLevelText || '',
-					reasons: item.reasons?.length ? item.reasons : (demo.reasons || [])
-				}
-			})
-		}
-	} catch {
-		console.error('載入廠商資料失敗，改用 demo 資料')
+const extractVendorList = (payload) => {
+	if (Array.isArray(payload)) return payload
+	if (Array.isArray(payload?.data)) return payload.data
+	return []
+}
 
-	}
-	vendors.value = demoApi.map((item) => {
-		const demo = demoVendorDataMap[item.control_number] || {}
-		return {
-			...item,
-			image: factoryImages[item.id % factoryImages.length],
-			// 只在後端沒給值的時候才用 demo 資料補上
-			product: item.product || demo.product || '',
-			acceptance_standard: item.acceptance_standard?.length ? item.acceptance_standard : (demo.acceptance_standard || []),
-			capacityLevel: item.capacityLevel ?? demo.capacityLevel ?? 0,
-			capacityLevelText: item.capacityLevelText || demo.capacityLevelText || '',
-			reasons: item.reasons?.length ? item.reasons : (demo.reasons || [])
-		}
-	})
+const normalizeVendor = (item, index) => ({
+	...item,
+	id: item.control_number,
+	image: factoryImages[index % factoryImages.length],
 })
 
-// ⚠️ 暫時性 demo 用途：後端推薦邏輯完成後移除
-// 依「事業名稱」關鍵字，指定要顯示的廠商 id 清單
-const demoCompanyVendorMap = {
-	'聯華電子股份有限公司': [
-		'E2601186',
-		'L91A2853',
-		'O1703020',
-		'S20A2670'
-	],
+const loadVendors = async () => {
+	console.log('標準模式載入廠商清單', companyMatchStore.companyData)
+	// 廠內模式：不管簡易或標準，都不需要載入廠商清單
+	if (isInternalMode.value) {
+		vendors.value = []
+		return
+	}
 
-	'台灣美光 (台中一廠)': [
-		'D9700018',
-		'O1703020',
-		'R9000394',
-		'H5308154',
-		'E2601186',
-		'H5389720',
-		'E2000107',
-		'K7200924',
-		'H47A0463',
-	]
-	// 之後如果還要加其他 demo 公司，繼續往下加
+	if (isQuickMode.value) {
+		// 簡易模式：沒有條件配對，直接抓全部廠商清單
+		isLoadingVendors.value = true
+		loadError.value = false
+		try {
+			const data = await getCompanyList()
+			const list = extractVendorList(data)
+			vendors.value = list.map(normalizeVendor)
+
+			if (vendors.value.length === 0) {
+				ElMessage.warning('目前查無廠商資料')
+			}
+		} catch (error) {
+			console.error('載入廠商資料失敗', error)
+			loadError.value = true
+			vendors.value = []
+			ElMessage.error('載入廠商資料失敗，請稍後再試')
+		} finally {
+			isLoadingVendors.value = false
+		}
+		return
+	}
+
+	// 標準模式：使用條件配對後存在 store 裡的結果
+
+	const list = extractVendorList(companyMatchStore.companyData)
+	vendors.value = list.map(normalizeVendor)
+	// vendors.value = companyMatchStore.companyData.data
+
+	if (vendors.value.length === 0) {
+		ElMessage.warning('目前查無符合條件的推薦廠商資料')
+	}
 }
 
-// ⚠️ 暫時性 demo 用途：後端補齊 product / 允收條件 / 前月收受總量 / 適合原因 後移除
-const demoVendorDataMap = {
-	'E2601186': {
-		product: ['稀硫酸'],
-		acceptance_standard: ['pH ≤ 2.0', '外觀 : 無懸浮顆粒', '含水率 : <55%', '硫酸濃度 : ≧45%', '比重 : >1.345'],
-		capacityLevel: 2,           // 1=綠 2=黃 3=紅
-		capacityLevelText: '中等',
-		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
-	},
-	'J5902815': {
-		product: ['工業用氣矽酸鈉', 'HF+HNO,混合液', '硝酸鈣', '硝酸', '硝酸鈉', '氟矽酸'],
 
-		capacityLevel: 2,           // 1=綠 2=黃 3=紅
-		capacityLevelText: '中等',
-		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
-	},
-	'L91A2853': {
-		product: [
-			'稀酸B',
-			'硫酸B'
-		],
-
-		capacityLevel: 1, // 1=綠 2=黃 3=紅
-		capacityLevelText: '中等',
-		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
-	},
-
-	'O1703020': {
-		product: [
-			'發煙硫酸B',
-			'硫酸B',
-			'稀硫酸B',
-			'稀酸B'
-		],
-		capacityLevel: 1, // 1=綠 2=黃 3=紅
-		capacityLevelText: '中等',
-		reasons: ['地緣鄰近', '允收條件相符', '許可量充足']
-	},
-
-	'S20A2670': {
-		product: [
-			'工業級稀硫酸（40%）',
-			'工業級稀硫酸（45%）',
-			'工業級稀硫酸（50%）',
-			'工業級稀硫酸（60%）'
-		],
-
-		capacityLevel: 3, // 1=綠 2=黃 3=紅
-		capacityLevelText: '中等',
-		reasons: ['允收條件相符', '再利用產品明確', '許可量充足']
-	},
-	'D9700018': {
-		product: ['稀硫酸'],
-		capacityLevel: 2, // 1=綠 2=黃 3=紅
-		capacityLevelText: '中等',
-		reasons: ['允收條件相符', '許可量充足']
-	},
-	'R9000394': {
-		product: ['稀硫酸'],
-		capacityLevel: 3, // 1=綠 2=黃 3=紅
-		reasons: ['允收條件相符']
-	},
-	'H5308154': {
-		product: ['稀硫酸'],
-		capacityLevel: 2, // 1=綠 2=黃 3=紅
-		reasons: ['允收條件相符']
-	},
-	'H5389720': {
-		product: ['稀硫酸'],
-		capacityLevel: 1, // 1=綠 2=黃 3=紅
-		reasons: ['許可量充足']
-	},
-	'E2000107': {
-		product: ['工業級稀硫酸', '工業級稀硫酸-除雙氧水'],
-		capacityLevel: 1, // 1=綠 2=黃 3=紅
-		reasons: ['允收條件相符', '許可量充足']
-	},
-	'K7200924': {
-		product: ['稀硫酸'],
-		capacityLevel: 2, // 1=綠 2=黃 3=紅
-		reasons: ['允收條件相符', '許可量充足']
-	},
-	'H47A0463': {
-		product: ['硫酸銅'],
-		capacityLevel: 3, // 1=綠 2=黃 3=紅
-		reasons: ['允收條件相符']
-	},
-	// 其他公司照這個格式加下去...
-}
-
-// 說明：依目前輸入的事業名稱，找出對應的假推薦廠商 id 清單
-const getDemoVendorIds = (businessName = '') => {
-	const matchedKey = Object.keys(demoCompanyVendorMap).find((keyword) => businessName.includes(keyword))
-	return matchedKey ? demoCompanyVendorMap[matchedKey] : null
-}
 // 說明：判斷目前選擇的循環模式是否為「廠內模式」(執行主體為產源事業自己)
 const isInternalMode = computed(() => {
 	return ['廠內模式1', '廠內模式2', '廠內模式3'].includes(normalizeModeName(selectedMode.value?.modeName))
@@ -953,46 +813,35 @@ const isInternalMode = computed(() => {
 const sortedVendors = computed(() => {
 
 	let result = vendors.value;
-	// ⚠️ demo 用途：若尚未設定事業名稱（例如直接進本頁測試），先假填一組公司名稱以便展示
-	const businessNameForDemo = conditionStore.businessConditions.businessName || ''
-	//台灣美光 (台中一廠) //聯華電子股份有限公司
+	// 廠內模式時，執行主體是產源事業自己，僅顯示自己公司的資料
 	if (isInternalMode.value) {
-		// ⚠️ demo 用途：廠內模式時，執行主體是產源事業自己，僅顯示自己公司的資料
-		result = result.filter((v) => v.company_name === businessNameForDemo)
-	} else {
-
-		// ⚠️ demo 用途：依公司名稱做假篩選
-		const demoControlNumbers = getDemoVendorIds(businessNameForDemo)
-		if (demoControlNumbers) {
-			const controlNumberSet = new Set(demoControlNumbers)
-			result = result.filter((v) => controlNumberSet.has(v.control_number))
-		}
+		const businessName = conditionStore.businessConditions.businessName || ''
+		result = result.filter((v) => v.company_name === businessName)
 	}
 
-	// ⚠️ demo 用途：同一 control_number 底下若有多筆列，只保留第一筆代表該公司
-	const seen = new Set()
-	result = result.filter((v) => {
-		if (seen.has(v.control_number)) return false
-		seen.add(v.control_number)
-		return true
-	})
-
-	// 依地區篩選
-	if (sortType.value === 'distance' && selectedRegions.value.length > 0) {
+	// 依地區篩選（road_distance_km 排序模式下的縣市篩選，篩選邏輯本身不受 road_distance_km 缺欄位影響）
+	if (sortType.value === 'road_distance_km' && selectedRegions.value.length > 0) {
 		result = result.filter((v) => selectedRegions.value.includes(v.region))
 	}
 
-	if (sortType.value === 'distance') return result.sort((a, b) => a.distance - b.distance)
-	if (sortType.value === 'capacity') {
-		return [...result].sort((a, b) => b.permitted_quantity - a.permitted_quantity)
+	if (sortType.value === 'road_distance_km') {
+		// ⚠️ road_distance_km 欄位後端尚未提供，暫時維持排序邏輯不變，等後端補上欄位後會自動生效
+		return [...result].sort((a, b) => (a.road_distance_km ?? 0) - (b.road_distance_km ?? 0))
 	}
-	return result.sort((a, b) => b.score - a.score)
+	if (sortType.value === 'capacity') {
+		return [...result].sort((a, b) => (b.permitted_quantity ?? 0) - (a.permitted_quantity ?? 0))
+	}
+	// 預設「依事業管制編號」排序
+	return [...result].sort((a, b) => String(a.control_number || '').localeCompare(String(b.control_number || '')))
 })
 
 // 說明：依目前條件即時計算「total Pages」內容，提供畫面顯示與決策判斷使用。
 const totalPages = computed(() => Math.ceil(sortedVendors.value.length / pageSize))
 // 說明：依目前條件即時計算「paged Vendors」內容，提供畫面顯示與決策判斷使用。
 const pagedVendors = computed(() => sortedVendors.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize))
+
+
+onMounted(loadVendors)
 
 watch(sortType, () => {
 	currentPage.value = 1
@@ -1004,6 +853,7 @@ watch(detailDialogVisible, (value) => {
 
 watch(() => selectedMode.value?.modeName, () => {
 	currentPage.value = 1
+	loadVendors() // 補上這一行，切換方案時重新載入/篩選廠商
 	if (activeVendor.value) {
 		const allowedVendorIds = new Set(sortedVendors.value.map((vendor) => vendor.id))
 		if (!allowedVendorIds.has(activeVendor.value.id)) {
@@ -1032,11 +882,6 @@ const closeVendorDetail = () => {
 	detailDialogVisible.value = false
 }
 
-// 說明：由「聯絡廠商」操作觸發；提示目前廠商聯絡資訊。
-const contactVendor = () => {
-	if (!activeVendor.value) return
-	ElMessage.info(`請洽 ${activeVendor.value.contactPhone} 進一步聯絡合作細節`)
-}
 
 // 說明：由地址「查看位置」觸發；開啟 Google 地圖搜尋該地址。
 const openMap = (address) => {
@@ -1092,7 +937,7 @@ const exportVendorPdf = () => {
 			<div class="grid">
 				<div class="block"><div class="meta">公告類別</div><div class="value">${escapeHtml(vendor.category)}</div></div>
 				<div class="block"><div class="meta">再利用機構</div><div class="value">${vendor.isReuseOrg ? '是' : '否'}</div></div>
-				<div class="block"><div class="meta">距離</div><div class="value">${escapeHtml(vendor.distance)} km</div></div>
+				<div class="block"><div class="meta">距離</div><div class="value">${escapeHtml(vendor.road_distance_km)} km</div></div>
 				<div class="block"><div class="meta">再生產品</div><div class="value">${escapeHtml(vendor.product)}</div></div>
 				<div class="block"><div class="meta">最大再利用量</div><div class="value">${escapeHtml(vendor.capacity)} 噸/月</div></div>
 				<div class="block"><div class="meta">事業管制編號</div><div class="value">${escapeHtml(vendor.controlNo)}</div></div>
@@ -1668,73 +1513,6 @@ const goBackHome = () => {
 	}
 }
 
-.flow-node {
-	position: relative;
-	text-align: center;
-	padding: 14px 10px;
-	border-radius: 16px;
-	background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(240, 250, 255, 0.86));
-	border: 1px solid rgba(139, 187, 255, 0.38);
-	box-shadow: 0 10px 20px rgba(66, 122, 190, 0.1);
-}
-
-.node-icon {
-	width: 40px;
-	height: 40px;
-	margin: 0 auto 8px;
-	border-radius: 50%;
-	display: grid;
-	place-items: center;
-	font-size: 14px;
-	font-weight: 700;
-	color: #fff;
-	background: linear-gradient(135deg, #42a5f5, #5c6ef0);
-	box-shadow: 0 8px 14px rgba(80, 116, 232, 0.28);
-}
-
-.flow-node:nth-child(2) .node-icon {
-	background: linear-gradient(135deg, #4db6ac, #26a69a);
-}
-
-.flow-node:nth-child(3) .node-icon {
-	background: linear-gradient(135deg, #66bb6a, #43a047);
-}
-
-.flow-node:nth-child(4) .node-icon {
-	background: linear-gradient(135deg, #ab47bc, #7e57c2);
-}
-
-.node-title {
-	margin: 0;
-	font-size: 14px;
-	font-weight: 700;
-	color: #204f65;
-}
-
-.node-sub {
-	margin: 4px 0 0;
-	font-size: 12px;
-	color: #5f7691;
-}
-
-
-
-.mode-tags {
-	margin-top: 14px;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-
-	span {
-		padding: 4px 10px;
-		font-size: 12px;
-		border-radius: 999px;
-		color: #2b6d64;
-		background: rgba(203, 243, 235, 0.7);
-		border: 1px solid rgba(84, 178, 157, 0.2);
-	}
-}
-
 .suppliers-header {
 	display: flex;
 	justify-content: space-between;
@@ -2186,47 +1964,6 @@ const goBackHome = () => {
 	background: rgba(199, 247, 213, 0.7);
 }
 
-
-.rating-row {
-	display: inline-flex;
-	align-items: center;
-	gap: 10px;
-	margin: 0 0 8px;
-}
-
-.stars {
-	font-size: 16px;
-	letter-spacing: 1px;
-	color: #f5b400;
-	line-height: 1;
-}
-
-.ai-match-label {
-	font-size: 18px;
-	font-weight: 600;
-	color: #5d6f85;
-}
-
-.ai-match-value {
-	font-size: 34px;
-	font-weight: 800;
-	line-height: 1;
-	color: #1aa65a;
-}
-
-.dialog-kicker {
-	margin: 0;
-	font-size: 13px;
-	font-weight: 700;
-	color: #2f9e44;
-}
-
-.dialog-specialty {
-	margin: 2px 0 0;
-	font-size: 14px;
-	color: #536a83;
-	line-height: 1.7;
-}
 
 .top-right-media {
 	display: flex;
@@ -2704,14 +2441,6 @@ const goBackHome = () => {
 		grid-template-columns: 1fr;
 	}
 
-	.rating-row {
-		flex-wrap: wrap;
-		gap: 6px 10px;
-	}
-
-	.ai-match-value {
-		font-size: 26px;
-	}
 
 	.mode-title-row {
 		flex-direction: column;
