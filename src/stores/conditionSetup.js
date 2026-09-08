@@ -20,7 +20,11 @@ const defaultSite = () => ({
 // 說明：封裝「default Business」商業邏輯，供目前流程重複使用。
 const defaultBusiness = () => ({
     businessName: '',
-    businessAddress: '',
+    city: '',
+    cityLabel: '',
+    district: '',
+    districtLabel: '',
+    address: '',
     clearanceFrequency: '',
     clearanceAmount: null,
     technologyMaturity: 5,

@@ -16,7 +16,7 @@
 							<div class="business-info-form">
 								<el-form label-position="top">
 									<el-row :gutter="24">
-										<el-col :xs="24" :sm="24" :md="12">
+										<el-col :xs="24" :sm="24" :md="8">
 											<el-form-item>
 												<template #label>
 													<div class="label-with-icon">
@@ -33,7 +33,7 @@
 										</el-col>
 
 
-										<el-col :xs="24" :sm="24" :md="12">
+										<el-col :xs="24" :sm="24" :md="16">
 											<el-form-item>
 												<template #label>
 													<div class="label-with-icon">
@@ -44,12 +44,25 @@
 														<span>事業地址</span>
 													</div>
 												</template>
-
 												<div class="address-input-row">
-													<el-input v-model="businessAddress" :class="{ 'is-invalid': shouldMarkInvalid('businessAddress') }" placeholder="輸入地址或點擊按鈕自動定位" />
-													<el-button :icon="Location" @click="getGeolocation" :loading="geoLoading">
-														定位
-													</el-button>
+													<el-row :gutter="12" class="address-city-row">
+														<el-col :xs="24" :sm="5">
+															<el-select v-model="store.businessConditions.city" :class="{ 'is-invalid': shouldMarkInvalid('businessCity') }" placeholder="縣市">
+																<el-option v-for="item in cityOptions" :key="item.value" :label="item.label" :value="item.value" />
+															</el-select>
+														</el-col>
+														<el-col :xs="24" :sm="5">
+															<el-select v-model="store.businessConditions.district" :class="{ 'is-invalid': shouldMarkInvalid('businessDistrict') }" placeholder="鄉鎮市區">
+																<el-option v-for="item in districtOptions" :key="item.value" :label="item.label" :value="item.value" />
+															</el-select>
+														</el-col>
+														<el-col :xs="24" :sm="10">
+															<el-input v-model="store.businessConditions.address" placeholder="路段樓層" />
+														</el-col>
+														<el-col :xs="24" :sm="4">
+															<el-button :icon="Location" @click="getGeolocation" :loading="geoLoading">定位</el-button>
+														</el-col>
+													</el-row>
 												</div>
 											</el-form-item>
 										</el-col>
@@ -154,16 +167,6 @@
 												</el-select>
 											</el-form-item>
 										</el-col>
-										<el-col v-if="store.siteConditions.hasSecondaryWaste" :xs="24" :sm="12" :md="12">
-											<el-form-item>
-												<template #label>
-													<span><span class="required-mark">*</span>廢棄物代碼</span>
-												</template>
-												<el-select v-model="store.siteConditions.secondaryWasteCode" :class="{ 'is-invalid': shouldMarkInvalid('hasSecondaryWaste') }" placeholder="選擇廢棄物代碼" filterable>
-													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />
-												</el-select>
-											</el-form-item>
-										</el-col>
 
 									</el-row>
 								</el-form>
@@ -248,7 +251,7 @@ import { getAnnouncementCategoryOptions, getProcessList } from '@/api/wasteCode'
 import FlowStepProgress from './FlowStepProgress.vue'
 import VerticalConditionNav from './VerticalConditionNav.vue'
 import ConditionAccordionSection from './ConditionAccordionSection.vue'
-
+import { taiwanCities } from '@/data/taiwanCities'
 const props = defineProps({
 	initialStandards: {
 		type: Array,
@@ -272,29 +275,68 @@ const props = defineProps({
 	}
 })
 
+
 const wasteDetailOptions = [
 	{ value: '廢硫酸', label: '廢硫酸' },
 	{ value: '廢氫氟酸', label: '廢氫氟酸' },
 	{ value: '廢磷酸', label: '廢磷酸' }
 ]
+
 const selectedWasteDetail = ref(props.wasteDetail || wasteDetailOptions[0].value)
 const isWasteDetailEditing = ref(false)
 
 const emits = defineEmits(['next'])
-
 const store = useConditionSetupStore()
 const showSemanticModal = ref(false)
-
 const acceptanceRef = ref(null)
 const physicalRef = ref(null)
 const sourceRef = ref(null)
-const siteRef = ref(null)
-const businessRef = ref(null)
-const environmentRef = ref(null)
 const technologyRef = ref(null)
-const demandRef = ref(null)
 const sourceIndustryOptions = ref([])
 const sourceProcessOptions = ref([])
+
+
+// 縣市選項
+const cityOptions = computed(() =>
+	taiwanCities.map((city) => ({ value: city.value, label: city.name }))
+)
+
+// 依所選縣市，動態產生對應的鄉鎮市區選項
+const districtOptions = computed(() => {
+	const matchedCity = taiwanCities.find(
+		(c) => c.value === store.businessConditions.city
+	)
+	return matchedCity
+		? matchedCity.districts.map((d) => ({ value: d.value, label: d.name }))
+		: []
+})
+
+const isGeoUpdating = ref(false)
+
+// 縣市改變時，清空已選的鄉鎮市區，避免殘留不對應的區
+watch(
+	() => store.businessConditions.city,
+	(newCity, oldCity) => {
+		const matched = cityOptions.value.find((item) => item.value === newCity)
+		store.businessConditions.cityLabel = matched ? matched.label : ''
+
+		if (isGeoUpdating.value) return  // 定位流程中，不清空 district
+		if (oldCity !== undefined && newCity !== oldCity) {
+			store.businessConditions.district = ''
+			store.businessConditions.districtLabel = ''
+		}
+	}
+)
+
+// 鄉鎮市區改變時，同步更新 districtLabel
+watch(
+	() => store.businessConditions.district,
+	(newDistrict) => {
+		const matched = districtOptions.value.find((item) => item.value === newDistrict)
+		store.businessConditions.districtLabel = matched ? matched.label : ''
+	}
+)
+
 const reuseSpaceOptions = [
 	{ value: true, label: '有' },
 	{ value: false, label: '無' }
@@ -309,12 +351,7 @@ const businessName = computed({
 		store.businessConditions.businessName = value
 	}
 })
-const businessAddress = computed({
-	get: () => store.businessConditions.businessAddress || '',
-	set: (value) => {
-		store.businessConditions.businessAddress = value
-	}
-})
+
 const geoLoading = ref(false)
 
 const expandedMap = reactive({
@@ -342,6 +379,7 @@ const demandSelections = computed({
 	get: () => store.demandSelections,
 	set: (val) => store.setDemandSelections(val),
 })
+
 
 // 各區塊「已設定」狀態判斷：不以必填為標準，而是公瓡輸入就計入
 // 說明：依目前條件即時計算「configured Sections」內容，提供畫面顯示與決策判斷使用。
@@ -508,8 +546,13 @@ const getMissingRequiredFields = () => {
 		missingFields.push({ sectionId: 'physical', label: '事業名稱' })
 	}
 
-	if (!String(store.businessConditions.businessAddress || '').trim()) {
-		missingFields.push({ sectionId: 'physical', label: '事業地址' })
+	if (!store.businessConditions.city) {
+		missingFields.push({ sectionId: 'physical', label: '事業地址（縣市）' })
+	} else if (!store.businessConditions.district) {
+		missingFields.push({ sectionId: 'physical', label: '事業地址（鄉鎮市區）' })
+	}
+	if (!String(store.businessConditions.address || '').trim()) {
+		missingFields.push({ sectionId: 'physical', label: '事業地址（路段樓層）' })
 	}
 
 	if (!store.sourceConditions.industry) {
@@ -563,7 +606,9 @@ const shouldMarkInvalid = (fieldKey) => {
 
 	const fieldCheckMap = {
 		businessName: () => !String(store.businessConditions.businessName || '').trim(),
-		businessAddress: () => !String(store.businessConditions.businessAddress || '').trim(),
+		businessCity: () => !store.businessConditions.city,
+		businessDistrict: () => !store.businessConditions.district,
+		businessAddress: () => !String(store.businessConditions.address || '').trim(),
 		acceptance: () => !hasCompleteAcceptanceCondition(),
 		sourceIndustry: () => !store.sourceConditions.industry,
 		sourceProcess: () => !store.sourceConditions.process,
@@ -613,15 +658,36 @@ const getGeolocation = () => {
 				)
 				const data = await response.json()
 				if (data.address) {
-					const city = data.address.city || data.address.county || data.address.state || ''
-					const district = data.address.city_district || data.address.town || data.address.suburb || data.address.village || ''
-					const road = data.address.road || data.address.pedestrian || ''
-					const houseNumber = data.address.house_number || ''
-					const formattedAddress = `${city}${district}${road}${houseNumber ? `${houseNumber}號` : ''}`
+					const cityName = data.address.city || data.address.county || data.address.state || ''
+					const districtName = data.address.suburb || data.address.city_district || data.address.town || data.address.village || ''
 
-					const detailedAddress = formattedAddress || data.display_name || ''
-					businessAddress.value = detailedAddress
-					ElMessage.success('定位成功')
+					const matchedCity = taiwanCities.find((c) => cityName.includes(c.name) || c.name.includes(cityName))
+					if (matchedCity) {
+						isGeoUpdating.value = true  // 開始定位流程，暫停 watch 清空行為
+
+						store.businessConditions.city = matchedCity.value           // ★ 存代碼，不是 name
+						store.businessConditions.cityLabel = matchedCity.name
+
+						const matchedDistrict = matchedCity.districts.find(
+							(d) => districtName.includes(d.name) || d.name.includes(districtName)
+						)
+						if (matchedDistrict) {
+							store.businessConditions.district = matchedDistrict.value // ★ 存代碼
+							store.businessConditions.districtLabel = matchedDistrict.name
+						}
+
+						const matchedAddress = (data.address.road || '') + (data.address.house_number ? data.address.house_number + '號' : '')
+						if (matchedAddress) {
+							store.businessConditions.address = matchedAddress
+						}
+
+						await nextTick()
+						isGeoUpdating.value = false  // 結束，恢復 watch 正常行為
+
+						ElMessage.success('定位成功')
+					} else {
+						ElMessage.error('無法比對到對應縣市，請手動選擇')
+					}
 				} else {
 					ElMessage.error('無法獲取地址資訊')
 				}
@@ -898,17 +964,16 @@ defineExpose({
 
 .address-input-row {
 	display: flex;
+	flex-direction: column; // 改成直排：第一排選單、第二排輸入框+按鈕
 	width: 100%;
 	gap: 8px;
-
-	:deep(.el-input) {
-		flex: 1;
-	}
-
-	:deep(.el-button) {
-		flex-shrink: 0;
-	}
 }
+
+.address-city-row {
+	width: 100%;
+}
+
+
 
 .semantic-button {
 	color: #ffffff;
@@ -1217,13 +1282,14 @@ defineExpose({
 		line-height: 1.6;
 	}
 
-	.address-input-row {
+	.address-detail-row {
 		flex-direction: column;
 
 		:deep(.el-button) {
 			width: 100%;
 		}
 	}
+
 
 	.form-col {
 		margin-bottom: 16px;
