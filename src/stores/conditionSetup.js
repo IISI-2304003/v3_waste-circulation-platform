@@ -50,6 +50,8 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
         demandSelections: [],
         recommendedPaths: [],
         selectedRecommendedPath: defaultSelectedPath(),
+        selectedCode: '',
+        wasteDetail: '',
     }),
     actions: {
         setActiveSection(sectionId) {
@@ -79,6 +81,12 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
                   }
                 : defaultSelectedPath();
         },
+        setSelectedCode(code) {
+            this.selectedCode = code;
+        },
+        setWasteDetail(detail) {
+            this.wasteDetail = detail;
+        },
         resetAll() {
             this.activeSection = 'physical';
             this.sourceConditions = defaultSource();
@@ -90,6 +98,8 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
             this.demandSelections = [];
             this.recommendedPaths = [];
             this.selectedRecommendedPath = defaultSelectedPath();
+            this.selectedCode = '';
+            this.wasteDetail = '';
         },
     },
 });

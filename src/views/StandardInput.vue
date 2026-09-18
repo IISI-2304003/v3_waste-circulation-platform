@@ -20,12 +20,12 @@
 
     </div>
 
-    <ConditionSetupWorkspace :selected-code="route.query.code || ''" :waste-detail="route.query.wasteDetail || ''" @next="goCompanyMatch" />
+    <ConditionSetupWorkspace :selected-code="conditionStore.selectedCode" :waste-detail="conditionStore.wasteDetail" :loading="isSubmitting" @next="goCompanyMatch" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import ConditionSetupWorkspace from '@/components/condition-setup/ConditionSetupWorkspace.vue'
@@ -43,6 +43,7 @@ const buildCompanyPayload = () => ({
 
   sourceConditions: {
     // 來源產業 ID（下拉選單 value）
+    // industry: "756",
     industry: conditionStore.sourceConditions.industry,
     // 來源產業名稱（下拉選單 label）
     industryLabel: conditionStore.sourceConditions.industryLabel,
@@ -106,6 +107,17 @@ const goBackHome = () => {
   conditionStore.resetAll()
   router.push('/')
 }
+
+onMounted(() => {
+  // 只有當網址上真的帶了值，才覆蓋 store（避免空字串把已存的值洗掉）
+  if (route.query.code) {
+    conditionStore.setSelectedCode(route.query.code)
+  }
+  if (route.query.wasteDetail) {
+    conditionStore.setWasteDetail(route.query.wasteDetail)
+  }
+})
+
 </script>
 
 <style scoped lang="scss">

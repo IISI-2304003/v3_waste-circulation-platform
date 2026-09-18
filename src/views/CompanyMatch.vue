@@ -35,7 +35,7 @@
                 <div>
                   <h2>分析結果</h2>
                   <p>根據您設定的條件，系統已完成循環利用可行性分析，並推薦最適合的循環路徑。</p>
-                  <!-- <p class="reminder-text">貼心提醒: 本系統提供決策參考，實際合作仍應依相關條件評估。</p> -->
+                  <p v-if="unsetCount > 0" class="reminder-text">未設定之評估因子不納入本次量化分析</p>
                 </div>
               </div>
 
@@ -44,7 +44,7 @@
           <el-col :xs="24" :md="11">
 
             <div class="banner-summary">
-              <div class="summary-title">您本次條件分析</div>
+              <div class="summary-title">您本次條件分析 <span class="section-desc">已評估 {{ conditionSummary.length - unsetCount }}/{{ conditionSummary.length }} 項</span></div>
               <div class="summary-list">
                 <div class="summary-row" v-for="item in conditionSummary" :key="item.id">
                   <div class="summary-item-grid">
@@ -59,10 +59,10 @@
                       <el-col :xs="24" :sm="9" :md="9">
                         <div class="summary-label">{{ item.label }}</div>
                       </el-col>
-                      <el-col :xs="18" :sm="10" :md="10">
+                      <el-col :xs="18" :sm="9" :md="9">
                         <div class="summary-value">{{ item.value }}</div>
                       </el-col>
-                      <el-col :xs="6" :sm="3" :md="3">
+                      <el-col :xs="6" :sm="4" :md="4">
                         <div class="summary-impact-tag" :style="{ backgroundColor: item.color + '20', borderColor: item.color }">
                           <span class="impact-dot" :style="{ backgroundColor: item.color }"></span>
                           <span class="impact-label">{{ item.levelLabel }}</span>
@@ -90,7 +90,7 @@
           <div class="section-bar"></div>
           <div>
             <span class="section-title">推薦循環模式</span>
-            <span class="section-desc">依據您的條件，為您推薦最適合的三種循環路徑</span>
+            <span class="section-desc">依據本次條件分析結果，提供可能適用的循環模式</span>
           </div>
         </div>
         <el-button text type="primary" class="modes-link" @click="openModesDialog">
@@ -113,7 +113,7 @@
               <div class="path-body">
                 <div class="path-intro">
                   <span class="path-mode-name" :style="{ color: path.accentColor }">{{ path.modeName }}</span>
-                  <span v-if="path.rank === 1" class="best-tag">最佳方案</span>
+                  <span v-if="path.rank === 1" class="best-tag">優先建議</span>
                   <p class="path-summary">{{ path.summary }}</p>
                 </div>
                 <div class="flow-diagram">
@@ -145,12 +145,12 @@
                       {{ path.matchRate }} <span class="stat-unit" :style="{ color: path.accentColor }">家</span>
                     </span> -->
                   </div>
-                  <el-button type="primary" class="detail-btn" @click="goNext(path)">
+                  <!-- <el-button type="primary" class="detail-btn" @click="goNext(path)">
                     執行方式與技術廠商
                     <el-icon class="el-icon--right">
                       <ArrowRight />
                     </el-icon>
-                  </el-button>
+                  </el-button> -->
                 </div>
 
               </div>
@@ -182,13 +182,13 @@
           <p class="help-sub">本系統提供決策參考，實際合作仍應依相關條件評估。</p>
         </div>
       </div>
-      <div class="footer-hint">請先點選上方任一推薦路徑卡片的「執行方式與技術廠商」，即可進入下一步。</div>
-      <!-- <el-button type="primary" @click="goNext">
+      <!-- <div class="footer-hint">請先點選上方任一推薦路徑卡片的「執行方式與技術廠商」，即可進入下一步。</div> -->
+      <el-button type="primary" class="detail-btn" @click="goNext">
         下一步：技術決策推薦
         <el-icon class="el-icon--right">
           <ArrowRight />
         </el-icon>
-      </el-button> -->
+      </el-button>
     </div>
 
     <TopModesDialog v-model="modesDialogVisible" :preferred-mode-name="recommendedPaths?.[0]?.modeName || ''" />
@@ -220,25 +220,17 @@ import { useConditionSetupStore } from '@/stores/conditionSetup'
 import TopModesDialog from '@/components/TopModesDialog.vue'
 import { getAnnouncementCategoryOptions } from '@/api/wasteCode'
 import circulationModes from '@/data/circulationModes.json'
-// import { b } from 'vue-router/dist/index-CzEDAlw7.js'
 
 const router = useRouter()
 const store = useConditionSetupStore()
 const modesDialogVisible = ref(false)
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1440)
-const industryOptions = ref([])
 
 // 說明：由視窗 resize 事件觸發；更新 viewportWidth 供雷達圖響應式參數重算。
 const updateViewportWidth = () => {
   viewportWidth.value = window.innerWidth
 }
 
-const industryLabelMap = {
-  semiconductor: '電子與半導體',
-  steel: '鋼鐵冶金',
-  chemical: '化工製程',
-  food: '食品加工'
-}
 
 // 說明：封裝「yes No Text」商業邏輯，供目前流程重複使用。
 const yesNoText = (value) => {
@@ -247,43 +239,24 @@ const yesNoText = (value) => {
   return '未設定'
 }
 
-const clearanceFrequencyLabelMap = {
-  daily: '每日',
-  weekly: '每週',
-  monthly: '每月',
-  quarterly: '每季',
-  yearly: '每年'
-}
 
-const toClearanceFrequencyLabel = (value) => {
-  if (!value) return '未設定'
-  return clearanceFrequencyLabelMap[value] || value
-}
 
 const IMPACT_LEVEL_SCORE_MAP = {
   high: 100,
   medium: 65,
-  low: 30
+  low: 30,
+  unrated: 0, // 灰色，雷達圖上通常畫在中心點或不特別強調
 }
 
 const IMPACT_LEVEL_STYLE_MAP = {
   high: { color: '#1f9d55', levelLabel: '高' },
   medium: { color: '#f59e0b', levelLabel: '中' },
-  low: { color: '#ef4444', levelLabel: '低' }
+  low: { color: '#ef4444', levelLabel: '低' },
+  unrated: { color: '#9ca3af', levelLabel: '未評估' }, // 灰色
 }
 
-// 計算條件的影響度級別
-// 說明：回傳「get Impact Level」資料供畫面渲染或後續商業規則使用。
-const getImpactLevel = (condition) => {
-  // 根據條件的設定情況評估影響度
-  // 高(high): 完整設定，100-75 分
-  // 中(medium): 部分設定，74-50 分
-  // 低(low): 未設定或最少設定，49-0 分
-  const score = condition.score || 0
-  if (score >= 75) return { level: 'high', ...IMPACT_LEVEL_STYLE_MAP.high }
-  if (score >= 50) return { level: 'medium', ...IMPACT_LEVEL_STYLE_MAP.medium }
-  return { level: 'low', ...IMPACT_LEVEL_STYLE_MAP.low }
-}
+
+
 
 // 說明：封裝「to Radar Score」商業邏輯，供目前流程重複使用。
 const toRadarScore = (level) => IMPACT_LEVEL_SCORE_MAP[level] || 0
@@ -298,6 +271,79 @@ const formatRadarIndicatorName = (label = '') => {
   return `${text.slice(0, 4)}\n${text.slice(4, 8)}\n${text.slice(8)}`
 }
 
+// 計算條件的影響度級別
+// 物化特性 — 依照表格：硫酸濃度、比重、含水率三項，填幾項算等級
+const PHYSICAL_PARAM_KEYS = ['硫酸濃度', '比重', '含水率'] // 對應 acceptanceConditions 裡的 parameter 值
+
+const getPhysicalLevel = (acceptanceConditions) => {
+  const filledCount = PHYSICAL_PARAM_KEYS.filter((key) =>
+    acceptanceConditions.some((c) => c.parameter === key && c.value !== '' && c.value != null)
+  ).length
+
+  if (filledCount === 0) return 'unrated' // 完全未填 → 未評估
+  if (filledCount === 3) return 'high'
+  if (filledCount === 2) return 'medium'
+  return 'low' // 1 項
+}
+
+// 料源穩定性：對應  sourceFrequencyOptions（只有這三個值）
+const sourceFrequencyLabelMap = {
+  monthly: '每月',
+  quarterly: '每季',
+  yearly: '每年',
+}
+
+const FREQUENCY_LEVEL_MAP = {
+  monthly: 'high',
+  quarterly: 'medium',
+  yearly: 'low',
+}
+const getSourceLevel = (frequency) => {
+  if (!frequency) return 'unrated'
+  return FREQUENCY_LEVEL_MAP[frequency] || 'unrated'
+}
+
+// 場地配置：對應 reuseSpaceOptions（true=有 / false=無）
+// 圖表規則：否(無/false) → 中；是(有/true) → 高
+const getSiteLevel = (hasReuseSpace) => {
+  if (hasReuseSpace === null || hasReuseSpace === undefined) return 'unrated'
+  return hasReuseSpace === false ? 'medium' : 'high'
+}
+
+// 環境影響：對應 secondaryWasteOptions（true=有 / false=無）
+// 圖表規則：否(無/false) → 高；是(有/true) → 中
+const getEnvironmentLevel = (hasSecondaryWaste) => {
+  if (hasSecondaryWaste === null || hasSecondaryWaste === undefined) return 'unrated'
+  return hasSecondaryWaste === false ? 'high' : 'medium'
+}
+
+// 技術與運作成熟度：對應 technologyOptions value
+const TECH_LEVEL_MAP = { mature: 'high', imported: 'medium', innovative: 'low' }
+const LEVEL_RANK = { high: 3, medium: 2, low: 1 }
+const getTechLevel = (technologySelections) => {
+  if (!technologySelections.length) return 'unrated'
+  return technologySelections
+    .map((v) => TECH_LEVEL_MAP[v])
+    .filter(Boolean)
+    .reduce((best, cur) => (LEVEL_RANK[cur] > LEVEL_RANK[best] ? cur : best), 'low')
+}
+
+// 再生產品使用者製程需求
+const DEMAND_LEVEL_MAP = {
+  'replace-raw-material': 'high',
+  'non-original-process': 'medium',
+  'external-sale': 'medium',
+  'none': 'low',
+}
+const getDemandLevel = (demandSelections) => {
+  if (!demandSelections.length) return 'unrated'
+  return demandSelections
+    .map((v) => DEMAND_LEVEL_MAP[v])
+    .filter(Boolean)
+    .reduce((best, cur) => (LEVEL_RANK[cur] > LEVEL_RANK[best] ? cur : best), 'low')
+}
+
+
 // 說明：依目前條件即時計算「condition Summary」內容，提供畫面顯示與決策判斷使用。
 const conditionSummary = computed(() => {
   // 計算每個條件的設定程度和評分
@@ -305,84 +351,73 @@ const conditionSummary = computed(() => {
   const acceptanceCount = Array.isArray(store.acceptanceConditions)
     ? store.acceptanceConditions.filter(c => c.parameter && String(c.parameter).trim()).length
     : 0
-  const acceptanceScore = acceptanceCount > 0 ? Math.min(acceptanceCount * 20, 100) : 0
+  const physicalLevel = getPhysicalLevel(store.acceptanceConditions)
+  const sourceLevel = getSourceLevel(store.sourceConditions.frequency
+  )
+  const siteLevel = getSiteLevel(store.siteConditions.hasReuseSpace)
+  const environmentLevel = getEnvironmentLevel(store.siteConditions.hasSecondaryWaste)
+  const technologyLevel = getTechLevel(store.technologySelections)
+  const demandLevel = getDemandLevel(store.demandSelections)
 
-  const sourceScore = (store.sourceConditions.industry && store.sourceConditions.process) ? 80 : 40
-
-  const siteScore = (store.siteConditions.hasReuseSpace !== null || store.siteConditions.hasSecondaryWaste !== null) ? 70 : 20
-
-  const environmentScore = store.siteConditions.hasSecondaryWaste !== null ? 75 : 30
-
-  const businessScore = (store.businessConditions.clearanceFrequency && store.businessConditions.clearanceAmount) ? 85 : 35
-
-  const technologyScore = 50 // 默認中等影響度
-
-  const demandScore = 50 // 默認中等影響度
-  console.log("store.businessConditions", store.businessConditions);
+  const buildItem = (level, extra) => ({
+    score: IMPACT_LEVEL_SCORE_MAP[level],
+    level,
+    ...IMPACT_LEVEL_STYLE_MAP[level],
+    ...extra,
+  })
 
   return [
     {
       id: 'physical',
       label: '物化特性',
-      value: acceptanceCount > 0 ? `已設定 ${acceptanceCount} 項` : '未設定',
-      score: acceptanceScore,
+      value: acceptanceCount > 0 ? `關鍵條件 ${acceptanceCount} 項` : '未設定',
       icon: DataAnalysis,
-      ...getImpactLevel({ score: acceptanceScore })
+      ...buildItem(physicalLevel)
     },
     {
       id: 'source',
       label: '料源穩定性',
       value: (() => {
-        if (!store.sourceConditions.industry) return '未設定'
-        const matched = industryOptions.value.find((o) => o.value === store.sourceConditions.industry)
-        return matched ? matched.label : store.sourceConditions.industry
+        const matched = sourceFrequencyLabelMap[store.sourceConditions.frequency]
+        return `產出頻率:${matched || '未設定'}`
       })(),
-      score: sourceScore,
       icon: Connection,
-      ...getImpactLevel({ score: sourceScore })
+      ...buildItem(sourceLevel)
     },
     {
       id: 'site',
       label: '場地配置',
       value: `空間：${yesNoText(store.siteConditions.hasReuseSpace)}`,
-      score: siteScore,
       icon: Location,
-      ...getImpactLevel({ score: siteScore })
+      ...buildItem(siteLevel)
     },
     {
       id: 'environment',
       label: '環境影響',
       value: `衍生廢棄物：${yesNoText(store.siteConditions.hasSecondaryWaste)}`,
-      score: environmentScore,
       icon: Files,
-      ...getImpactLevel({ score: environmentScore })
-    },
-    {
-      id: 'business',
-      label: '經濟效益',
-      value: toClearanceFrequencyLabel(store.businessConditions.clearanceFrequency),
-      score: businessScore,
-      icon: Money,
-      ...getImpactLevel({ score: businessScore })
+      ...buildItem(environmentLevel)
     },
     {
       id: 'technology',
       label: '技術成熟度',
       value: '已設定',
-      score: technologyScore,
       icon: Operation,
-      ...getImpactLevel({ score: technologyScore })
+      ...buildItem(technologyLevel)
     },
     {
       id: 'demand',
       label: '再生產品使用者製程需求',
       value: '已設定',
-      score: demandScore,
       icon: Goods,
-      ...getImpactLevel({ score: demandScore })
+      ...buildItem(demandLevel)
     }
   ]
 })
+// 說明：計算目前條件中尚未評估的項目數量。
+const unsetCount = computed(() =>
+  conditionSummary.value.filter((item) => item.level === 'unrated').length
+)
 
 // 說明：依目前條件即時計算「radar Series Values」內容，提供畫面顯示與決策判斷使用。
 const radarSeriesValues = computed(() => conditionSummary.value.map((item) => toRadarScore(item.level)))
@@ -429,26 +464,6 @@ const radarResponsiveConfig = computed(() => {
 // ★ 新增：ECharts 雷達圖 option（替換原本的 radarPoints computed）
 // 說明：依目前條件即時計算「radar Option」內容，提供畫面顯示與決策判斷使用。
 const radarOption = computed(() => ({
-  // tooltip: {
-  //   trigger: 'item',
-  //   formatter: () => {
-  //     return conditionSummary.value
-  //       .map((item) => {
-  //         const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${item.color};margin-right:6px;"></span>`
-  //         return `${dot}<span style="color:#2d554a;font-weight:600">${item.label}</span>：<span style="color:${item.color};font-weight:700">${item.levelLabel}影響</span>`
-  //       })
-  //       .join('<br/>')
-  //   },
-  //   backgroundColor: 'rgba(255,255,255,0.95)',
-  //   borderColor: '#e4ecea',
-  //   borderWidth: 1,
-  //   textStyle: {
-  //     // tooltip 內文文字大小
-  //     fontSize: 12,
-  //     fontFamily: "-apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', sans-serif"
-  //   },
-  //   padding: [10, 14]
-  // },
   radar: {
     // indicator.name 決定雷達圖外圈標籤文字內容
     indicator: conditionSummary.value.map(item => ({
@@ -663,21 +678,13 @@ const goBackHome = () => {
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goNext = (path) => {
   store.setRecommendedPaths(recommendedPaths.value)
-  store.setSelectedRecommendedPath(path)
+  // store.setSelectedRecommendedPath(path)
+  console.log('Selected recommended path:', recommendedPaths.value)
   router.push('/technology-match')
 }
 
 onMounted(async () => {
   window.addEventListener('resize', updateViewportWidth)
-  try {
-    const data = await getAnnouncementCategoryOptions()
-    const list = Array.isArray(data) ? data : data?.value
-    industryOptions.value = Array.isArray(list)
-      ? list.map((item) => ({ value: String(item.id), label: String(item.name) }))
-      : []
-  } catch {
-    industryOptions.value = []
-  }
 })
 
 onBeforeUnmount(() => {
@@ -1076,7 +1083,7 @@ onBeforeUnmount(() => {
 .section-desc {
   font-size: 15px;
   color: #7a9490;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .modes-link {
@@ -1257,8 +1264,6 @@ onBeforeUnmount(() => {
 }
 
 .detail-btn {
-  align-self: flex-end;
-  margin-top: auto;
   font-size: 15px;
   font-weight: 700;
   border: none;

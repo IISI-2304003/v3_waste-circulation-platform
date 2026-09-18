@@ -150,9 +150,9 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>是否有再利用空間</span>
+													<span>是否有增設處理或再利用設備空間</span>
 												</template>
-												<el-select v-model="store.siteConditions.hasReuseSpace" :class="{ 'is-invalid': shouldMarkInvalid('hasReuseSpace') }" placeholder="選擇是否有再利用空間" filterable>
+												<el-select v-model="store.siteConditions.hasReuseSpace" placeholder="選擇是否有再利用空間" filterable>
 													<el-option v-for="item in reuseSpaceOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -160,9 +160,9 @@
 										<el-col :xs="24" :sm="12" :md="12">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>是否有產生衍生廢棄物</span>
+													<span>是否有產生衍生廢棄物</span>
 												</template>
-												<el-select v-model="store.siteConditions.hasSecondaryWaste" :class="{ 'is-invalid': shouldMarkInvalid('hasSecondaryWaste') }" placeholder="選擇是否有產生衍生廢棄物" filterable>
+												<el-select v-model="store.siteConditions.hasSecondaryWaste" placeholder="選擇是否有產生衍生廢棄物" filterable>
 													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />
 												</el-select>
 											</el-form-item>
@@ -179,10 +179,10 @@
 										<el-col :xs="24" :sm="24" :md="24" class="form-col">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>請選擇符合之技術成熟度類型（可複選）</span>
+													<span>請選擇符合之技術成熟度類型（可複選）</span>
 												</template>
 
-												<el-checkbox-group v-model="technologySelections" class="option-checkbox-group" :class="{ 'is-invalid': shouldMarkInvalid('technologySelections') }">
+												<el-checkbox-group v-model="technologySelections" class="option-checkbox-group">
 													<el-checkbox v-for="item in technologyOptions" :key="item.value" :value="item.value">
 														{{ item.label }}
 													</el-checkbox>
@@ -192,10 +192,10 @@
 										<el-col :xs="24" :sm="24" :md="24" class="form-col">
 											<el-form-item>
 												<template #label>
-													<span><span class="required-mark">*</span>請選擇符合之使用者需求（可複選）</span>
+													<span>請選擇符合之使用者需求（可複選）</span>
 												</template>
 
-												<el-checkbox-group v-model="demandSelections" class="option-checkbox-group" :class="{ 'is-invalid': shouldMarkInvalid('demandSelections') }">
+												<el-checkbox-group v-model="demandSelections" class="option-checkbox-group">
 													<el-checkbox v-for="item in demandOptions" :key="item.value" :value="item.value">
 														{{ item.label }}
 													</el-checkbox>
@@ -228,8 +228,8 @@
 			</div>
 			<div class="action-buttons">
 				<el-button @click="resetAll">重設條件</el-button>
-				<el-button type="primary" @click="handleNext" class="detail-btn">下一步 : 決策分析
-					<el-icon class="el-icon--right">
+				<el-button type="primary" @click="handleNext" class="detail-btn" :loading="props.loading" :disabled="props.loading">下一步 : 決策分析
+					<el-icon class="el-icon--right" v-if="!props.loading">
 						<ArrowRight />
 					</el-icon>
 				</el-button>
@@ -272,6 +272,10 @@ const props = defineProps({
 	wasteDetail: {
 		type: String,
 		default: ''
+	},
+	loading: {
+		type: Boolean,
+		default: false
 	}
 })
 
@@ -364,10 +368,9 @@ const expandedMap = reactive({
 	demand: true
 })
 const sourceFrequencyOptions = [
-	{ value: 'daily', label: '每日' },
-	{ value: 'weekly', label: '每週' },
 	{ value: 'monthly', label: '每月' },
-	{ value: 'quarterly', label: '每季' }
+	{ value: 'quarterly', label: '每季' },
+	{ value: 'yearly', label: '每年' }
 ]
 
 
@@ -413,7 +416,8 @@ const technologyOptions = [
 const demandOptions = [
 	{ value: 'replace-raw-material', label: '再生產品可回廠原製程使用' },
 	{ value: 'non-original-process', label: '再生產品非原製程使用' },
-	{ value: 'external-sale', label: '再生產品對外販售' }
+	{ value: 'external-sale', label: '再生產品對外販售' },
+	{ value: 'none', label: '以上皆否' }
 ]
 
 const hasValidationAttempted = ref(false)
@@ -491,12 +495,31 @@ watch(
 watch(
 	() => store.sourceConditions.process,
 	(nextProcess) => {
-		console.log('來源製程選項改變，更新 process:', store.sourceConditions.process)
 		const matched = sourceProcessOptions.value.find((item) => item.value === nextProcess)
 		store.sourceConditions.processLabel = matched ? matched.label : ''
-		console.log('來源製程選項改變，更新 processLabel:', store.sourceConditions.processLabel)
 	}
 )
+
+// demandOptions改變
+watch(
+	demandSelections, // 這是一個 computed,本身就有響應性,可以直接傳
+	(newVal, oldVal) => {
+		if (!newVal || newVal.length === 0) return
+
+		const NONE = 'none'
+		const wasNoneSelected = oldVal?.includes(NONE)
+		const isNoneSelected = newVal.includes(NONE)
+
+		if (isNoneSelected && !wasNoneSelected) {
+			// 剛勾選「以上皆否」→ 清空其他選項，只留這一個
+			demandSelections.value = [NONE]
+		} else if (isNoneSelected && newVal.length > 1) {
+			// 「以上皆否」已存在，但又勾了別的選項 → 自動取消「以上皆否」
+			demandSelections.value = newVal.filter((v) => v !== NONE)
+		}
+	}
+)
+
 onMounted(async () => {
 	await loadSourceIndustryOptions()
 	if (store.sourceConditions.industry) {
@@ -562,22 +585,6 @@ const getMissingRequiredFields = () => {
 		missingFields.push({ sectionId: 'source', label: '廢棄物來源製程' })
 	}
 
-	if (store.siteConditions.hasReuseSpace === null) {
-		missingFields.push({ sectionId: 'site', label: '是否有再利用空間' })
-	}
-
-	if (store.siteConditions.hasSecondaryWaste === null) {
-		missingFields.push({ sectionId: 'environment', label: '是否有產生衍生廢棄物' })
-	}
-	if (technologySelections.value.length === 0) {
-		missingFields.push({ sectionId: 'technology', label: '技術成熟度類型' })
-	}
-
-	if (demandSelections.value.length === 0) {
-		missingFields.push({ sectionId: 'technology', label: '使用者需求' })
-	}
-
-
 	return missingFields
 }
 
@@ -614,10 +621,6 @@ const shouldMarkInvalid = (fieldKey) => {
 		sourceProcess: () => !store.sourceConditions.process,
 		sourceOutputAmount: () => store.sourceConditions.outputAmount === null || store.sourceConditions.outputAmount === undefined,
 		sourceFrequency: () => !store.sourceConditions.frequency,
-		hasReuseSpace: () => store.siteConditions.hasReuseSpace === null,
-		hasSecondaryWaste: () => store.siteConditions.hasSecondaryWaste === null,
-		technologySelections: () => technologySelections.value.length === 0,
-		demandSelections: () => demandSelections.value.length === 0,
 	}
 
 	return fieldCheckMap[fieldKey]?.() || false
