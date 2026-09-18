@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<title>技術決策完整分析報告</title>
+<style>
+  @page { size: A4; margin: 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'NotoSansTC', 'Microsoft JhengHei', sans-serif;
+    color: #1f2d3d;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 12px;
+  }
+  h1 { font-size: 22px; color: #1f4d47; margin: 0 0 4px; }
+  .meta { font-size: 11px; color: #5b7890; margin-bottom: 16px; }
+  h2 {
+    font-size: 15px; color: #2b5876;
+    border-bottom: 1px solid #dfe9f3;
+    padding-bottom: 4px; margin: 20px 0 10px;
+    break-after: avoid;
+  }
+
+  .mode-summary {
+    background: #f7fbff;
+    border: 1px solid #dbe8f3;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+    page-break-inside: avoid;
+  }
+  .mode-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(122,206,255,0.4), rgba(178,149,255,0.38));
+    color: #0f4f9f;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+  .steps-text { font-size: 12px; color: #496b79; margin: 6px 0 0; }
+  .mode-summary-text { margin: 6px 0 0; color: #496b79; }
+
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .summary-table th { width: 130px; }
+  th, td {
+    border: 1px solid #dbe8f3;
+    padding: 6px 8px;
+    font-size: 11px;
+    word-break: break-word;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #f5f9fc; color: #355b78; }
+
+  .vendor-card {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    page-break-inside: avoid;
+  }
+  .vendor-card .tag-row .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .badge.category { background: #e8f4ff; color: #1a73e8; }
+  .badge.reuse { background: #e8fff0; color: #1aaa5c; }
+  .vendor-card h3 { font-size: 14px; margin: 6px 0; color: #1a1a1a; }
+  .vendor-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px 12px;
+    margin-bottom: 6px;
+  }
+  .vendor-meta-grid .item .label { font-size: 10px; color: #26a69a; font-weight: 700; }
+  .vendor-meta-grid .item .value { font-size: 11px; color: #333; margin-top: 2px; }
+  .reason-tags .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #faedb5;
+    color: #c78305;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 0 4px 4px 0;
+  }
+
+  .internal-note {
+    background: #fdf6e3;
+    border: 1px dashed #e0c46c;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    color: #7a6117;
+    text-align: center;
+  }
+
+  .empty-hint { font-size: 12px; color: #999; padding: 10px 0; }
+  .footer-note { margin-top: 24px; font-size: 10px; color: #999; text-align: right; }
+</style>
+</head>
+<body>
+  <h1>技術決策完整分析報告</h1>
+  <p class="meta">匯出時間：{{exportTime}}</p>
+
+  <h2>推薦循環模式</h2>
+  <div class="mode-summary">
+    <span class="mode-badge">{{mode.modeName}}</span>
+    <strong>{{mode.title}}</strong>
+    <p class="steps-text">{{mode.stepsText}}</p>
+    {{#if mode.summary}}
+      <p class="mode-summary-text">{{mode.summary}}</p>
+    {{/if}}
+  </div>
+
+  <h2>決策需求摘要</h2>
+  {{#if demandSummary.length}}
+    <table class="summary-table">
+      <tbody>
+        {{#each demandSummary}}
+          <tr><th>{{this.label}}</th><td>{{this.value}}</td></tr>
+        {{/each}}
+      </tbody>
+    </table>
+  {{else}}
+    <p class="empty-hint">無可匯出資料</p>
+  {{/if}}
+
+  <h2>{{#if isInternalMode}}廠內自行執行{{else}}執行方式與技術廠商{{/if}}</h2>
+  {{#if isInternalMode}}
+    <div class="internal-note">
+      此循環模式由產源事業於廠內自行執行，無須尋找外部技術廠商。
+    </div>
+  {{else}}
+    {{#if vendors.length}}
+      {{#each vendors}}
+        <div class="vendor-card">
+          <div class="tag-row">
+            <span class="badge category">{{this.announcement_category_name}}</span>
+            {{#if this.showReuseTag}}
+              <span class="badge reuse">再利用機構</span>
+            {{/if}}
+          </div>
+          <h3>{{this.company_name}}</h3>
+          <div class="vendor-meta-grid">
+            <div class="item"><div class="label">再利用廢棄物</div><div class="value">{{this.waste_name}}</div></div>
+            <div class="item"><div class="label">所在地</div><div class="value">{{this.region}}</div></div>
+            <div class="item"><div class="label">距離</div><div class="value">{{this.road_distance_km}} km</div></div>
+            <div class="item"><div class="label">許可總量</div><div class="value">{{this.permitted_quantity}} 噸/月</div></div>
+            <div class="item"><div class="label">前月收受總量</div><div class="value">{{this.capacityLevelText}}</div></div>
+            <div class="item"><div class="label">事業管制編號</div><div class="value">{{this.control_number}}</div></div>
+            <div class="item"><div class="label">有效許可期限</div><div class="value">{{this.permit_end_date}}</div></div>
+          </div>
+          {{#if this.conditional_judgment.length}}
+            <div class="reason-tags">
+              {{#each this.conditional_judgment}}
+                <span class="tag">{{this}}</span>
+              {{/each}}
+            </div>
+          {{/if}}
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="empty-hint">目前無廠商資料</p>
+    {{/if}}
+  {{/if}}
+
+  <p class="footer-note">本報告由系統自動產出，僅供決策參考，實際合作仍應依相關條件評估。</p>
+</body>
+</html>

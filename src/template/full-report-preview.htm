@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>完整分析報告預覽</title>
+	<style>
+		@page {
+			size: A4;
+			margin: 15mm;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+			color: #1f2d3d;
+			line-height: 1.6;
+			margin: 0;
+			padding: 24px;
+			background: #f2f2f2;
+			font-size: 12px;
+		}
+
+		.page {
+			max-width: 780px;
+			margin: 0 auto;
+			background: #fff;
+			padding: 30px 36px;
+			box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+		}
+
+		h1 {
+			font-size: 22px;
+			color: #1f4d47;
+			margin: 0 0 4px;
+		}
+
+		.meta {
+			font-size: 11px;
+			color: #5b7890;
+			margin-bottom: 16px;
+		}
+
+		h2 {
+			font-size: 15px;
+			color: #2b5876;
+			border-bottom: 1px solid #dfe9f3;
+			padding-bottom: 4px;
+			margin: 20px 0 10px;
+			break-after: avoid;
+		}
+
+		.mode-summary {
+			background: #f7fbff;
+			border: 1px solid #dbe8f3;
+			border-radius: 8px;
+			padding: 10px 14px;
+			margin-bottom: 4px;
+			page-break-inside: avoid;
+		}
+
+		.mode-badge {
+			display: inline-block;
+			padding: 3px 10px;
+			border-radius: 999px;
+			background: linear-gradient(135deg, rgba(122, 206, 255, 0.4), rgba(178, 149, 255, 0.38));
+			color: #0f4f9f;
+			font-size: 12px;
+			font-weight: 700;
+			margin-right: 8px;
+			white-space: nowrap;
+		}
+
+		.steps-text {
+			font-size: 12px;
+			color: #496b79;
+			margin: 6px 0 0;
+		}
+
+		.mode-summary-text {
+			margin: 6px 0 0;
+			color: #496b79;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			table-layout: fixed;
+		}
+
+		.summary-table th {
+			width: 130px;
+		}
+
+		th,
+		td {
+			border: 1px solid #dbe8f3;
+			padding: 6px 8px;
+			font-size: 11px;
+			word-break: break-word;
+			text-align: left;
+			vertical-align: top;
+		}
+
+		th {
+			background: #f5f9fc;
+			color: #355b78;
+		}
+
+		.vendor-card {
+			border: 1px solid #e8e8e8;
+			border-radius: 8px;
+			padding: 10px 12px;
+			margin-bottom: 10px;
+			page-break-inside: avoid;
+		}
+
+		.vendor-card .tag-row .badge {
+			display: inline-block;
+			padding: 2px 10px;
+			border-radius: 999px;
+			font-size: 10px;
+			font-weight: 700;
+			margin-right: 6px;
+		}
+
+		.badge.category {
+			background: #e8f4ff;
+			color: #1a73e8;
+		}
+
+		.badge.reuse {
+			background: #e8fff0;
+			color: #1aaa5c;
+		}
+
+		.vendor-card h3 {
+			font-size: 14px;
+			margin: 6px 0;
+			color: #1a1a1a;
+		}
+
+		.vendor-meta-grid {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 4px 12px;
+			margin-bottom: 6px;
+		}
+
+		.vendor-meta-grid .item .label {
+			font-size: 10px;
+			color: #26a69a;
+			font-weight: 700;
+		}
+
+		.vendor-meta-grid .item .value {
+			font-size: 11px;
+			color: #333;
+			margin-top: 2px;
+		}
+
+		.reason-tags .tag {
+			display: inline-block;
+			padding: 2px 10px;
+			border-radius: 999px;
+			background: #faedb5;
+			color: #c78305;
+			font-size: 10px;
+			font-weight: 600;
+			margin: 0 4px 4px 0;
+		}
+
+		.internal-note {
+			background: #fdf6e3;
+			border: 1px dashed #e0c46c;
+			border-radius: 8px;
+			padding: 14px;
+			font-size: 13px;
+			color: #7a6117;
+			text-align: center;
+		}
+
+		.empty-hint {
+			font-size: 12px;
+			color: #999;
+			padding: 10px 0;
+		}
+
+		.footer-note {
+			margin-top: 24px;
+			font-size: 10px;
+			color: #999;
+			text-align: right;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="page">
+		<h1>技術決策完整分析報告</h1>
+		<p class="meta">匯出時間：2026-09-08 14:30</p>
+
+		<h2>推薦循環模式</h2>
+		<div class="mode-summary">
+			<span class="mode-badge">廠外模式 4</span>
+			<strong>原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。</strong>
+			<p class="steps-text">原料購入 → 純化(再製) → 調整成分 → 返回原製程</p>
+			<p class="mode-summary-text">可縮短運輸與處理鏈，提升資源再利用效益。</p>
+		</div>
+
+		<h2>決策需求摘要</h2>
+		<table class="summary-table">
+			<tbody>
+				<tr>
+					<th>所在地區</th>
+					<td>高雄市</td>
+				</tr>
+				<tr>
+					<th>允收條件</th>
+					<td>pH值 6~9；含水率 &lt; 5% 等 3 項</td>
+				</tr>
+				<tr>
+					<th>廢棄物來源製程</th>
+					<td>石化製程廢溶劑</td>
+				</tr>
+				<tr>
+					<th>每月需求量</th>
+					<td>500 噸 / 月</td>
+				</tr>
+				<tr>
+					<th>來源產業</th>
+					<td>石油化學製品製造業</td>
+				</tr>
+				<tr>
+					<th>優先條件</th>
+					<td>有再利用空間、無衍生廢棄物</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<!-- ============================================
+         情境 A：一般模式，顯示廠商清單
+         若要測試「廠內模式」，把下面整塊註解掉，
+         改用最下面「情境 B」的區塊
+    ============================================ -->
+		<h2>執行方式與技術廠商</h2>
+
+    <div class="vendor-card">
+      <div class="tag-row">
+        <span class="badge category">再利用機構</span>
+      </div>
+      <h3>台塑化學股份有限公司</h3>
+      <div class="vendor-meta-grid">
+        <div class="item"><div class="label">再利用廢棄物</div><div class="value">廢溶劑</div></div>
+        <div class="item"><div class="label">所在地</div><div class="value">高雄市</div></div>
+        <div class="item"><div class="label">距離</div><div class="value">12 km</div></div>
+        <div class="item"><div class="label">許可總量</div><div class="value">500 噸/月</div></div>
+        <div class="item"><div class="label">前月收受總量</div><div class="value">低</div></div>
+        <div class="item"><div class="label">事業管制編號</div><div class="value">H12345678</div></div>
+        <div class="item"><div class="label">有效許可期限</div><div class="value">2027-12-31</div></div>
+      </div>
+      <div class="reason-tags">
+        <span class="tag">地緣接近</span>
+        <span class="tag">產能充足</span>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="tag-row">
+        <span class="badge category">處理機構</span>
+        <span class="badge reuse">再利用機構</span>
+      </div>
+      <h3>中油煉製事業部</h3>
+      <div class="vendor-meta-grid">
+        <div class="item"><div class="label">再利用廢棄物</div><div class="value">廢溶劑、廢酸</div></div>
+        <div class="item"><div class="label">所在地</div><div class="value">高雄市</div></div>
+        <div class="item"><div class="label">距離</div><div class="value">18 km</div></div>
+        <div class="item"><div class="label">許可總量</div><div class="value">420 噸/月</div></div>
+        <div class="item"><div class="label">前月收受總量</div><div class="value">中</div></div>
+        <div class="item"><div class="label">事業管制編號</div><div class="value">H23456789</div></div>
+        <div class="item"><div class="label">有效許可期限</div><div class="value">2026-11-30</div></div>
+      </div>
+      <div class="reason-tags">
+        <span class="tag">允收條件相符</span>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="tag-row">
+        <span class="badge category">再利用機構</span>
+      </div>
+      <h3>長春人造樹脂廠</h3>
+      <div class="vendor-meta-grid">
+        <div class="item"><div class="label">再利用廢棄物</div><div class="value">廢溶劑</div></div>
+        <div class="item"><div class="label">所在地</div><div class="value">台南市</div></div>
+        <div class="item"><div class="label">距離</div><div class="value">45 km</div></div>
+        <div class="item"><div class="label">許可總量</div><div class="value">380 噸/月</div></div>
+        <div class="item"><div class="label">前月收受總量</div><div class="value">高</div></div>
+        <div class="item"><div class="label">事業管制編號</div><div class="value">H34567890</div></div>
+        <div class="item"><div class="label">有效許可期限</div><div class="value">2027-06-15</div></div>
+      </div>
+      <div class="reason-tags">
+        <span class="tag">產能充足</span>
+        <span class="tag">環評條件符合</span>
+      </div>
+    </div>
+
+		<!-- ============================================
+         情境 B：廠內模式，取代整個廠商清單區塊
+         測試時把上面「執行方式與技術廠商」整段註解，
+         取消下面這段的註解
+    ============================================ -->
+		<!-- <h2>廠內自行執行</h2>
+		<div class="internal-note">
+			此循環模式由產源事業於廠內自行執行，無須尋找外部技術廠商。
+		</div> -->
+		<!-- ============================================ -->
+
+		<p class="footer-note">本報告由系統自動產出，僅供決策參考，實際合作仍應依相關條件評估。</p>
+	</div>
+</body>
+
+</html>

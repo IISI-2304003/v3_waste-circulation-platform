@@ -475,7 +475,7 @@
 							<el-icon class="el-icon--left">
 								<Download />
 							</el-icon>
-							下載綜合報告
+							下載此廠商評估報告
 						</el-button>
 					</div>
 				</div>
@@ -507,7 +507,7 @@
 					<el-icon class="el-icon--left">
 						<Download />
 					</el-icon>
-					下載完整報告
+					下載完整分析報告
 				</el-button>
 			</div>
 
@@ -536,6 +536,8 @@ import factory5 from '@/assets/factory/factory-5.png'
 import { taiwanCities } from '@/data/taiwanCities'
 import { useCompanyMatchStore } from '@/stores/companyMatch'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import { toVendorReportData, toVendorSummaryData, toModeReportData } from '@/utils/reportPayload'
+import { downloadReport } from '@/api/downloadReport'
 
 const companyMatchStore = useCompanyMatchStore()
 const factoryImages = [factory1, factory2, factory3, factory4, factory5] // 用於隨機分配廠商圖片
@@ -554,6 +556,10 @@ const pageSize = 4
 const detailDialogVisible = ref(false)
 const activeVendor = ref(null)
 const modeDialogVisible = ref(false)
+
+// PDF 匯出加載狀態
+const vendorPdfLoading = ref(false)
+const fullPdfLoading = ref(false)
 
 const iconComponentMap = {
 	Goods: markRaw(Goods),
@@ -661,6 +667,7 @@ const allRecommendedPaths = computed(() => conditionStore.recommendedPaths || []
 // 說明：依目前條件即時計算「selected Mode」內容，提供畫面顯示與決策判斷使用。
 const selectedMode = computed(() => {
 	const hasStoredMode = conditionStore.selectedRecommendedPath?.modeName
+	console.log('conditionStore.recommendedPaths:', conditionStore.recommendedPaths)
 	const modeNameFromStore = conditionStore.selectedRecommendedPath?.modeName || ''
 	const matchedRecommended = allRecommendedPaths.value.find((item) => normalizeModeName(item.modeName) === normalizeModeName(modeNameFromStore))
 
@@ -889,172 +896,39 @@ const openMap = (address) => {
 	window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank')
 }
 
-// 說明：封裝「escape Html」商業邏輯，供目前流程重複使用。
-const escapeHtml = (value) => String(value ?? '')
-	.replace(/&/g, '&amp;')
-	.replace(/</g, '&lt;')
-	.replace(/>/g, '&gt;')
-	.replace(/"/g, '&quot;')
-	.replace(/'/g, '&#39;')
 
-// 說明：由匯出操作觸發；將目前廠商詳情整理為可列印 PDF 視窗內容。
-const exportVendorPdf = () => {
+
+
+
+// 說明：。
+const exportVendorPdf = async () => {
 	if (!activeVendor.value) return
-
-	const vendor = activeVendor.value
-	const printWindow = window.open('', '_blank', 'width=960,height=720')
-	if (!printWindow) {
-		ElMessage.warning('無法開啟匯出視窗，請確認瀏覽器未封鎖彈出視窗')
-		return
-	}
-
-	// 說明：封裝「tags」商業邏輯，供目前流程重複使用。
-	const tags = (arr = []) => arr.map((item) => `<span style="display:inline-block;margin:0 6px 6px 0;padding:4px 10px;border-radius:999px;background:#ecf5ff;color:#2b5876;font-size:12px;">${escapeHtml(item)}</span>`).join('')
-
-	printWindow.document.write(`
-		<!doctype html>
-		<html lang="zh-Hant">
-		<head>
-			<meta charset="UTF-8" />
-			<title>${escapeHtml(vendor.name)} - 公司詳情</title>
-			<style>
-				body{font-family:Segoe UI,Microsoft JhengHei,sans-serif;color:#1f2d3d;margin:28px;line-height:1.6;}
-				h1{margin:0 0 8px;font-size:28px;color:#1f4d47;}
-				h2{margin:22px 0 10px;font-size:16px;color:#2b5876;border-bottom:1px solid #dfe9f3;padding-bottom:4px;}
-				p{margin:4px 0;}
-				.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;}
-				.block{background:#f7fbff;border:1px solid #dbe8f3;border-radius:10px;padding:10px 12px;}
-				.meta{font-size:13px;color:#5b7890;}
-				.value{font-weight:600;color:#183e61;}
-				@media print { body { margin: 14mm; } }
-			</style>
-		</head>
-		<body>
-			<h1>${escapeHtml(vendor.name)}</h1>
-			<p class="meta">${escapeHtml(vendor.category)} ｜ ${escapeHtml(vendor.location)} ｜ ${escapeHtml(vendor.controlNo)}</p>
-
-			<h2>六項概要</h2>
-			<div class="grid">
-				<div class="block"><div class="meta">公告類別</div><div class="value">${escapeHtml(vendor.category)}</div></div>
-				<div class="block"><div class="meta">再利用機構</div><div class="value">${vendor.isReuseOrg ? '是' : '否'}</div></div>
-				<div class="block"><div class="meta">距離</div><div class="value">${escapeHtml(vendor.road_distance_km)} km</div></div>
-				<div class="block"><div class="meta">再生產品</div><div class="value">${escapeHtml(vendor.product)}</div></div>
-				<div class="block"><div class="meta">最大再利用量</div><div class="value">${escapeHtml(vendor.capacity)} 噸/月</div></div>
-				<div class="block"><div class="meta">事業管制編號</div><div class="value">${escapeHtml(vendor.controlNo)}</div></div>
-			</div>
-
-			<h2>再利用技術</h2>
-			<p>${escapeHtml(vendor.reuseTech)}</p>
-
-			<h2>允收標準</h2>
-			<div>${tags(vendor.acceptance_standard)}</div>
-
-			<h2>製程單元</h2>
-			<div>${tags(vendor.processUnits)}</div>
-
-			<h2>品質標準</h2>
-			<div>${tags(vendor.qualityStandards)}</div>
-
-			<h2>產品銷售對象產業類別</h2>
-			<div>${tags(vendor.salesTargetIndustries)}</div>
-
-			<h2>聯絡資訊</h2>
-			<p><strong>連絡電話：</strong>${escapeHtml(vendor.contactPhone)}</p>
-			<p><strong>工廠地址：</strong>${escapeHtml(vendor.factoryAddress)}</p>
-		</body>
-		</html>
-	`)
-	printWindow.document.close()
-	printWindow.focus()
-	setTimeout(() => {
-		printWindow.print()
-	}, 200)
+	vendorPdfLoading.value = true
+	await downloadReport({
+		type: 'vendor',
+		payload: {
+			vendor: toVendorReportData(activeVendor.value),
+			mode: toModeReportData(selectedMode.value)
+		},
+		filename: `${activeVendor.value.company_name}_廠商評估報告.pdf`
+	})
+	vendorPdfLoading.value = false
 }
 
 // 說明：由匯出操作觸發；輸出目前模式與廠商排序的完整報告。
-const exportFullReportPdf = () => {
-	const printWindow = window.open('', '_blank', 'width=1080,height=760')
-	if (!printWindow) {
-		ElMessage.warning('無法開啟匯出視窗，請確認瀏覽器未封鎖彈出視窗')
-		return
-	}
-
-	const modeName = escapeHtml(selectedMode.value?.modeName || '未設定')
-	const modeTitle = escapeHtml(selectedMode.value?.title || '未設定')
-	const modeSummary = escapeHtml(selectedMode.value?.summary || '未設定')
-	const summaryRows = visibleDemandSummary.value
-		.map((item) => `<tr><th>${escapeHtml(item.label)}</th><td>${escapeHtml(item.value)}</td></tr>`)
-		.join('')
-
-	const vendorRows = sortedVendors.value
-		.map((vendor, index) => `
-			<tr>
-				<td>${index + 1}</td>
-				<td>${escapeHtml(vendor.company_name || vendor.name || '')}</td>
-				<td>${escapeHtml(vendor.region || vendor.location || '')}</td>
-				<td>${escapeHtml(vendor.waste_name || '')}</td>
-				<td>${escapeHtml(vendor.product || '')}</td>
-				<td>${escapeHtml(vendor.permitted_quantity || vendor.capacity || '')}</td>
-				<td>${escapeHtml(vendor.control_number || vendor.controlNo || '')}</td>
-			</tr>
-		`).join('')
-
-	printWindow.document.write(`
-		<!doctype html>
-		<html lang="zh-Hant">
-		<head>
-			<meta charset="UTF-8" />
-			<title>技術決策完整報告</title>
-			<style>
-				body{font-family:Segoe UI,Microsoft JhengHei,sans-serif;color:#1f2d3d;margin:24px;line-height:1.6;}
-				h1{margin:0 0 6px;font-size:28px;color:#1f4d47;}
-				h2{margin:20px 0 8px;font-size:18px;color:#2b5876;border-bottom:1px solid #dfe9f3;padding-bottom:4px;}
-				p{margin:4px 0;}
-				table{width:100%;border-collapse:collapse;table-layout:fixed;}
-				th,td{border:1px solid #dbe8f3;padding:8px 10px;font-size:13px;word-break:break-word;vertical-align:top;}
-				th{background:#f5f9fc;text-align:left;color:#355b78;}
-				.summary th{width:170px;}
-				.meta{color:#5b7890;font-size:13px;}
-				@media print { body { margin: 12mm; } }
-			</style>
-		</head>
-		<body>
-			<h1>技術決策完整報告</h1>
-			<p class="meta">匯出時間：${escapeHtml(new Date().toLocaleString('zh-TW'))}</p>
-
-			<h2>推薦循環模式</h2>
-			<p><strong>${modeName}</strong>｜${modeTitle}</p>
-			<p>${modeSummary}</p>
-
-			<h2>決策需求摘要</h2>
-			<table class="summary">
-				<tbody>${summaryRows || '<tr><th>摘要</th><td>無可匯出資料</td></tr>'}</tbody>
-			</table>
-
-			<h2>推薦廠商清單（依目前排序）</h2>
-			<table>
-				<thead>
-					<tr>
-						<th style="width:48px;">排名</th>
-						<th>廠商名稱</th>
-						<th style="width:110px;">所在地</th>
-						<th>再利用廢棄物</th>
-						<th>再生產品</th>
-						<th style="width:120px;">許可總量</th>
-						<th style="width:140px;">事業管制編號</th>
-					</tr>
-				</thead>
-				<tbody>${vendorRows || '<tr><td colspan="7">目前無廠商資料</td></tr>'}</tbody>
-			</table>
-		</body>
-		</html>
-	`)
-
-	printWindow.document.close()
-	printWindow.focus()
-	setTimeout(() => {
-		printWindow.print()
-	}, 200)
+const exportFullReportPdf = async () => {
+	fullPdfLoading.value = true
+	await downloadReport({
+		type: 'full',
+		payload: {
+			mode: toModeReportData(selectedMode.value),
+			demandSummary: visibleDemandSummary.value.map((item) => ({ label: item.label, value: item.value })),
+			isInternalMode: isInternalMode.value,
+			vendors: sortedVendors.value.map(toVendorSummaryData)
+		},
+		filename: `技術決策完整分析報告.pdf`
+	})
+	fullPdfLoading.value = false
 }
 
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<title>廠商評估報告</title>
+<style>
+  @page { size: A4; margin: 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'NotoSansTC', 'Microsoft JhengHei', sans-serif;
+    color: #1f2d3d;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 12px;
+  }
+  h1 { font-size: 22px; color: #1f4d47; margin: 0 0 8px; }
+  .meta { font-size: 11px; color: #5b7890; margin-bottom: 16px; }
+  h2 {
+    font-size: 15px; color: #2b5876;
+    border-bottom: 1px solid #dfe9f3;
+    padding-bottom: 4px; margin: 20px 0 10px;
+    break-after: avoid;
+  }
+
+  /* ── badge 標籤列 ── */
+  .tag-row { margin-bottom: 8px; }
+  .tag-row .badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .badge.category { background: #e8f4ff; color: #1a73e8; }
+  .badge.reuse { background: #e8fff0; color: #1aaa5c; }
+
+  /* ── 推薦循環模式 ── */
+  .mode-summary {
+    background: #f7fbff;
+    border: 1px solid #dbe8f3;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+    page-break-inside: avoid;
+  }
+  .mode-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(122,206,255,0.4), rgba(178,149,255,0.38));
+    color: #0f4f9f;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+  .steps-text { font-size: 12px; color: #496b79; margin: 6px 0 0; }
+
+  /* ── 基本資訊 ── */
+  .vendor-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px 16px;
+    margin-bottom: 10px;
+    page-break-inside: avoid;
+  }
+  .vendor-meta-grid .item .label { font-size: 10px; color: #26a69a; font-weight: 700; }
+  .vendor-meta-grid .item .value { font-size: 12px; color: #333; margin-top: 2px; }
+
+  /* ── 適合原因 ── */
+  .reason-tags { page-break-inside: avoid; }
+  .reason-tags .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #faedb5;
+    color: #c78305;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 0 4px 4px 0;
+  }
+
+  /* ── 允收條件 ── */
+  .acceptance-tags { page-break-inside: avoid; }
+  .acceptance-tags .tag.blue {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #ecf5ff;
+    color: #2b5876;
+    font-size: 10px;
+    margin: 0 4px 4px 0;
+  }
+
+  .conclusion {
+    background: rgba(225, 250, 232, 0.6);
+    border: 1px solid rgba(103, 184, 129, 0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: #2b5876;
+    page-break-inside: avoid;
+  }
+
+  .contact-row {
+    page-break-inside: avoid;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .contact-item {
+    background: #f6faff;
+    border: 1px solid #dbe8f3;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .contact-item .label { font-size: 10px; color: #5d7994; font-weight: 700; }
+  .contact-item .value { font-size: 12px; color: #1e476b; margin-top: 3px; }
+
+  .empty-hint { font-size: 11px; color: #999; }
+  .footer-note { margin-top: 20px; font-size: 10px; color: #999; text-align: right; }
+</style>
+</head>
+<body>
+
+  <!-- 標籤列 -->
+  <div class="tag-row">
+    <span class="badge category">{{vendor.announcement_category_name}}</span>
+    {{#if vendor.showReuseTag}}
+      <span class="badge reuse">再利用機構</span>
+    {{/if}}
+  </div>
+  <h1>{{vendor.company_name}}</h1>
+  <p class="meta">{{vendor.region}} ｜ 事業管制編號 {{vendor.control_number}}</p>
+
+  <h2>推薦循環模式</h2>
+  <div class="mode-summary">
+    <span class="mode-badge">{{mode.modeName}}</span>
+    <strong>{{mode.title}}</strong>
+    <p class="steps-text">{{mode.stepsText}}</p>
+  </div>
+
+  <h2>基本資訊</h2>
+  <div class="vendor-meta-grid">
+    <div class="item"><div class="label">再利用廢棄物</div><div class="value">{{vendor.waste_name}}</div></div>
+    <div class="item"><div class="label">所在地</div><div class="value">{{vendor.region}}</div></div>
+    <div class="item"><div class="label">距離</div><div class="value">{{vendor.road_distance_km}} km</div></div>
+    <div class="item"><div class="label">許可總量</div><div class="value">{{vendor.permitted_quantity}} 噸/月</div></div>
+    <div class="item"><div class="label">前月收受總量</div><div class="value">{{vendor.capacityLevelText}}</div></div>
+    <div class="item"><div class="label">事業管制編號</div><div class="value">{{vendor.control_number}}</div></div>
+    <div class="item"><div class="label">有效許可期限</div><div class="value">{{vendor.permit_end_date}}</div></div>
+  </div>
+
+  <h2>允收條件</h2>
+  {{#if vendor.acceptance_standard.length}}
+    <div class="acceptance-tags">
+      {{#each vendor.acceptance_standard}}
+        <span class="tag blue">{{this.source_text}}</span>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="empty-hint">無資料</p>
+  {{/if}}
+
+  <h2>適合原因</h2>
+  {{#if vendor.conditional_judgment.length}}
+    <div class="reason-tags">
+      {{#each vendor.conditional_judgment}}
+        <span class="tag">{{this}}</span>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="empty-hint">無資料</p>
+  {{/if}}
+
+  <h2>決策結論</h2>
+  <div class="conclusion">
+    綜合評估各項條件與技術可行性，建議優先採用「{{mode.modeName}}」，並與「{{vendor.company_name}}」合作，可兼顧資源再利用效益、處理量能與環境價值，具備良好執行可行性。
+  </div>
+
+  <h2>聯絡資訊</h2>
+  <div class="contact-row">
+    <div class="contact-item"><div class="label">聯絡人</div><div class="value">{{vendor.contact_person}}</div></div>
+    <div class="contact-item"><div class="label">聯絡電話</div><div class="value">{{vendor.phone}}</div></div>
+    <div class="contact-item"><div class="label">工廠地址</div><div class="value">{{vendor.address}}</div></div>
+  </div>
+
+  <p class="footer-note">匯出時間：{{exportTime}}</p>
+</body>
+</html>
