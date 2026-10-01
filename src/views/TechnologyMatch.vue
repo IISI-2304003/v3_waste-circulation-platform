@@ -58,43 +58,56 @@
 						<h2>推薦循環模式</h2>
 						<a class="mode-explain-link" style=" margin-left: auto" @click.prevent="openModeExplainDialog">十大循環模式說明 ›</a>
 					</div>
-					<div class="mode-title-row">
-						<span class="mode-badge">{{ selectedMode.modeName }}</span>
-						<h3>{{ selectedMode.title }}</h3>
+					<p class="recommended-path-count">本次共建議 <strong>{{ allRecommendedPaths.length }}</strong> 項可適用模式</p>
+					<div class="recommended-path-list">
+						<span v-for="path in allRecommendedPaths" :key="path.id || path.modeName" class="recommended-path-chip">
+							{{ path.modeName }}
+						</span>
 					</div>
-					<div class="flow-diagram">
-						<template v-for="(node, index) in selectedMode.steps" :key="node.label">
-							<div class="flow-step">
-								<div class="flow-icon" :style="{
-									borderColor: selectedMode.accentColor + '60',
-									color: selectedMode.accentColor,
-
-								}">
-									<el-icon :size="22">
-										<component :is="node.icon" />
-									</el-icon>
-								</div>
-								<span class="flow-label">{{ node.label }}</span>
+					<div class="execution-direction-stats">
+						<div class="execution-direction-stat external-stat">
+							<span class="direction-stat-icon"><el-icon>
+									<Connection />
+								</el-icon></span>
+							<div>
+								<p>廠外執行方向</p>
+								<strong>{{ recommendedPathCounts.external }} 項模式</strong>
 							</div>
-							<div v-if="index < selectedMode.steps.length - 1" class="flow-arrow" :style="{ color: selectedMode.accentColor }">
-								<el-icon>
-									<ArrowRight />
-								</el-icon>
+						</div>
+						<div class="execution-direction-stat internal-stat">
+							<span class="direction-stat-icon"><el-icon>
+									<SetUp />
+								</el-icon></span>
+							<div>
+								<p>廠內執行方向</p>
+								<strong>{{ recommendedPathCounts.internal }} 項模式</strong>
 							</div>
-						</template>
-					</div>
-					<div class="matching-method" v-if="!['廠內模式1', '廠內模式2', '廠內模式3'].includes(normalizeModeName(selectedMode.modeName))">
-						<span>媒合方式：外部技術單位協作</span>
-						<span class="match-description">實際合作對象須依允收條件及合作關係進一步確認</span>
-					</div>
-					<div class="matching-method" v-else>
-						<span>執行主體：產源事業</span>
-						<span class="match-description">須確認廠內設備、製程及操作條件</span>
+						</div>
 					</div>
 				</section>
 			</div>
 
 			<section class="panel-card suppliers-panel">
+				<nav v-if="hasBothExecutionDirections" class="execution-direction-tabs" aria-label="執行方式">
+					<button type="button" class="execution-direction-tab" :class="{ 'is-active': !isInternalMode }" :aria-pressed="!isInternalMode" @click="selectExecutionDirection('external')">
+						<el-icon>
+							<Connection />
+						</el-icon>
+						<span class="execution-direction-tab-copy">
+							<strong>外部技術協作</strong>
+							<small>查看符合條件之技術廠商</small>
+						</span>
+					</button>
+					<button type="button" class="execution-direction-tab" :class="{ 'is-active': isInternalMode }" :aria-pressed="isInternalMode" @click="selectExecutionDirection('internal')">
+						<el-icon>
+							<SetUp />
+						</el-icon>
+						<span class="execution-direction-tab-copy">
+							<strong>廠內自行執行</strong>
+							<small>評估廠內執行條件與建議</small>
+						</span>
+					</button>
+				</nav>
 				<div class="suppliers-header">
 					<div class="section-header suppliers-title">
 						<div class="ai-icon">
@@ -247,7 +260,7 @@
 				</div>
 			</section>
 
-			<section v-if="!isQuickMode" class="panel-card suppliers-panel">
+			<!-- <section v-if="!isQuickMode" class="panel-card suppliers-panel">
 				<div class="suppliers-header">
 					<div class="section-header suppliers-title">
 						<div class="ai-icon">
@@ -307,7 +320,7 @@
 					</article>
 				</div>
 				<div v-else class="alternative-empty">目前無其他替代方案。</div>
-			</section>
+			</section> -->
 
 			<el-dialog v-model="detailDialogVisible" class="vendor-detail-dialog " width="min(1120px, 94vw)" align-center destroy-on-close :modal="true" :close-on-click-modal="true" :close-on-press-escape="true" append-to-body @closed="closeVendorDetail">
 				<template #header>
@@ -664,6 +677,20 @@ const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim
 
 const allRecommendedPaths = computed(() => conditionStore.recommendedPaths || [])
 
+const recommendedPathsByDirection = computed(() => allRecommendedPaths.value.reduce((paths, path) => {
+	const modeName = normalizeModeName(path?.modeName)
+	if (modeName.startsWith('廠內模式')) paths.internal.push(path)
+	if (modeName.startsWith('廠外模式')) paths.external.push(path)
+	return paths
+}, { external: [], internal: [] }))
+
+const recommendedPathCounts = computed(() => ({
+	external: recommendedPathsByDirection.value.external.length,
+	internal: recommendedPathsByDirection.value.internal.length
+}))
+
+const hasBothExecutionDirections = computed(() => recommendedPathCounts.value.external > 0 && recommendedPathCounts.value.internal > 0)
+
 // 說明：依目前條件即時計算「selected Mode」內容，提供畫面顯示與決策判斷使用。
 const selectedMode = computed(() => {
 	const hasStoredMode = conditionStore.selectedRecommendedPath?.modeName
@@ -814,8 +841,21 @@ const loadVendors = async () => {
 
 // 說明：判斷目前選擇的循環模式是否為「廠內模式」(執行主體為產源事業自己)
 const isInternalMode = computed(() => {
-	return ['廠內模式1', '廠內模式2', '廠內模式3'].includes(normalizeModeName(selectedMode.value?.modeName))
+	return normalizeModeName(selectedMode.value?.modeName).startsWith('廠內模式')
 })
+
+const selectExecutionDirection = (direction) => {
+	const paths = recommendedPathsByDirection.value[direction] || []
+	if (paths.length === 0 || (direction === 'internal') === isInternalMode.value) return
+	conditionStore.setSelectedRecommendedPath(paths[0])
+}
+
+watch(allRecommendedPaths, () => {
+	if (hasBothExecutionDirections.value) {
+		conditionStore.setSelectedRecommendedPath(recommendedPathsByDirection.value.external[0])
+	}
+}, { immediate: true })
+
 // 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
 
@@ -1153,17 +1193,87 @@ const goBackHome = () => {
 }
 
 .mode-panel-inner {
+	.recommended-path-count {
+		margin: 0 0 8px;
+		font-size: 16px;
+		font-weight: 600;
+		color: #315c70;
 
-
-	.mode-title-row {
-		margin-bottom: 16px;
-
-		h3 {
-			font-size: 18px;
+		strong {
+			color: #1769aa;
 		}
 	}
 
+	.recommended-path-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-bottom: 14px;
+	}
 
+	.recommended-path-chip {
+		padding: 6px 14px;
+		border: 1px solid rgba(103, 157, 220, 0.16);
+		border-radius: 999px;
+		background: #edf4ff;
+		color: #1769c2;
+		font-size: 15px;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.execution-direction-stats {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+	}
+
+	.execution-direction-stat {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+		padding: 12px;
+		border-radius: 12px;
+
+		&.external-stat {
+			background: linear-gradient(115deg, #eef8f1, #e5f5ed);
+			color: #178d56;
+		}
+
+		&.internal-stat {
+			background: linear-gradient(115deg, #eef7fc, #e4f3fc);
+			color: #1688bf;
+		}
+
+		.direction-stat-icon {
+			width: 36px;
+			height: 36px;
+			flex: 0 0 36px;
+			border-radius: 50%;
+			display: grid;
+			place-items: center;
+			background: rgba(255, 255, 255, 0.78);
+			font-size: 20px;
+		}
+
+		p,
+		strong {
+			display: block;
+			margin: 0;
+		}
+
+		p {
+			font-size: 15px;
+			font-weight: 700;
+		}
+
+		strong {
+			margin-top: 2px;
+			color: #315b70;
+			font-size: 15px;
+		}
+	}
 
 }
 
@@ -1393,6 +1503,64 @@ const goBackHome = () => {
 	align-items: flex-end;
 	gap: 12px;
 	margin-bottom: 14px;
+}
+
+.execution-direction-tabs {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.execution-direction-tab {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	min-width: 0;
+	min-height: 56px;
+	padding: 9px 14px;
+	border: 1px solid rgba(104, 151, 177, 0.24);
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.72);
+	color: #567181;
+	text-align: left;
+	cursor: pointer;
+	transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+
+	&:hover {
+		border-color: rgba(30, 166, 113, 0.55);
+	}
+
+	&.is-active {
+		border-color: #21a873;
+		background: linear-gradient(110deg, rgba(231, 249, 239, 0.96), rgba(244, 252, 247, 0.9));
+		box-shadow: 0 3px 10px rgba(45, 144, 102, 0.1);
+		color: #168a5b;
+	}
+
+	.el-icon {
+		flex: 0 0 auto;
+		font-size: 23px;
+	}
+}
+
+.execution-direction-tab-copy {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	gap: 2px;
+
+	strong {
+		font-size: 16px;
+		line-height: 1.35;
+	}
+
+	small {
+		font-size: 13px;
+		line-height: 1.35;
+		color: #69808b;
+	}
 }
 
 .alt-nav-actions {
@@ -2313,6 +2481,31 @@ const goBackHome = () => {
 
 	.contact-row {
 		grid-template-columns: 1fr;
+	}
+
+	.execution-direction-tabs {
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+
+	.execution-direction-tab {
+		justify-content: flex-start;
+		gap: 8px;
+		padding: 9px;
+
+		.el-icon {
+			font-size: 20px;
+		}
+	}
+
+	.execution-direction-tab-copy {
+		strong {
+			font-size: 14px;
+		}
+
+		small {
+			font-size: 11px;
+		}
 	}
 
 
