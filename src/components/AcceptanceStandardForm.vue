@@ -156,19 +156,28 @@ const applyMappedUnit = (standard) => {
 	return standard
 }
 
-onMounted(async () => {
+const loadParameterOptions = async (wastecode) => {
 	try {
-		const properties = await getParameterOptions(props.wastecode)
+		const properties = await getParameterOptions(wastecode)
 		parameterOptions.value = [...properties.map((p) => p.test_item), '外觀']
 		parameterUnitMap.value = Object.fromEntries(properties.map((p) => [p.test_item, p.unit || '']))
-		// 單位選單使用 API 回傳的唯一單位列表
 		const apiUnits = [...new Set(properties.map((p) => p.unit).filter(Boolean)), '']
 		if (apiUnits.length > 1) unitOptions.value = apiUnits
 		standards.value.forEach(applyMappedUnit)
 	} catch {
 		// API 失敗時保持預設值
 	}
-})
+}
+
+watch(
+	() => props.wastecode,
+	(code) => {
+		if (code) loadParameterOptions(code)
+		console.log('Loaded parameter options for wastecode:', code)
+
+	},
+	{ immediate: true } // 取代 onMounted，掛載時若已有值也會執行
+)
 
 // 說明：由使用者互動觸發；執行「handle Parameter Change」流程並同步更新相關狀態。
 const handleParameterChange = (standard) => {
