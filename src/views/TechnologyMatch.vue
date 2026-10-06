@@ -124,9 +124,9 @@
 							<el-option label="依再利用量" value="capacity" />
 						</el-select>
 						<el-select v-if="sortType === 'road_distance_km'" v-model="selectedRegions" multiple collapse-tags collapse-tags-tooltip placeholder="篩選縣市" class="sort-select region-select">
-							<el-option v-for="city in taiwanCities" :key="city" :label="city" :value="city">
-								<el-checkbox :model-value="selectedRegions.includes(city)" style="pointer-events:none" />
-								<span style="margin-left:8px">{{ city }}</span>
+							<el-option v-for="city in taiwanCities" :key="city.value" :label="city.name" :value="city.name">
+								<el-checkbox :model-value="selectedRegions.includes(city.name)" style="pointer-events:none" />
+								<span style="margin-left:8px">{{ city.name }}</span>
 							</el-option>
 						</el-select>
 					</div>
@@ -2455,6 +2455,10 @@ const goBackHome = () => {
 		flex-direction: column;
 	}
 
+	.suppliers-header {
+		align-items: stretch;
+	}
+
 	.section-header {
 		flex-direction: row;
 		align-items: center;
@@ -2521,6 +2525,12 @@ const goBackHome = () => {
 
 	.sort-select {
 		width: 100%;
+	}
+
+	.sort-controls {
+		width: 100%;
+		flex-direction: column;
+		align-items: stretch;
 	}
 
 	.alt-nav-actions {
