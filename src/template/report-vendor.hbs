@@ -21,6 +21,7 @@
     padding-bottom: 4px; margin: 20px 0 10px;
     break-after: avoid;
   }
+  .section-note { font-size: 11px; color: #5b7890; margin: 0 0 8px; }
 
   /* ── badge 標籤列 ── */
   .tag-row { margin-bottom: 8px; }
@@ -44,6 +45,7 @@
     margin-bottom: 4px;
     page-break-inside: avoid;
   }
+  .mode-summary + .mode-summary { margin-top: 8px; }
   .mode-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -134,12 +136,18 @@
   <h1>{{vendor.company_name}}</h1>
   <p class="meta">{{vendor.region}} ｜ 事業管制編號 {{vendor.control_number}}</p>
 
-  <h2>推薦循環模式</h2>
-  <div class="mode-summary">
-    <span class="mode-badge">{{mode.modeName}}</span>
-    <strong>{{mode.title}}</strong>
-    <p class="steps-text">{{mode.stepsText}}</p>
-  </div>
+  {{!-- ═════ 一般模式：推薦循環模式（僅廠外模式；簡易模式不顯示） ═════ --}}
+  {{#unless isSimple}}
+    <h2>推薦循環模式</h2>
+    <p class="section-note">本廠商適用於以下廠外模式</p>
+    {{#each outerModes}}
+      <div class="mode-summary">
+        <span class="mode-badge">{{this.modeName}}</span>
+        <strong>{{this.title}}</strong>
+        <p class="steps-text">{{this.stepsText}}</p>
+      </div>
+    {{/each}}
+  {{/unless}}
 
   <h2>基本資訊</h2>
   <div class="vendor-meta-grid">
@@ -163,21 +171,24 @@
     <p class="empty-hint">無資料</p>
   {{/if}}
 
-  <h2>適合原因</h2>
-  {{#if vendor.conditional_judgment.length}}
-    <div class="reason-tags">
-      {{#each vendor.conditional_judgment}}
-        <span class="tag">{{this}}</span>
-      {{/each}}
-    </div>
-  {{else}}
-    <p class="empty-hint">無資料</p>
-  {{/if}}
+  {{!-- ═════ 一般模式：適合原因 + 決策結論（簡易模式不顯示） ═════ --}}
+  {{#unless isSimple}}
+    <h2>適合原因</h2>
+    {{#if vendor.conditional_judgment.length}}
+      <div class="reason-tags">
+        {{#each vendor.conditional_judgment}}
+          <span class="tag">{{this}}</span>
+        {{/each}}
+      </div>
+    {{else}}
+      <p class="empty-hint">無資料</p>
+    {{/if}}
 
-  <h2>決策結論</h2>
-  <div class="conclusion">
-    綜合評估各項條件與技術可行性，建議優先採用「{{mode.modeName}}」，並與「{{vendor.company_name}}」合作，可兼顧資源再利用效益、處理量能與環境價值，具備良好執行可行性。
-  </div>
+    <h2>決策結論</h2>
+    <div class="conclusion">
+      綜合評估各項條件與技術可行性，建議優先採用「{{#each outerModes}}{{this.modeName}}{{#unless @last}}、{{/unless}}{{/each}}」，並與「{{vendor.company_name}}」合作，可兼顧資源再利用效益、處理量能與環境價值，具備良好執行可行性。
+    </div>
+  {{/unless}}
 
   <h2>聯絡資訊</h2>
   <div class="contact-row">
