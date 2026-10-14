@@ -217,53 +217,42 @@ import {
 } from '@element-plus/icons-vue'
 import FlowStepProgress from '@/components/condition-setup/FlowStepProgress.vue'
 import { useConditionSetupStore } from '@/stores/conditionSetup'
+import { useCompanyMatchStore } from '@/stores/companyMatch'
 import TopModesDialog from '@/components/TopModesDialog.vue'
 import { getAnnouncementCategoryOptions } from '@/api/wasteCode'
 import circulationModes from '@/data/circulationModes.json'
 
 const router = useRouter()
 const store = useConditionSetupStore()
+const companyMatchStore = useCompanyMatchStore()
 const modesDialogVisible = ref(false)
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1440)
-
-// 說明：由視窗 resize 事件觸發；更新 viewportWidth 供雷達圖響應式參數重算。
 const updateViewportWidth = () => {
   viewportWidth.value = window.innerWidth
 }
 
-
-// 說明：封裝「yes No Text」商業邏輯，供目前流程重複使用。
 const yesNoText = (value) => {
   if (value === true) return '有'
   if (value === false) return '無'
   return '未設定'
 }
 
-
-
 const IMPACT_LEVEL_SCORE_MAP = {
   high: 100,
   medium: 65,
   low: 30,
-  unrated: 0, // 灰色，雷達圖上通常畫在中心點或不特別強調
+  unrated: 0,
 }
 
 const IMPACT_LEVEL_STYLE_MAP = {
   high: { color: '#1f9d55', levelLabel: '高' },
   medium: { color: '#f59e0b', levelLabel: '中' },
   low: { color: '#ef4444', levelLabel: '低' },
-  unrated: { color: '#9ca3af', levelLabel: '未評估' }, // 灰色
+  unrated: { color: '#9ca3af', levelLabel: '未評估' },
 }
 
-
-
-
-// 說明：封裝「to Radar Score」商業邏輯，供目前流程重複使用。
 const toRadarScore = (level) => IMPACT_LEVEL_SCORE_MAP[level] || 0
 
-// 雷達圖「軸標籤文字內容」換行規則。
-// 想調整每行切幾個字，改這裡的 slice 範圍。
-// 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
 const formatRadarIndicatorName = (label = '') => {
   const text = String(label)
   if (text.length <= 5) return text
@@ -271,22 +260,19 @@ const formatRadarIndicatorName = (label = '') => {
   return `${text.slice(0, 4)}\n${text.slice(4, 8)}\n${text.slice(8)}`
 }
 
-// 計算條件的影響度級別
-// 物化特性 — 依照表格：硫酸濃度、比重、含水率三項，填幾項算等級
-const PHYSICAL_PARAM_KEYS = ['硫酸濃度', '比重', '含水率'] // 對應 acceptanceConditions 裡的 parameter 值
+const PHYSICAL_PARAM_KEYS = ['硫酸濃度', '比重', '含水率']
 
 const getPhysicalLevel = (acceptanceConditions) => {
   const filledCount = PHYSICAL_PARAM_KEYS.filter((key) =>
-    acceptanceConditions.some((c) => c.parameter === key && c.value !== '' && c.value != null)
+    acceptanceConditions.some((condition) => condition.parameter === key && condition.value !== '' && condition.value != null)
   ).length
 
-  if (filledCount === 0) return 'unrated' // 完全未填 → 未評估
+  if (filledCount === 0) return 'unrated'
   if (filledCount === 3) return 'high'
   if (filledCount === 2) return 'medium'
-  return 'low' // 1 項
+  return 'low'
 }
 
-// 料源穩定性：對應  sourceFrequencyOptions（只有這三個值）
 const sourceFrequencyLabelMap = {
   monthly: '每月',
   quarterly: '每季',
@@ -298,20 +284,17 @@ const FREQUENCY_LEVEL_MAP = {
   quarterly: 'medium',
   yearly: 'low',
 }
+
 const getSourceLevel = (frequency) => {
   if (!frequency) return 'unrated'
   return FREQUENCY_LEVEL_MAP[frequency] || 'unrated'
 }
 
-// 場地配置：對應 reuseSpaceOptions（true=有 / false=無）
-// 圖表規則：否(無/false) → 中；是(有/true) → 高
 const getSiteLevel = (hasReuseSpace) => {
   if (hasReuseSpace === null || hasReuseSpace === undefined) return 'unrated'
   return hasReuseSpace === false ? 'medium' : 'high'
 }
 
-// 環境影響：對應 secondaryWasteOptions（true=有 / false=無）
-// 圖表規則：否(無/false) → 高；是(有/true) → 中
 const getEnvironmentLevel = (hasSecondaryWaste) => {
   if (hasSecondaryWaste === null || hasSecondaryWaste === undefined) return 'unrated'
   return hasSecondaryWaste === false ? 'high' : 'medium'
@@ -570,94 +553,38 @@ const modeStyleMap = {
   10: { gradient: 'linear-gradient(160deg,#ab47bc,#6a1b9a)', accentColor: '#ab47bc' },
 }
 
-// 從 JSON 建立所有模式（步驟圖示轉為 Vue 元件）
-const allModes = circulationModes.map((mode) => ({
-  modeName: mode.name,
-  summary: mode.description,
-  steps: (mode.steps || []).map((step) => ({
-    label: step.label,
-    icon: iconComponentMap[step.icon] || Goods,
-  })),
-  ...(modeStyleMap[mode.id] || { gradient: `linear-gradient(160deg,${mode.color},${mode.color})`, accentColor: mode.color }),
-  matchRate: 0,
-}))
-
-// 評估因子對應矩陣（key 對應 JSON name，無空格）
-const modeFactorMatrix = {
-  '廠內模式1': [2, 6, 8, 10],
-  '廠內模式2': [1, 5, 8, 9],
-  '廠內模式3': [2, 3, 5, 7, 9],
-  '廠外模式1': [2, 3, 4, 7, 9],
-  '廠外模式2': [2, 3, 5, 6, 7],
-  '廠外模式3': [1, 6, 8, 10],
-  '廠外模式4': [1, 6, 7, 10],
-  '廠外模式5': [1, 6, 7],
-  '廠外模式6': [2, 5, 7, 9],
-  '廠外模式7': [2, 4, 7, 9],
-}
-
-// 說明：封裝「with Rank」商業邏輯，供目前流程重複使用。
-const withRank = (paths) => paths.map((path, index) => ({ ...path, id: `r${index + 1}`, rank: index + 1 }))
-
-// 說明：依目前條件即時計算「recommended Paths」內容，提供畫面顯示與決策判斷使用。
+// 以 API 回傳的前三筆模式為準，從本機資料補上流程與顯示資訊。
 const recommendedPaths = computed(() => {
-  const { siteConditions, technologySelections, demandSelections } = store
+  const response = companyMatchStore.companyData
+  console.log('companyMatchStore.companyData:', response)
+  const apiPaths = response?.recommendedPath ?? response?.data?.recommendedPath
+  const paths = Array.isArray(apiPaths) ? apiPaths : apiPaths ? [apiPaths] : []
 
-  // 啟用的評估因子（1-indexed）
-  const activeFactors = new Set()
-  if (demandSelections.includes('replace-raw-material')) activeFactors.add(1)
-  if (demandSelections.includes('non-original-process')) activeFactors.add(2)
-  if (demandSelections.includes('external-sale')) activeFactors.add(3)
-  if (technologySelections.includes('mature')) activeFactors.add(4)
-  if (technologySelections.includes('imported')) activeFactors.add(5)
-  if (technologySelections.includes('innovative')) activeFactors.add(6)
-  if (siteConditions.hasReuseSpace === false) activeFactors.add(7)
-  if (siteConditions.hasReuseSpace === true) activeFactors.add(8)
-  if (siteConditions.hasSecondaryWaste === true) activeFactors.add(9)
-  if (siteConditions.hasSecondaryWaste === false) activeFactors.add(10)
+  return paths.slice(0, 3).map((path, index) => {
+    const mode = circulationModes.find((item) =>
+      normalizeModeName(item.name) === normalizeModeName(path.mode_name || path.modeName)
+    )
+    if (!mode) return null
 
-  // 計算每個模式的命中分數（總分 + 各群組分）
-  // 平局排序優先序：製程核心需求 > 環境影響性 > 技術精進程度 > 場地可行性
-  const GROUP_FACTORS = {
-    demand: [1, 2, 3],   // 製程核心需求（Step 7）
-    environment: [9, 10],     // 環境影響性（Step 4）
-    technology: [4, 5, 6],   // 技術精進程度（Step 6）
-    site: [7, 8],      // 場地可行性（Step 3）
-  }
-
-  const scored = allModes.map((mode) => {
-    const factors = modeFactorMatrix[normalizeModeName(mode.modeName)] || []
-    const score = factors.filter((f) => activeFactors.has(f)).length
-    const groupScore = (group) => factors.filter((f) => GROUP_FACTORS[group].includes(f) && activeFactors.has(f)).length
-    return {
-      ...mode,
-      _score: score,
-      _demandScore: groupScore('demand'),
-      _envScore: groupScore('environment'),
-      _techScore: groupScore('technology'),
-      _siteScore: groupScore('site'),
+    const style = modeStyleMap[mode.id] || {
+      gradient: `linear-gradient(160deg,${mode.color},${mode.color})`,
+      accentColor: mode.color,
     }
-  })
 
-  // 無任何因子時，依有無再利用空間給預設排序
-  if (activeFactors.size === 0) {
-    const defaultOrder = siteConditions.hasReuseSpace === true
-      ? ['廠內模式1', '廠外模式4', '廠外模式6']
-      : ['廠外模式4', '廠外模式6', '廠外模式2']
-    const defaultModes = defaultOrder.map((name) => allModes.find((m) => normalizeModeName(m.modeName) === name)).filter(Boolean)
-    return withRank(defaultModes)
-  }
-
-  // 依總分排序；平局依群組優先序依次比較
-  scored.sort((a, b) => {
-    if (b._score !== a._score) return b._score - a._score
-    if (b._demandScore !== a._demandScore) return b._demandScore - a._demandScore
-    if (b._envScore !== a._envScore) return b._envScore - a._envScore
-    if (b._techScore !== a._techScore) return b._techScore - a._techScore
-    if (b._siteScore !== a._siteScore) return b._siteScore - a._siteScore
-    return 0
-  })
-  return withRank(scored.slice(0, 3))
+    return {
+      ...path,
+      id: `r${index + 1}`,
+      rank: index + 1,
+      modeName: mode.name,
+      title: path.title || mode.description,
+      summary: mode.description,
+      steps: (mode.steps || []).map((step) => ({
+        label: step.label,
+        icon: iconComponentMap[step.icon] || Goods,
+      })),
+      ...style,
+    }
+  }).filter(Boolean)
 })
 
 // 說明：將輸入資料標準化為系統格式，供決策與查詢流程使用。
@@ -678,7 +605,7 @@ const goBackHome = () => {
 // 說明：由導覽按鈕觸發；切換路由或流程步驟狀態。
 const goNext = (path) => {
   store.setRecommendedPaths(recommendedPaths.value)
-  // store.setSelectedRecommendedPath(path)
+  store.setSelectedRecommendedPath(recommendedPaths.value[0])
   console.log('Selected recommended path:', recommendedPaths.value)
   router.push('/technology-match')
 }
