@@ -330,10 +330,10 @@
 								<span class="vendor-tag">{{ activeVendor.announcement_category_name }}</span>
 								<span class="vendor-tag" v-if="activeVendor.is_reuse_company === '是' && activeVendor.announcement_category_name !== '再利用機構'">再利用機構</span>
 								<h3>{{ activeVendor.company_name }}</h3>
-								<div class="mode-title-row">
+								<div v-if="!isQuickMode" class="mode-title-row">
 									<span class="mode-badge">{{ selectedMode.modeName }}</span>
 								</div>
-								<div class="flow-diagram">
+								<div v-if="!isQuickMode" class="flow-diagram">
 									<template v-for="(node, index) in selectedMode.steps" :key="node.label">
 										<div class="flow-step">
 											<div class="flow-icon" :style="{
@@ -431,14 +431,14 @@
 								<p class="capacity-note" v-if="activeVendor.capacityLevel === 1">收受能力充足，可立即決策合作。</p>
 							</div>
 						</section>
-						<section class="detail-card">
+						<section v-if="!isQuickMode" class="detail-card">
 							<p class="detail-title">適合原因</p>
 							<el-divider />
 							<div class="tag-wrap">
 								<span v-for="item in activeVendor.conditional_judgment" :key="item" class="detail-tag yellow">{{ item }}</span>
 							</div>
 						</section>
-						<section class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
+						<section v-if="!isQuickMode" class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
 							<p class="detail-title">決策結論</p>
 							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ selectedMode.modeName }}」,並與「{{ activeVendor.company_name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
 						</section>
@@ -786,8 +786,7 @@ const loadError = ref(false)
 
 const extractVendorList = (payload) => {
 	if (Array.isArray(payload)) return payload
-	if (Array.isArray(payload?.data)) return payload.data
-	return []
+	return Array.isArray(payload?.finalCompanys) ? payload.finalCompanys : []
 }
 
 const normalizeVendor = (item, index) => ({
@@ -829,7 +828,7 @@ const loadVendors = async () => {
 
 	// 標準模式：使用條件配對後存在 store 裡的結果
 
-	const list = extractVendorList(companyMatchStore.companyData)
+	const list = extractVendorList(companyMatchStore.companyData.data)
 	vendors.value = list.map(normalizeVendor)
 	// vendors.value = companyMatchStore.companyData.data
 
@@ -860,6 +859,7 @@ watch(allRecommendedPaths, () => {
 const sortedVendors = computed(() => {
 
 	let result = vendors.value;
+	console.log('sortedVendors intermediate result:', result)
 	// 廠內模式時，執行主體是產源事業自己，僅顯示自己公司的資料
 	if (isInternalMode.value) {
 		const businessName = conditionStore.businessConditions.businessName || ''
@@ -947,6 +947,7 @@ const exportVendorPdf = async () => {
 	await downloadReport({
 		type: 'vendor',
 		payload: {
+			isSimple: isQuickMode.value,
 			vendor: toVendorReportData(activeVendor.value),
 			mode: toModeReportData(selectedMode.value)
 		},
@@ -961,6 +962,7 @@ const exportFullReportPdf = async () => {
 	await downloadReport({
 		type: 'full',
 		payload: {
+			isSimple: isQuickMode.value,
 			mode: toModeReportData(selectedMode.value),
 			demandSummary: visibleDemandSummary.value.map((item) => ({ label: item.label, value: item.value })),
 			isInternalMode: isInternalMode.value,
