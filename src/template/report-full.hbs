@@ -24,15 +24,20 @@
   .mode-group-title { font-size: 13px; color: #355b78; margin: 12px 0 6px; break-after: avoid; }
   .section-note { font-size: 11px; color: #5b7890; margin: 0 0 8px; }
 
+  .mode-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    page-break-inside: avoid;
+  }
   .mode-summary {
     background: #f7fbff;
     border: 1px solid #dbe8f3;
     border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 4px;
+    min-width: 0;
+    padding: 10px;
     page-break-inside: avoid;
   }
-  .mode-summary + .mode-summary { margin-top: 8px; }
   .mode-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -122,6 +127,7 @@
 
     {{#if outerModes.length}}
       <h3 class="mode-group-title">廠外執行方向（{{outerModes.length}} 項）</h3>
+      <div class="mode-summary-grid">
       {{#each outerModes}}
         <div class="mode-summary">
           <span class="mode-badge">{{this.modeName}}</span>
@@ -132,10 +138,12 @@
           {{/if}}
         </div>
       {{/each}}
+      </div>
     {{/if}}
 
     {{#if innerModes.length}}
       <h3 class="mode-group-title">廠內執行方向（{{innerModes.length}} 項）</h3>
+      <div class="mode-summary-grid">
       {{#each innerModes}}
         <div class="mode-summary">
           <span class="mode-badge">{{this.modeName}}</span>
@@ -146,6 +154,7 @@
           {{/if}}
         </div>
       {{/each}}
+      </div>
     {{/if}}
 
     <h2>決策需求摘要</h2>

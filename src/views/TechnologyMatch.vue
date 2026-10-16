@@ -238,9 +238,9 @@
 											</div>
 										</div>
 
-										<!-- 底部：適合原因 + 查看詳情 -->
+										<!-- 底部：評估結果 + 查看詳情 -->
 										<div class="card-footer">
-											<span class="reason-label">適合原因</span>
+											<span class="reason-label">評估結果</span>
 											<div class="footer-row">
 												<div class="reason-block">
 													<span v-for="reason in vendor.conditional_judgment" :key="reason" class="detail-tag yellow">{{ reason }}</span>
@@ -327,33 +327,11 @@
 					<div v-if="activeVendor" class="dialog-top-header">
 						<div class="top-header-main">
 							<div class="top-left-copy">
-								<span class="vendor-tag">{{ activeVendor.announcement_category_name }}</span>
-								<span class="vendor-tag" v-if="activeVendor.is_reuse_company === '是' && activeVendor.announcement_category_name !== '再利用機構'">再利用機構</span>
+								<div class="vendor-tags">
+									<span class="vendor-tag">{{ activeVendor.announcement_category_name }}</span>
+									<span class="vendor-tag" v-if="activeVendor.is_reuse_company === '是' && activeVendor.announcement_category_name !== '再利用機構'">再利用機構</span>
+								</div>
 								<h3>{{ activeVendor.company_name }}</h3>
-								<div v-if="!isQuickMode" class="mode-title-row">
-									<span class="mode-badge">{{ selectedMode.modeName }}</span>
-								</div>
-								<div v-if="!isQuickMode" class="flow-diagram">
-									<template v-for="(node, index) in selectedMode.steps" :key="node.label">
-										<div class="flow-step">
-											<div class="flow-icon" :style="{
-												borderColor: selectedMode.accentColor + '60',
-												color: selectedMode.accentColor,
-
-											}">
-												<el-icon :size="22">
-													<component :is="node.icon" />
-												</el-icon>
-											</div>
-											<span class="flow-label">{{ node.label }}</span>
-										</div>
-										<div v-if="index < selectedMode.steps.length - 1" class="flow-arrow" :style="{ color: selectedMode.accentColor }">
-											<el-icon>
-												<ArrowRight />
-											</el-icon>
-										</div>
-									</template>
-								</div>
 							</div>
 
 							<div class="top-right-media">
@@ -364,8 +342,28 @@
 				</template>
 
 				<div v-if="activeVendor" class="dialog-body-v2">
-					<el-row :gutter="12" class="top-metrics-row">
-						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+					<section v-if="!isQuickMode && topRecommendedModes.length" class="recommended-modes-section">
+						<p class="recommended-modes-heading">推薦循環模式</p>
+						<div class="recommended-modes-grid">
+							<article v-for="mode in topRecommendedModes" :key="mode.id || mode.modeName" class="recommended-mode-card">
+								<h4 class="recommended-mode-name">{{ mode.modeName }}</h4>
+								<p class="recommended-mode-flow">
+									<template v-for="(node, index) in mode.steps" :key="`${mode.modeName}-${node.label}`">
+										<span class="recommended-mode-step">
+											<el-icon :style="{ color: mode.accentColor }">
+												<component :is="node.icon" />
+											</el-icon>
+											<span>{{ node.label }}</span>
+										</span>
+										<span v-if="index < mode.steps.length - 1" class="recommended-flow-arrow" aria-hidden="true">→</span>
+									</template>
+								</p>
+							</article>
+						</div>
+					</section>
+
+					<el-row class="top-metrics-row">
+						<el-col>
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Location />
@@ -373,7 +371,7 @@
 								<strong>{{ activeVendor.region }}</strong>
 							</div>
 						</el-col>
-						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+						<el-col>
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Promotion />
@@ -381,7 +379,7 @@
 								<strong>{{ activeVendor.road_distance_km }} km</strong>
 							</div>
 						</el-col>
-						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+						<el-col>
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<DataAnalysis />
@@ -389,7 +387,7 @@
 								<strong>{{ activeVendor.permitted_quantity }}噸/月</strong>
 							</div>
 						</el-col>
-						<el-col :xs="12" :sm="8" :md="4" :lg="6" :xl="4">
+						<el-col>
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Finished />
@@ -397,7 +395,7 @@
 								<strong>{{ activeVendor.permit_end_date }}</strong>
 							</div>
 						</el-col>
-						<el-col :xs="12" :sm="8" :md="4" :lg="4" :xl="4">
+						<el-col>
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Files />
@@ -432,7 +430,7 @@
 							</div>
 						</section>
 						<section v-if="!isQuickMode" class="detail-card">
-							<p class="detail-title">適合原因</p>
+							<p class="detail-title">評估結果</p>
 							<el-divider />
 							<div class="tag-wrap">
 								<span v-for="item in activeVendor.conditional_judgment" :key="item" class="detail-tag yellow">{{ item }}</span>
@@ -694,7 +692,6 @@ const hasBothExecutionDirections = computed(() => recommendedPathCounts.value.ex
 // 說明：依目前條件即時計算「selected Mode」內容，提供畫面顯示與決策判斷使用。
 const selectedMode = computed(() => {
 	const hasStoredMode = conditionStore.selectedRecommendedPath?.modeName
-	console.log('conditionStore.recommendedPaths:', conditionStore.recommendedPaths)
 	const modeNameFromStore = conditionStore.selectedRecommendedPath?.modeName || ''
 	const matchedRecommended = allRecommendedPaths.value.find((item) => normalizeModeName(item.modeName) === normalizeModeName(modeNameFromStore))
 
@@ -737,6 +734,15 @@ const selectedMode = computed(() => {
 		]
 
 	}
+})
+
+const topRecommendedModes = computed(() => {
+	const modes = allRecommendedPaths.value.slice(0, 3).map((path) => ({
+		...path,
+		accentColor: path.accentColor || 'var(--ds-primary-green)',
+		steps: mapModeSteps(path.steps)
+	}))
+	return modes.length ? modes : [selectedMode.value]
 })
 
 const alternativesPerPage = 2
@@ -796,7 +802,6 @@ const normalizeVendor = (item, index) => ({
 })
 
 const loadVendors = async () => {
-	console.log('標準模式載入廠商清單', companyMatchStore.companyData)
 	// 廠內模式：不管簡易或標準，都不需要載入廠商清單
 	if (isInternalMode.value) {
 		vendors.value = []
@@ -859,7 +864,6 @@ watch(allRecommendedPaths, () => {
 const sortedVendors = computed(() => {
 
 	let result = vendors.value;
-	console.log('sortedVendors intermediate result:', result)
 	// 廠內模式時，執行主體是產源事業自己，僅顯示自己公司的資料
 	if (isInternalMode.value) {
 		const businessName = conditionStore.businessConditions.businessName || ''
@@ -944,15 +948,20 @@ const openMap = (address) => {
 const exportVendorPdf = async () => {
 	if (!activeVendor.value) return
 	vendorPdfLoading.value = true
+
 	await downloadReport({
 		type: 'vendor',
 		payload: {
 			isSimple: isQuickMode.value,
 			vendor: toVendorReportData(activeVendor.value),
-			mode: toModeReportData(selectedMode.value)
+			mode: isQuickMode.value
+				? toModeReportData(selectedMode.value)
+				: allRecommendedPaths.value.map(toModeReportData),
 		},
 		filename: `${activeVendor.value.company_name}_廠商評估報告.pdf`
 	})
+	console.log('Vendor PDF downloaded', activeVendor.value)
+	console.log('Vendor PDF downloaded_2', selectedMode.value)
 	vendorPdfLoading.value = false
 }
 
@@ -963,7 +972,9 @@ const exportFullReportPdf = async () => {
 		type: 'full',
 		payload: {
 			isSimple: isQuickMode.value,
-			mode: toModeReportData(selectedMode.value),
+			mode: isQuickMode.value
+				? toModeReportData(selectedMode.value)
+				: allRecommendedPaths.value.map(toModeReportData),
 			demandSummary: visibleDemandSummary.value.map((item) => ({ label: item.label, value: item.value })),
 			isInternalMode: isInternalMode.value,
 			vendors: sortedVendors.value.map(toVendorSummaryData)
@@ -1478,6 +1489,55 @@ const goBackHome = () => {
 	}
 }
 
+.recommended-modes-section {
+	margin-bottom: 16px;
+}
+
+.recommended-modes-heading {
+	margin: 0 0 10px;
+	font-size: 16px;
+	font-weight: 700;
+	color: #315d57;
+}
+
+.recommended-modes-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.recommended-mode-card {
+	min-width: 0;
+	padding: 14px 16px;
+	border: 1px solid rgba(92, 151, 139, 0.22);
+	border-radius: 10px;
+	background: rgba(255, 255, 255, 0.78);
+}
+
+.recommended-mode-name {
+	margin: 0 0 8px;
+	color: #245c54;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.4;
+}
+
+.recommended-mode-flow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 7px;
+	margin: 0;
+	color: #536d69;
+	font-size: 16px;
+	line-height: 1.6;
+}
+
+.recommended-flow-arrow {
+	color: #6d9b91;
+	font-weight: 700;
+}
+
 
 .mode-desc {
 	margin: 10px 0 16px;
@@ -1899,7 +1959,7 @@ const goBackHome = () => {
 		}
 	}
 
-	// 底部：適合原因 + 按鈕
+	// 底部：評估結果 + 按鈕
 	.card-footer {
 		display: flex;
 		flex-direction: column;
@@ -1970,7 +2030,7 @@ const goBackHome = () => {
 	display: flex;
 	justify-content: stretch;
 	gap: 0;
-	padding: 22px 24px 18px;
+	padding: 24px;
 	background:
 		radial-gradient(circle at 10% 0%, rgba(87, 166, 255, 0.18), transparent 28%),
 		radial-gradient(circle at 92% 16%, rgba(92, 114, 255, 0.16), transparent 30%),
@@ -1988,13 +2048,30 @@ const goBackHome = () => {
 
 .top-header-main {
 	display: grid;
-	grid-template-columns: minmax(340px, 1fr) minmax(320px, 0.95fr);
+	grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+	align-items: center;
 	gap: 18px;
 	width: 100%;
 }
 
 .top-left-copy {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 10px;
 	min-width: 0;
+
+	h3 {
+		max-width: 100%;
+		overflow-wrap: anywhere;
+	}
+}
+
+.vendor-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .vendor-tag {
@@ -2049,14 +2126,83 @@ const goBackHome = () => {
 }
 
 .dialog-body-v2 {
-	padding: 22px 24px 24px;
+	padding: 28px 24px 24px;
 	display: flex;
 	flex-direction: column;
 }
 
+.recommended-modes-section {
+	margin-bottom: 16px;
+}
+
+.recommended-modes-heading {
+	margin: 0 0 10px;
+	color: #315d57;
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.recommended-modes-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.recommended-mode-card {
+	min-width: 0;
+	padding: 12px 14px;
+	border: 1px solid rgba(154, 196, 231, 0.42);
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.82);
+}
+
+.recommended-mode-name {
+	margin: 0 0 10px;
+	color: #183e61;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.45;
+}
+
+.recommended-mode-flow {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 0;
+	color: #526a76;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.recommended-mode-step {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.recommended-mode-step .el-icon {
+	flex: 0 0 auto;
+	font-size: 18px;
+}
+
+.recommended-flow-arrow {
+	color: #8ba0aa;
+}
+
+@media (max-width: 767px) {
+	.recommended-modes-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.top-metrics-row {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
 .dialog-hero-image {
 	width: 100%;
-	height: 220px;
+	height: 190px;
 	object-fit: cover;
 	border-radius: 18px;
 	border: 1px solid rgba(136, 181, 213, 0.3);
@@ -2064,12 +2210,27 @@ const goBackHome = () => {
 }
 
 .top-metrics-row {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 12px;
 	margin-bottom: 14px;
-	align-items: stretch; // 讓每個 el-col 等高
+	align-items: stretch;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
 
 	:deep(.el-col) {
-		margin-bottom: 12px;
-		display: flex; // 讓 el-col 內部的 hero-stat 也能撐滿
+		width: auto;
+		max-width: none;
+		padding: 0;
+		margin-bottom: 0;
+		display: flex;
+		flex: none;
+	}
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+	.top-metrics-row {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 }
 
@@ -2259,6 +2420,12 @@ const goBackHome = () => {
 	color: #f5a623;
 	background: rgba(255, 245, 204, 0.84);
 	border-color: rgba(245, 190, 72, 0.28);
+}
+
+.detail-tag.red {
+	color: #c24238;
+	background: rgba(254, 226, 226, 0.9);
+	border-color: rgba(224, 88, 88, 0.3);
 }
 
 .contact-card {

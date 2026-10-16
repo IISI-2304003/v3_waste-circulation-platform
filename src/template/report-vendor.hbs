@@ -15,6 +15,15 @@
   }
   h1 { font-size: 22px; color: #1f4d47; margin: 0 0 8px; }
   .meta { font-size: 11px; color: #5b7890; margin-bottom: 16px; }
+  .vendor-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 14px; margin-bottom: 14px;
+    border: 1px solid #dbe8f3; border-radius: 8px;
+    background: linear-gradient(135deg, #f8fcff, #ebf6ff);
+    page-break-inside: avoid;
+  }
+  .vendor-header-copy { flex: 1; min-width: 0; }
+
   h2 {
     font-size: 15px; color: #2b5876;
     border-bottom: 1px solid #dfe9f3;
@@ -37,15 +46,21 @@
   .badge.reuse { background: #e8fff0; color: #1aaa5c; }
 
   /* ── 推薦循環模式 ── */
+  .mode-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    page-break-inside: avoid;
+  }
   .mode-summary {
     background: #f7fbff;
     border: 1px solid #dbe8f3;
     border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 4px;
+    min-width: 0;
+    padding: 10px;
     page-break-inside: avoid;
   }
-  .mode-summary + .mode-summary { margin-top: 8px; }
+  .mode-name { display: block; color: #183e61; font-size: 13px; margin-bottom: 4px; }
   .mode-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -58,11 +73,15 @@
     white-space: nowrap;
   }
   .steps-text { font-size: 12px; color: #496b79; margin: 6px 0 0; }
+  .capacity-summary {
+    padding: 8px 10px; border: 1px solid #dbe8f3;
+    border-radius: 8px; background: #f6faff; page-break-inside: avoid;
+  }
 
   /* ── 基本資訊 ── */
   .vendor-meta-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 6px 16px;
     margin-bottom: 10px;
     page-break-inside: avoid;
@@ -70,7 +89,7 @@
   .vendor-meta-grid .item .label { font-size: 10px; color: #26a69a; font-weight: 700; }
   .vendor-meta-grid .item .value { font-size: 12px; color: #333; margin-top: 2px; }
 
-  /* ── 適合原因 ── */
+  /* ── 評估結果 ── */
   .reason-tags { page-break-inside: avoid; }
   .reason-tags .tag {
     display: inline-block;
@@ -127,37 +146,50 @@
 <body>
 
   <!-- 標籤列 -->
-  <div class="tag-row">
-    <span class="badge category">{{vendor.announcement_category_name}}</span>
-    {{#if vendor.showReuseTag}}
-      <span class="badge reuse">再利用機構</span>
-    {{/if}}
+  <div class="vendor-header">
+    <div class="vendor-header-copy">
+      <div class="tag-row">
+        <span class="badge category">{{vendor.announcement_category_name}}</span>
+        {{#if vendor.showReuseTag}}
+          <span class="badge reuse">再利用機構</span>
+        {{/if}}
+      </div>
+      <h1>{{vendor.company_name}}</h1>
+    </div>
+   
   </div>
-  <h1>{{vendor.company_name}}</h1>
-  <p class="meta">{{vendor.region}} ｜ 事業管制編號 {{vendor.control_number}}</p>
 
   {{!-- ═════ 一般模式：推薦循環模式（僅廠外模式；簡易模式不顯示） ═════ --}}
   {{#unless isSimple}}
     <h2>推薦循環模式</h2>
-    <p class="section-note">本廠商適用於以下廠外模式</p>
-    {{#each outerModes}}
-      <div class="mode-summary">
-        <span class="mode-badge">{{this.modeName}}</span>
-        <strong>{{this.title}}</strong>
-        <p class="steps-text">{{this.stepsText}}</p>
+    {{#if recommendedModes.length}}
+      <div class="mode-summary-grid">
+      {{#each recommendedModes}}
+        <div class="mode-summary">
+          <strong class="mode-name">{{this.modeName}}</strong>
+          <p class="steps-text">{{this.stepsText}}</p>
+        </div>
+      {{/each}}
       </div>
-    {{/each}}
+    {{else}}
+      <div class="mode-summary-grid">
+      {{#each outerModes}}
+        <div class="mode-summary">
+          <strong class="mode-name">{{this.modeName}}</strong>
+          <p class="steps-text">{{this.stepsText}}</p>
+        </div>
+      {{/each}}
+      </div>
+    {{/if}}
   {{/unless}}
 
   <h2>基本資訊</h2>
   <div class="vendor-meta-grid">
-    <div class="item"><div class="label">再利用廢棄物</div><div class="value">{{vendor.waste_name}}</div></div>
     <div class="item"><div class="label">所在地</div><div class="value">{{vendor.region}}</div></div>
     <div class="item"><div class="label">距離</div><div class="value">{{vendor.road_distance_km}} km</div></div>
     <div class="item"><div class="label">許可總量</div><div class="value">{{vendor.permitted_quantity}} 噸/月</div></div>
-    <div class="item"><div class="label">前月收受總量</div><div class="value">{{vendor.capacityLevelText}}</div></div>
-    <div class="item"><div class="label">事業管制編號</div><div class="value">{{vendor.control_number}}</div></div>
     <div class="item"><div class="label">有效許可期限</div><div class="value">{{vendor.permit_end_date}}</div></div>
+    <div class="item"><div class="label">事業管制編號</div><div class="value">{{vendor.control_number}}</div></div>
   </div>
 
   <h2>允收條件</h2>
@@ -171,9 +203,12 @@
     <p class="empty-hint">無資料</p>
   {{/if}}
 
-  {{!-- ═════ 一般模式：適合原因 + 決策結論（簡易模式不顯示） ═════ --}}
+  <h2>前月收受總量</h2>
+  <div class="capacity-summary">{{vendor.capacityLevelText}}</div>
+
+  {{!-- ═════ 一般模式：評估結果 + 決策結論（簡易模式不顯示） ═════ --}}
   {{#unless isSimple}}
-    <h2>適合原因</h2>
+    <h2>評估結果</h2>
     {{#if vendor.conditional_judgment.length}}
       <div class="reason-tags">
         {{#each vendor.conditional_judgment}}
@@ -186,7 +221,7 @@
 
     <h2>決策結論</h2>
     <div class="conclusion">
-      綜合評估各項條件與技術可行性，建議優先採用「{{#each outerModes}}{{this.modeName}}{{#unless @last}}、{{/unless}}{{/each}}」，並與「{{vendor.company_name}}」合作，可兼顧資源再利用效益、處理量能與環境價值，具備良好執行可行性。
+      綜合評估各項條件與技術可行性，建議優先採用「{{#if selectedMode}}{{selectedMode.modeName}}{{else}}{{mode.modeName}}{{/if}}」，並與「{{vendor.company_name}}」合作，可兼顧資源再利用效益、處理量能與環境價值，具備良好執行可行性。
     </div>
   {{/unless}}
 

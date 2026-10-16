@@ -576,7 +576,6 @@ const recommendedPaths = computed(() => {
       id: `r${index + 1}`,
       rank: index + 1,
       modeName: mode.name,
-      title: path.title || mode.description,
       summary: mode.description,
       steps: (mode.steps || []).map((step) => ({
         label: step.label,

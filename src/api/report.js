@@ -3,7 +3,7 @@ import request from './index';
 export function exportVendorReport(payload) {
     return request.post('/reports/vendor', payload, {
         responseType: 'blob',
-        timeout: 15000,
+        timeout: 45000,
     });
 }
 
