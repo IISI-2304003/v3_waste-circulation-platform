@@ -183,7 +183,7 @@
 													<p class="meta-text">{{ vendor.region }}</p>
 												</div>
 											</div>
-											<div class="meta-item">
+											<div v-if="!isQuickMode" class="meta-item">
 												<span class="meta-icon"><el-icon>
 														<Position />
 													</el-icon></span>
@@ -240,7 +240,7 @@
 
 										<!-- 底部：評估結果 + 查看詳情 -->
 										<div class="card-footer">
-											<span class="reason-label">評估結果</span>
+											<span v-if="!isQuickMode" class="reason-label">評估結果</span>
 											<div class="footer-row">
 												<div class="reason-block">
 													<span v-for="reason in vendor.conditional_judgment" :key="reason" class="detail-tag yellow">{{ reason }}</span>
@@ -366,12 +366,20 @@
 						<el-col>
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
+										<Goods />
+									</el-icon><span>再利用廢棄物</span></div>
+								<strong>{{ activeVendor.waste_name }}</strong>
+							</div>
+						</el-col>
+						<el-col>
+							<div class="hero-stat">
+								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Location />
 									</el-icon><span>所在地</span></div>
 								<strong>{{ activeVendor.region }}</strong>
 							</div>
 						</el-col>
-						<el-col>
+						<el-col v-if="!isQuickMode">
 							<div class="hero-stat">
 								<div class="hero-stat-head"><el-icon class="stat-icon">
 										<Promotion />
@@ -436,9 +444,9 @@
 								<span v-for="item in activeVendor.conditional_judgment" :key="item" class="detail-tag yellow">{{ item }}</span>
 							</div>
 						</section>
-						<section v-if="!isQuickMode" class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
+						<section v-if="!isQuickMode && recommendedModeNames" class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
 							<p class="detail-title">決策結論</p>
-							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ selectedMode.modeName }}」,並與「{{ activeVendor.company_name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
+							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ recommendedModeNames }}」,並與「{{ activeVendor.company_name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
 						</section>
 
 
@@ -522,7 +530,7 @@
 				</el-button>
 			</div>
 
-			<TopModesDialog v-model="modeDialogVisible" :preferred-mode-name="selectedMode.modeName" />
+			<TopModesDialog v-model="modeDialogVisible" :preferred-mode-name="selectedMode?.modeName || ''" />
 		</div>
 	</div>
 </template>
@@ -674,11 +682,11 @@ const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim
 
 
 const allRecommendedPaths = computed(() => conditionStore.recommendedPaths || [])
+const recommendedModeNames = computed(() => allRecommendedPaths.value.map((path) => path.modeName).filter(Boolean).join('、'))
 
 const recommendedPathsByDirection = computed(() => allRecommendedPaths.value.reduce((paths, path) => {
-	const modeName = normalizeModeName(path?.modeName)
-	if (modeName.startsWith('廠內模式')) paths.internal.push(path)
-	if (modeName.startsWith('廠外模式')) paths.external.push(path)
+	if (path?.mode_type === 'internal') paths.internal.push(path)
+	if (path?.mode_type === 'external') paths.external.push(path)
 	return paths
 }, { external: [], internal: [] }))
 
@@ -691,49 +699,10 @@ const hasBothExecutionDirections = computed(() => recommendedPathCounts.value.ex
 
 // 說明：依目前條件即時計算「selected Mode」內容，提供畫面顯示與決策判斷使用。
 const selectedMode = computed(() => {
-	const hasStoredMode = conditionStore.selectedRecommendedPath?.modeName
-	const modeNameFromStore = conditionStore.selectedRecommendedPath?.modeName || ''
-	const matchedRecommended = allRecommendedPaths.value.find((item) => normalizeModeName(item.modeName) === normalizeModeName(modeNameFromStore))
-
-	if (hasStoredMode) {
-		return {
-			...(matchedRecommended || {}),
-			modeName: conditionStore.selectedRecommendedPath.modeName,
-			title: conditionStore.selectedRecommendedPath.title || matchedRecommended?.title || '',
-			summary: conditionStore.selectedRecommendedPath.summary || matchedRecommended?.summary || '依據您選擇的循環路徑，系統提供對應技術決策建議。',
-			accentColor: matchedRecommended?.accentColor || 'var(--ds-primary-green)',
-			steps: mapModeSteps(matchedRecommended?.steps || [])
-		}
-	}
-
-	if (conditionStore.siteConditions.hasReuseSpace === true) {
-		return {
-			modeName: '廠內模式 1',
-			title: "物料製程內未排出，逕自循環使用",
-			summary: '利用廠內再利用空間完成前處理與純化再製後，直接回到原製程，縮短運輸與處理鏈。',
-			accentColor: 'var(--ds-primary-green)',
-			steps: [
-				{ label: '原料購入', icon: iconComponentMap.Goods },
-				{ label: '廠內前處理', icon: iconComponentMap.Files },
-				{ label: '純化(再製)', icon: iconComponentMap.Operation },
-				{ label: '返回原製程', icon: iconComponentMap.Promotion }
-			]
-		}
-	}
-
-	return {
-		modeName: '廠外模式 4',
-		title: "原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。",
-		summary: '原料購入使用後，送至受產源實質自主管理之公司純化（再製）、調整成分與濃度，再返回原廠原製程循環使用。',
-		accentColor: 'var(--ds-primary-green)',
-		steps: [
-			{ label: '原料購入', icon: iconComponentMap.Goods },
-			{ label: '純化(再製)', icon: iconComponentMap.Operation },
-			{ label: '調整成分', icon: iconComponentMap.SetUp },
-			{ label: '返回原製程', icon: iconComponentMap.Promotion }
-		]
-
-	}
+	const selectedModeName = normalizeModeName(conditionStore.selectedRecommendedPath?.modeName)
+	return allRecommendedPaths.value.find((path) => normalizeModeName(path.modeName) === selectedModeName)
+		|| allRecommendedPaths.value[0]
+		|| null
 })
 
 const topRecommendedModes = computed(() => {
@@ -742,7 +711,7 @@ const topRecommendedModes = computed(() => {
 		accentColor: path.accentColor || 'var(--ds-primary-green)',
 		steps: mapModeSteps(path.steps)
 	}))
-	return modes.length ? modes : [selectedMode.value]
+	return modes
 })
 
 const alternativesPerPage = 2
@@ -845,7 +814,7 @@ const loadVendors = async () => {
 
 // 說明：判斷目前選擇的循環模式是否為「廠內模式」(執行主體為產源事業自己)
 const isInternalMode = computed(() => {
-	return normalizeModeName(selectedMode.value?.modeName).startsWith('廠內模式')
+	return selectedMode.value?.mode_type === 'internal'
 })
 
 const selectExecutionDirection = (direction) => {
@@ -955,26 +924,29 @@ const exportVendorPdf = async () => {
 			isSimple: isQuickMode.value,
 			vendor: toVendorReportData(activeVendor.value),
 			mode: isQuickMode.value
-				? toModeReportData(selectedMode.value)
+				? (selectedMode.value ? toModeReportData(selectedMode.value) : {})
 				: allRecommendedPaths.value.map(toModeReportData),
 		},
 		filename: `${activeVendor.value.company_name}_廠商評估報告.pdf`
 	})
-	console.log('Vendor PDF downloaded', activeVendor.value)
-	console.log('Vendor PDF downloaded_2', selectedMode.value)
 	vendorPdfLoading.value = false
 }
 
 // 說明：由匯出操作觸發；輸出目前模式與廠商排序的完整報告。
 const exportFullReportPdf = async () => {
 	fullPdfLoading.value = true
+	const reportModes = allRecommendedPaths.value.map(toModeReportData)
+	const externalModeNames = reportModes.filter((mode) => mode.mode_type === 'external').map((mode) => mode.modeName).join('、')
+	const internalModeNames = reportModes.filter((mode) => mode.mode_type === 'internal').map((mode) => mode.modeName).join('、')
 	await downloadReport({
 		type: 'full',
 		payload: {
 			isSimple: isQuickMode.value,
 			mode: isQuickMode.value
-				? toModeReportData(selectedMode.value)
-				: allRecommendedPaths.value.map(toModeReportData),
+				? (selectedMode.value ? toModeReportData(selectedMode.value) : {})
+				: reportModes,
+			externalModeNames: isQuickMode.value ? '' : externalModeNames,
+			internalModeNames: isQuickMode.value ? '' : internalModeNames,
 			demandSummary: visibleDemandSummary.value.map((item) => ({ label: item.label, value: item.value })),
 			isInternalMode: isInternalMode.value,
 			vendors: sortedVendors.value.map(toVendorSummaryData)
@@ -2196,7 +2168,10 @@ const goBackHome = () => {
 	}
 
 	.top-metrics-row {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		:deep(.el-col) {
+			flex: 1 1 calc((100% - 12px) / 2);
+			max-width: calc((100% - 12px) / 2);
+		}
 	}
 }
 
@@ -2210,8 +2185,8 @@ const goBackHome = () => {
 }
 
 .top-metrics-row {
-	display: grid;
-	grid-template-columns: repeat(5, minmax(0, 1fr));
+	display: flex;
+	flex-wrap: wrap;
 	gap: 12px;
 	margin-bottom: 14px;
 	align-items: stretch;
@@ -2219,18 +2194,20 @@ const goBackHome = () => {
 	margin-right: 0 !important;
 
 	:deep(.el-col) {
-		width: auto;
-		max-width: none;
+		flex: 1 1 0;
+		min-width: 0;
 		padding: 0;
 		margin-bottom: 0;
 		display: flex;
-		flex: none;
 	}
 }
 
 @media (max-width: 991px) and (min-width: 768px) {
 	.top-metrics-row {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		:deep(.el-col) {
+			flex: 1 1 calc((100% - 24px) / 3);
+			max-width: calc((100% - 24px) / 3);
+		}
 	}
 }
 

@@ -21,7 +21,7 @@
     padding-bottom: 4px; margin: 20px 0 10px;
     break-after: avoid;
   }
-  .mode-group-title { font-size: 13px; color: #355b78; margin: 12px 0 6px; break-after: avoid; }
+  .mode-direction-label { margin: 0 0 4px; color: #355b78; font-size: 11px; font-weight: 700; }
   .section-note { font-size: 11px; color: #5b7890; margin: 0 0 8px; }
 
   .mode-summary-grid {
@@ -124,38 +124,20 @@
   {{!-- ═════ 一般模式：推薦循環模式 + 決策需求摘要（簡易模式不顯示） ═════ --}}
   {{#unless isSimple}}
     <h2>推薦循環模式</h2>
-
-    {{#if outerModes.length}}
-      <h3 class="mode-group-title">廠外執行方向（{{outerModes.length}} 項）</h3>
-      <div class="mode-summary-grid">
-      {{#each outerModes}}
-        <div class="mode-summary">
-          <span class="mode-badge">{{this.modeName}}</span>
-          <strong>{{this.title}}</strong>
-          <p class="steps-text">{{this.stepsText}}</p>
-          {{#if this.summary}}
-            <p class="mode-summary-text">{{this.summary}}</p>
-          {{/if}}
-        </div>
-      {{/each}}
+    <div class="mode-summary-grid">
+    {{#each mode}}
+      <div class="mode-summary">
+        <p class="mode-direction-label">{{#if this.isExternal}}廠外執行方向{{else}}廠內執行方向{{/if}}</p>
+        <span class="mode-badge">{{this.modeName}}</span>
+        <strong>{{this.title}}</strong>
+        <p class="steps-text">{{this.stepsText}}</p>
+        {{#if this.summary}}
+          <p class="mode-summary-text">{{this.summary}}</p>
+        {{/if}}
       </div>
-    {{/if}}
-
-    {{#if innerModes.length}}
-      <h3 class="mode-group-title">廠內執行方向（{{innerModes.length}} 項）</h3>
-      <div class="mode-summary-grid">
-      {{#each innerModes}}
-        <div class="mode-summary">
-          <span class="mode-badge">{{this.modeName}}</span>
-          <strong>{{this.title}}</strong>
-          <p class="steps-text">{{this.stepsText}}</p>
-          {{#if this.summary}}
-            <p class="mode-summary-text">{{this.summary}}</p>
-          {{/if}}
-        </div>
-      {{/each}}
-      </div>
-    {{/if}}
+    {{/each}}
+    </div>
+    {{/each}}
 
     <h2>決策需求摘要</h2>
     {{#if demandSummary.length}}
@@ -178,7 +160,7 @@
       <p class="section-note">共 {{vendors.length}} 家符合此廢棄物代碼之廠商</p>
     {{else}}
       <p class="section-note">
-        以下廠商適用於：{{#each outerModes}}{{this.modeName}}{{#unless @last}}、{{/unless}}{{/each}}
+        以下廠商適用於：{{externalModeNames}}
       </p>
     {{/if}}
 
@@ -195,7 +177,9 @@
           <div class="vendor-meta-grid">
             <div class="item"><div class="label">再利用廢棄物</div><div class="value">{{this.waste_name}}</div></div>
             <div class="item"><div class="label">所在地</div><div class="value">{{this.region}}</div></div>
-            <div class="item"><div class="label">距離</div><div class="value">{{this.road_distance_km}} km</div></div>
+            {{#unless @root.isSimple}}
+              <div class="item"><div class="label">距離</div><div class="value">{{this.road_distance_km}} km</div></div>
+            {{/unless}}
             <div class="item"><div class="label">許可總量</div><div class="value">{{this.permitted_quantity}} 噸/月</div></div>
             <div class="item"><div class="label">前月收受總量</div><div class="value">{{this.capacityLevelText}}</div></div>
             <div class="item"><div class="label">事業管制編號</div><div class="value">{{this.control_number}}</div></div>
@@ -217,10 +201,10 @@
 
   {{!-- ═════ 廠內：自行執行說明（簡易模式不顯示） ═════ --}}
   {{#unless isSimple}}
-    {{#if innerModes.length}}
+    {{#if internalModeNames}}
       <h2>廠內自行執行</h2>
       <div class="internal-note">
-        {{#each innerModes}}{{this.modeName}}{{#unless @last}}、{{/unless}}{{/each}}由產源事業於廠內自行執行，無須尋找外部技術廠商。
+        {{internalModeNames}}由產源事業於廠內自行執行，無須尋找外部技術廠商。
       </div>
     {{/if}}
   {{/unless}}

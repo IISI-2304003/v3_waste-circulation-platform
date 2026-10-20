@@ -34,6 +34,7 @@ const defaultBusiness = () => ({
 // 說明：封裝「default Selected Path」商業邏輯，供目前流程重複使用。
 const defaultSelectedPath = () => ({
     modeName: '',
+    mode_type: '',
     title: '',
     summary: '',
 });
@@ -76,6 +77,7 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
             this.selectedRecommendedPath = path
                 ? {
                       modeName: path.modeName || '',
+                        mode_type: path.mode_type || '',
                       title: path.title || '',
                       summary: path.summary || '',
                   }

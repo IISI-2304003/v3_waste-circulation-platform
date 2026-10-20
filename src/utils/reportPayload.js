@@ -19,6 +19,7 @@ export function toVendorSummaryData(vendor) {
         control_number: vendor.control_number,
         conditional_judgment: vendor.conditional_judgment || [],
         road_distance_km: vendor.road_distance_km,
+        capacityLevel: vendor.capacityLevel,
     };
 }
 
@@ -29,6 +30,8 @@ export function toVendorSummaryData(vendor) {
 export function toModeReportData(mode) {
     return {
         modeName: mode.modeName,
+        mode_type: mode.mode_type,
+        isExternal: mode.mode_type === 'external',
         title: mode.title,
         summary: mode.summary || '',
         stepsText: (mode.steps || []).map((s) => s.label).join('  →  '),

@@ -150,7 +150,7 @@
 										<el-col :xs="24" :sm="24" :md="12">
 											<el-form-item>
 												<template #label>
-													<span>是否有增設處理或再利用設備空間</span>
+													<span>廠內是否有增設處理或再利用設備空間</span>
 												</template>
 												<el-select v-model="store.siteConditions.hasReuseSpace" placeholder="選擇是否有再利用空間" filterable>
 													<el-option v-for="item in reuseSpaceOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -160,7 +160,7 @@
 										<el-col :xs="24" :sm="12" :md="12">
 											<el-form-item>
 												<template #label>
-													<span>是否有產生衍生廢棄物</span>
+													<span>增設處理或再利用設備是否有產生衍生廢棄物</span>
 												</template>
 												<el-select v-model="store.siteConditions.hasSecondaryWaste" placeholder="選擇是否有產生衍生廢棄物" filterable>
 													<el-option v-for="item in secondaryWasteOptions" :key="item.value" :label="item.label" :value="item.value" />

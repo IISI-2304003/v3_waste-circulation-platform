@@ -1,5 +1,5 @@
 <template>
-	<el-dialog v-model="visible" title="語意化搜尋" width="min(700px, 92vw)" class="semantic-input-dialog" :modal="true" append-to-body :close-on-click-modal="false" @close="handleClose">
+	<el-dialog v-model="visible" title="語意化輸入" width="min(700px, 92vw)" class="semantic-input-dialog" :modal="true" append-to-body :close-on-click-modal="false" @close="handleClose">
 		<div class="semantic-modal-content">
 			<!-- 說明 -->
 			<div class="modal-description">
