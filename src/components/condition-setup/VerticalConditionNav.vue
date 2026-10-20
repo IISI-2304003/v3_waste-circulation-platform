@@ -133,7 +133,7 @@ const IconUsers = defineComponent({
 const items = [
 	{ id: 'physical', label: '物化特性', svgIcon: IconFlask },
 	{ id: 'source', label: '來源與場域條件', svgIcon: IconBuilding },
-	{ id: 'technology', label: '技術與產品條件', svgIcon: IconCpu },
+	{ id: 'technology', label: '技術、產品與經濟條件', svgIcon: IconCpu },
 ]
 
 // 說明：回傳「get Step Status」資料供畫面渲染或後續商業規則使用。

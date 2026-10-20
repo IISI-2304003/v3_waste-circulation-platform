@@ -100,8 +100,13 @@
         </el-button>
       </div>
 
+      <div v-if="recommendedPaths.length === 0" class="empty-recommendation">
+        <strong>尚未提供足夠條件以推薦循環模式</strong>
+        <p>您仍可進行下一步，查看此廢棄物代碼對應的技術廠商。</p>
+      </div>
+
       <!-- 路徑卡片 - 三格一排 -->
-      <div class="path-list">
+      <div v-else class="path-list">
         <el-row :gutter="16">
           <el-col v-for="path in recommendedPaths" :key="path.id" :xs="24" :md="8" class="path-col">
             <div class="path-card">
@@ -1022,6 +1027,22 @@ onBeforeUnmount(() => {
 
   :deep(.el-row) {
     align-items: stretch;
+  }
+}
+
+.empty-recommendation {
+  margin: 24px 0;
+  padding: 20px 24px;
+  background: rgba(34, 149, 164, 0.08);
+  color: #2d554a;
+
+  strong {
+    font-size: 20px;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #59736e;
   }
 }
 

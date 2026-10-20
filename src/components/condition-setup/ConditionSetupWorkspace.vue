@@ -168,12 +168,13 @@
 											</el-form-item>
 										</el-col>
 
+
 									</el-row>
 								</el-form>
 							</ConditionAccordionSection>
 
 
-							<ConditionAccordionSection id="technology" ref="technologyRef" title="技術與產品條件" theme="violet" :expanded="expandedMap.technology" @toggle="toggleSection">
+							<ConditionAccordionSection id="technology" ref="technologyRef" title="技術、產品與經濟條件" theme="violet" :expanded="expandedMap.technology" @toggle="toggleSection">
 								<el-form label-position="top">
 									<el-row :gutter="24" class="form-row">
 										<el-col :xs="24" :sm="24" :md="24" class="form-col">
@@ -200,6 +201,34 @@
 														{{ item.label }}
 													</el-checkbox>
 												</el-checkbox-group>
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="8" class="form-col">
+											<el-form-item>
+												<template #label>
+													<span>資本額(元)</span>
+												</template>
+												<el-select v-model="store.businessConditions.capitalAmount" placeholder="選擇資本額">
+													<el-option v-for="item in capitalAmountOptions" :key="item.value" :label="item.label" :value="item.value" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="8" class="form-col">
+											<el-form-item>
+												<template #label>
+													<span>清除頻率</span>
+												</template>
+												<el-select v-model="store.businessConditions.clearanceFrequency" placeholder="選擇清除頻率">
+													<el-option v-for="item in clearanceFrequencyOptions" :key="item.value" :label="item.label" :value="item.label" />
+												</el-select>
+											</el-form-item>
+										</el-col>
+										<el-col :xs="24" :sm="24" :md="8">
+											<el-form-item>
+												<template #label>
+													<span>清除費用（元/公噸）</span>
+												</template>
+												<el-input-number v-model="store.businessConditions.clearanceCost" :min="0" :max="100000" :step="1" controls-position="right" />
 											</el-form-item>
 										</el-col>
 									</el-row>
@@ -367,7 +396,16 @@ const expandedMap = reactive({
 	technology: true,
 	demand: true
 })
+const capitalAmountOptions = [
+	{ value: 'hundred-million-up', label: '1億元以上' },
+	{ value: 'hundred-million-down', label: '1億元以下' }
+]
 const sourceFrequencyOptions = [
+	{ value: 'monthly', label: '每月' },
+	{ value: 'quarterly', label: '每季' },
+	{ value: 'yearly', label: '每年' }
+]
+const clearanceFrequencyOptions = [
 	{ value: 'monthly', label: '每月' },
 	{ value: 'quarterly', label: '每季' },
 	{ value: 'yearly', label: '每年' }
