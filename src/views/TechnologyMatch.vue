@@ -61,7 +61,7 @@
 					<p class="recommended-path-count">本次共建議 <strong>{{ allRecommendedPaths.length }}</strong> 項可適用模式</p>
 					<div class="recommended-path-list">
 						<span v-for="path in allRecommendedPaths" :key="path.id || path.modeName" class="recommended-path-chip">
-							{{ path.modeName }}
+							{{ path.rank === 1 ? path.modeName + ' ( 優先建議 )' : path.modeName }}
 						</span>
 					</div>
 					<div class="execution-direction-stats">
@@ -342,11 +342,11 @@
 				</template>
 
 				<div v-if="activeVendor" class="dialog-body-v2">
-					<section v-if="!isQuickMode && topRecommendedModes.length" class="recommended-modes-section">
+					<section v-if="!isQuickMode" class="recommended-modes-section">
 						<p class="recommended-modes-heading">推薦循環模式</p>
 						<div class="recommended-modes-grid">
-							<article v-for="mode in topRecommendedModes" :key="mode.id || mode.modeName" class="recommended-mode-card">
-								<h4 class="recommended-mode-name">{{ mode.modeName }}</h4>
+							<article v-for="mode in allRecommendedPaths" :key="mode.id || mode.modeName" class="recommended-mode-card">
+								<h4 class="recommended-mode-name">{{ mode.modeName }}<span v-if="mode.rank === 1" class="best-tag">優先建議</span></h4>
 								<p class="recommended-mode-flow">
 									<template v-for="(node, index) in mode.steps" :key="`${mode.modeName}-${node.label}`">
 										<span class="recommended-mode-step">
@@ -444,9 +444,9 @@
 								<span v-for="item in activeVendor.conditional_judgment" :key="item" class="detail-tag yellow">{{ item }}</span>
 							</div>
 						</section>
-						<section v-if="!isQuickMode && recommendedModeNames" class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
+						<section v-if="!isQuickMode" class="detail-card " style="background: rgba(225, 250, 232, 0.84);;">
 							<p class="detail-title">決策結論</p>
-							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ recommendedModeNames }}」,並與「{{ activeVendor.company_name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
+							<p class="detail-text">綜合評估各项條件與技術可行性,建議優先採用「{{ allRecommendedPaths[0]?.modeName || '尚無推薦循環模式' }}」,並與「{{ activeVendor.company_name }}」合作,可兼顧資源再利用效益、處理量能與環境價值,具備良好執行可行性。</p>
 						</section>
 
 
@@ -682,7 +682,6 @@ const normalizeModeName = (value = '') => String(value).replace(/\s+/g, '').trim
 
 
 const allRecommendedPaths = computed(() => conditionStore.recommendedPaths || [])
-const recommendedModeNames = computed(() => allRecommendedPaths.value.map((path) => path.modeName).filter(Boolean).join('、'))
 
 const recommendedPathsByDirection = computed(() => allRecommendedPaths.value.reduce((paths, path) => {
 	if (path?.mode_type === 'internal') paths.internal.push(path)
@@ -705,14 +704,7 @@ const selectedMode = computed(() => {
 		|| null
 })
 
-const topRecommendedModes = computed(() => {
-	const modes = allRecommendedPaths.value.slice(0, 3).map((path) => ({
-		...path,
-		accentColor: path.accentColor || 'var(--ds-primary-green)',
-		steps: mapModeSteps(path.steps)
-	}))
-	return modes
-})
+
 
 const alternativesPerPage = 2
 const alternativePage = ref(0)
@@ -895,6 +887,7 @@ const switchToAlternativePath = (path) => {
 const openVendorDetail = (vendor) => {
 	activeVendor.value = vendor
 	detailDialogVisible.value = true
+
 }
 
 // 說明：由詳情視窗關閉操作觸發；關閉視窗並結束目前詳情檢視。
@@ -1492,6 +1485,18 @@ const goBackHome = () => {
 	font-size: 16px;
 	font-weight: 700;
 	line-height: 1.4;
+
+	/* 方案標籤 */
+	.best-tag {
+		font-size: 15px;
+		font-weight: 700;
+		padding: 2px 10px;
+		border-radius: 20px;
+		background: rgba(255, 226, 192, 0.726);
+		color: #ff9c2c;
+		white-space: nowrap;
+		margin-left: 5px;
+	}
 }
 
 .recommended-mode-flow {

@@ -141,6 +141,18 @@
 
   .empty-hint { font-size: 11px; color: #999; }
   .footer-note { margin-top: 20px; font-size: 10px; color: #999; text-align: right; }
+
+  /* 方案標籤 */
+	.best-tag {
+		font-size: 15px;
+		font-weight: 700;
+		padding: 2px 10px;
+		border-radius: 20px;
+		background: rgba(255, 226, 192, 0.726);
+		color: #ff9c2c;
+		white-space: nowrap;
+		margin-left: 5px;
+	}
 </style>
 </head>
 <body>
@@ -159,13 +171,13 @@
    
   </div>
 
-  {{!-- ═════ 一般模式：推薦循環模式（僅廠外模式；簡易模式不顯示） ═════ --}}
+  {{!-- ═════ 一般模式：推薦循環模式 ═════ --}}
   {{#unless isSimple}}
     <h2>推薦循環模式</h2>
       <div class="mode-summary-grid">
       {{#each mode}}
         <div class="mode-summary">
-          <strong class="mode-name">{{this.modeName}}</strong>
+          <strong class="mode-name">{{this.modeName}} {{#if @first}} <span class="best-tag">優先建議</span>{{/if}}</strong>
           <p class="steps-text">{{this.stepsText}}</p>
         </div>
       {{/each}}
@@ -212,7 +224,7 @@
 
     <h2>決策結論</h2>
     <div class="conclusion">
-      綜合評估各項條件與技術可行性，建議優先採用「{{#each mode}}{{this.modeName}}{{#unless @last}}、{{/unless}}{{/each}}」，並與「{{vendor.company_name}}」合作，可兼顧資源再利用效益、處理量能與環境價值，具備良好執行可行性。
+      綜合評估各項條件與技術可行性，建議優先採用「{{#with (lookup mode 0)}}{{modeName}}{{/with}}」，並與「{{vendor.company_name}}」合作，可兼顧資源再利用效益、處理量能與環境價值，具備良好執行可行性。
     </div>
   {{/unless}}
 
