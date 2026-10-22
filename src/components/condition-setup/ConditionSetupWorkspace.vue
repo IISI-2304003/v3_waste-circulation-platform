@@ -76,8 +76,8 @@
 								</div>
 							</div>
 
-							<div v-if="props.wasteDetail" class="selected-waste-detail">
-								<strong class="selected-waste-detail-title">{{ props.selectedCode || 'C-0202' }}｜廢液 pH值小（等）於 2.0</strong>
+							<div v-if="props.selectedWaste" class="selected-waste-detail">
+								<strong class="selected-waste-detail-title">{{ props.selectedWaste?.code }}｜{{ props.selectedWaste.name }}</strong>
 								<div class="selected-waste-detail-row">
 									<span class="selected-waste-detail-label">分析廢液：</span>
 									<strong v-if="!isWasteDetailEditing">{{ selectedWasteDetail }}</strong>
@@ -101,7 +101,7 @@
 									</el-button>
 								</div>
 
-								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" :wastecode="props.selectedCode" :invalid="shouldMarkInvalid('acceptance')" @change="handleStandardsChange" />
+								<AcceptanceStandardForm ref="acceptanceRef" :initial-standards="store.acceptanceConditions.length ? store.acceptanceConditions : initialStandards" :wastecode="props.selectedWaste?.code || ''" :invalid="shouldMarkInvalid('acceptance')" @change="handleStandardsChange" />
 
 							</ConditionAccordionSection>
 
@@ -294,13 +294,9 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	},
-	selectedCode: {
-		type: String,
-		default: ''
-	},
-	wasteDetail: {
-		type: String,
-		default: ''
+	selectedWaste: {
+		type: Object,
+		default: () => null
 	},
 	loading: {
 		type: Boolean,
@@ -570,6 +566,7 @@ onMounted(async () => {
 			if (matchedProcess) store.sourceConditions.processLabel = matchedProcess.label
 		}
 	}
+
 })
 
 // 說明：由切換操作觸發；更新展開/收合或開關狀態。

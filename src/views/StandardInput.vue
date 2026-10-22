@@ -20,7 +20,7 @@
 
     </div>
 
-    <ConditionSetupWorkspace :selected-code="conditionStore.selectedCode" :waste-detail="conditionStore.wasteDetail" :loading="isSubmitting" @next="goCompanyMatch" />
+    <ConditionSetupWorkspace :selected-waste="conditionStore.selectedWaste" :loading="isSubmitting" @next="goCompanyMatch" />
   </div>
 </template>
 
@@ -109,13 +109,6 @@ const goBackHome = () => {
 }
 
 onMounted(() => {
-  // 只有當網址上真的帶了值，才覆蓋 store（避免空字串把已存的值洗掉）
-  if (route.query.code) {
-    conditionStore.setSelectedCode(route.query.code)
-  }
-  if (route.query.wasteDetail) {
-    conditionStore.setWasteDetail(route.query.wasteDetail)
-  }
 })
 
 </script>

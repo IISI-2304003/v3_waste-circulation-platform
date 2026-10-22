@@ -51,8 +51,7 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
         demandSelections: [],
         recommendedPaths: [],
         selectedRecommendedPath: defaultSelectedPath(),
-        selectedCode: '',
-        wasteDetail: '',
+        selectedWaste: null,
     }),
     actions: {
         setActiveSection(sectionId) {
@@ -77,17 +76,14 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
             this.selectedRecommendedPath = path
                 ? {
                       modeName: path.modeName || '',
-                        mode_type: path.mode_type || '',
+                      mode_type: path.mode_type || '',
                       title: path.title || '',
                       summary: path.summary || '',
                   }
                 : defaultSelectedPath();
         },
-        setSelectedCode(code) {
-            this.selectedCode = code;
-        },
-        setWasteDetail(detail) {
-            this.wasteDetail = detail;
+        setSelectedWaste(waste) {
+            this.selectedWaste = waste ? { ...waste } : null;
         },
         resetAll() {
             this.activeSection = 'physical';
@@ -100,8 +96,7 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
             this.demandSelections = [];
             this.recommendedPaths = [];
             this.selectedRecommendedPath = defaultSelectedPath();
-            this.selectedCode = '';
-            this.wasteDetail = '';
+            this.selectedWaste = null;
         },
     },
 });

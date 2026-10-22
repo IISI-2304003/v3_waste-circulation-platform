@@ -85,12 +85,10 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Plus, Delete, Search } from '@element-plus/icons-vue'
+import { Delete, Plus } from '@element-plus/icons-vue'
 import {
 	getParameterOptions,
 	getOperatorOptions,
-	searchByStandards
 } from '@/api/wasteCode'
 
 const router = useRouter()
@@ -173,7 +171,6 @@ watch(
 	() => props.wastecode,
 	(code) => {
 		if (code) loadParameterOptions(code)
-		console.log('Loaded parameter options for wastecode:', code)
 
 	},
 	{ immediate: true } // 取代 onMounted，掛載時若已有值也會執行

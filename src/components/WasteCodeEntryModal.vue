@@ -71,6 +71,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useConditionSetupStore } from '@/stores/conditionSetup'
+
+
+const conditionStore = useConditionSetupStore()
 
 const props = defineProps({
 	modelValue: { type: Boolean, default: false },
@@ -104,6 +108,10 @@ const handleCancel = () => {
 	emit('cancel')
 }
 const choose = (type) => {
+	console.log(props.list)
+	conditionStore.setSelectedWaste(
+		typeof props.list === 'object' ? props.list : null
+	)
 	visible.value = false
 	emit(type, type === 'analysis' ? selectedWasteDetail.value : undefined)
 }

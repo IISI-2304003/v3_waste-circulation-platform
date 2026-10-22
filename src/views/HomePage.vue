@@ -562,12 +562,12 @@ const navigateToEntry = (action, { code, category, page }, wasteDetail = '') => 
   if (action === 'analysis') {
     router.push({
       path: '/standard-input', // ← 換成你實際的路由
-      query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'full', wasteDetail }
+      // query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'full', wasteDetail }
     })
   } else {
     router.push({
       path: '/technology-match',
-      query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'quick' }
+      // query: { from: 'home', entry: 'wasteCode', code, category, page, mode: 'quick' }
     })
   }
 }

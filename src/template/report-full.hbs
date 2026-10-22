@@ -130,10 +130,12 @@
         <p class="mode-direction-label">{{#if this.isExternal}}廠外執行方向{{else}}廠內執行方向{{/if}}</p>
         <span class="mode-badge">{{this.modeName}}</span>
         <p class="steps-text">{{this.stepsText}}</p>
-    {{/each}}
+        {{#if this.summary}}
+            <p class="mode-summary-text">{{this.summary}}</p>
+          {{/if}}
     </div>
     {{/each}}
-
+    </div>
     <h2>決策需求摘要</h2>
     {{#if demandSummary.length}}
       <table class="summary-table">

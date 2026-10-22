@@ -823,7 +823,6 @@ watch(allRecommendedPaths, () => {
 
 // 說明：依目前條件即時計算「sorted Vendors」內容，提供畫面顯示與決策判斷使用。
 const sortedVendors = computed(() => {
-
 	let result = vendors.value;
 	// 廠內模式時，執行主體是產源事業自己，僅顯示自己公司的資料
 	if (isInternalMode.value) {
@@ -879,9 +878,6 @@ watch(alternativePaths, () => {
 	alternativePage.value = 0
 })
 
-const switchToAlternativePath = (path) => {
-	conditionStore.setSelectedRecommendedPath(path)
-}
 
 // 說明：由廠商卡片點擊觸發；設定 activeVendor 並開啟廠商詳情視窗。
 const openVendorDetail = (vendor) => {
@@ -941,8 +937,11 @@ const exportFullReportPdf = async () => {
 			externalModeNames: isQuickMode.value ? '' : externalModeNames,
 			internalModeNames: isQuickMode.value ? '' : internalModeNames,
 			demandSummary: visibleDemandSummary.value.map((item) => ({ label: item.label, value: item.value })),
-			isInternalMode: isInternalMode.value,
-			vendors: sortedVendors.value.map(toVendorSummaryData)
+			vendors: sortedVendors.value.map(toVendorSummaryData),
+			wasteCode: {
+				code: conditionStore.selectedWaste.code,
+				name: conditionStore.selectedWaste.name
+			}
 		},
 		filename: `技術決策完整分析報告.pdf`
 	})
