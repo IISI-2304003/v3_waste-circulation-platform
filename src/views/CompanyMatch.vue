@@ -610,7 +610,7 @@ const goBackHome = () => {
 const goNext = (path) => {
   store.setRecommendedPaths(recommendedPaths.value)
   store.setSelectedRecommendedPath(recommendedPaths.value[0])
-  console.log('Selected recommended path:', recommendedPaths.value)
+  store.setIsSimple(false)
   router.push('/technology-match')
 }
 

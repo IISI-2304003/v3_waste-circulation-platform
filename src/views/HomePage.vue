@@ -238,9 +238,11 @@ import CirculationModal from '../components/CirculationModal.vue'
 import { getCategories, getAllWasteCodesGrouped } from '@/api/wasteCode'
 import { categoryVisuals, fallbackVisual } from '@/data/categoryVisuals'
 import WasteCodeEntryModal from '../components/WasteCodeEntryModal.vue'
+import { useConditionSetupStore } from '@/stores/conditionSetup'
 
 const router = useRouter()
 const route = useRoute()
+const conditionStore = useConditionSetupStore()
 const { modes } = useCirculationModes()
 
 
@@ -559,6 +561,7 @@ const getCodeNameByCode = (code) => {
 }
 
 const navigateToEntry = (action, { code, category, page }, wasteDetail = '') => {
+  conditionStore.setIsSimple(action === 'lookup')
   if (action === 'analysis') {
     router.push({
       path: '/standard-input', // ← 換成你實際的路由

@@ -537,7 +537,7 @@
 
 <script setup>
 import { computed, ref, watch, onMounted, markRaw } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import TopModesDialog from '@/components/TopModesDialog.vue'
 import { getCompanyList } from '@/api/wasteCode'
@@ -562,9 +562,8 @@ const companyMatchStore = useCompanyMatchStore()
 const factoryImages = [factory1, factory2, factory3, factory4, factory5] // 用於隨機分配廠商圖片
 
 const router = useRouter()
-const route = useRoute()
-const isQuickMode = computed(() => route.query.mode === 'quick')// 模式判斷
 const conditionStore = useConditionSetupStore()
+const isQuickMode = computed(() => conditionStore.isSimple)
 
 const sortType = ref('overall')
 const selectedRegions = ref([])
