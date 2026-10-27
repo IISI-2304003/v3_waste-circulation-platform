@@ -27,6 +27,9 @@ const defaultBusiness = () => ({
     address: '',
     clearanceFrequency: '',
     clearanceAmount: null,
+    clearanceCost: null,
+    processingAmount: null,
+    processingCost: null,
     technologyMaturity: 5,
     recycledProductDemand: '',
 });

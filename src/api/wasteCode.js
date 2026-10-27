@@ -257,7 +257,6 @@ export function getOperatorOptions() {
     ];
 }
 
-
 /**
  * 決策分析
  */
@@ -265,7 +264,6 @@ export function getOperatorOptions() {
 export function postCompanyData(payload) {
     return request.post('/company/data', payload);
 }
-
 
 /**
  * 簡易模式取得廠商清單
