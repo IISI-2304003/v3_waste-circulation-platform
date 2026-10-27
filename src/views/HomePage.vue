@@ -108,7 +108,7 @@
             <span>知道代碼或名稱? 直接搜尋</span>
           </div>
           <div class="search-card-input-group">
-            <el-input v-model="searchKeyword" clearable placeholder="輸入代碼或關鍵字，例如：C-0202、廢硫酸" class="search-input-field" @input="currentPage = 1" @keyup.enter="currentPage = 1">
+            <el-input v-model="searchKeyword" clearable placeholder="輸入代碼或關鍵字，例如：C-0202、廢液" class="search-input-field" @input="currentPage = 1" @keyup.enter="currentPage = 1">
               <template #prefix>
                 <el-icon>
                   <Search />
@@ -122,7 +122,7 @@
               清除
             </el-button>
           </div>
-        
+
           <!-- 熱門關鍵字 暫時關閉-->
           <!-- <div class="hot-tags-section">
             <span class="hot-tags-label">熱門關鍵字：</span>
@@ -232,6 +232,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useCirculationModes } from '../composables/useCirculationModes'
 import ParticleBackground from '../components/ParticleBackground.vue'
 import CirculationModesGrid from '../components/CirculationModesGrid.vue'
@@ -562,6 +563,10 @@ const getCodeNameByCode = (code) => {
 }
 
 const navigateToEntry = (action, { code, category, page }, wasteDetail = '') => {
+  if (code !== 'C-0202') {
+    ElMessage.info('此廢棄物代碼尚無資料')
+    return
+  }
   conditionStore.setIsSimple(action === 'lookup')
   if (action === 'analysis') {
     router.push({

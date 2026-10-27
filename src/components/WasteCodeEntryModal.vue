@@ -11,7 +11,7 @@
 			<span class="entry-code-chip" :style="chipStyle">{{ code }}</span>
 			<p class="entry-code-name">{{ list.name }}</p>
 			<p class="entry-code-description">{{ list.description }}</p>
-			<div class="entry-detail-field">
+			<div v-if="code === 'C-0202'" class="entry-detail-field">
 				<label class="entry-detail-label" for="waste-detail-select">分析廢液細項</label>
 				<el-select id="waste-detail-select" v-model="selectedWasteDetail" class="entry-detail-select" placeholder="選擇廢液細項">
 					<el-option v-for="item in wasteDetailOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -113,7 +113,7 @@ const choose = (type) => {
 		typeof props.list === 'object' ? props.list : null
 	)
 	visible.value = false
-	emit(type, type === 'analysis' ? selectedWasteDetail.value : undefined)
+	emit(type, type === 'analysis' && props.code === 'C-0202' ? selectedWasteDetail.value : undefined)
 }
 </script>
 
