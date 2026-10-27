@@ -66,7 +66,11 @@ const buildCompanyPayload = () => ({
     businessAddress:
       conditionStore.businessConditions.cityLabel +
       conditionStore.businessConditions.districtLabel +
-      conditionStore.businessConditions.address
+      conditionStore.businessConditions.address,
+    clearanceAmount: conditionStore.businessConditions.clearanceAmount,
+    clearanceCost: conditionStore.businessConditions.clearanceCost,
+    processingAmount: conditionStore.businessConditions.processingAmount,
+    processingCost: conditionStore.businessConditions.processingCost,
   },
   technologySelections: {
     // 技術成熟度選項（複選值陣列）

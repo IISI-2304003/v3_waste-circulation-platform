@@ -251,8 +251,8 @@ export function getOperatorOptions() {
         { value: '等於', label: '等於 (=)' },
         { value: '小於(<)', label: '小於 (<)' },
         { value: '大於(>)', label: '大於 (>)' },
-        { value: '小於等於(<=)', label: '小於等於 (<=)' },
-        { value: '大於等於(>=)', label: '大於等於 (>=)' },
+        { value: '小於等於(<=)', label: '小於等於 (≤)' },
+        { value: '大於等於(>=)', label: '大於等於 (≥)' },
         { value: '範圍', label: '範圍 (~)' },
     ];
 }
