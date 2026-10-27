@@ -85,8 +85,8 @@ const props = defineProps({
 
 const wasteDetailOptions = [
 	{ value: 'C-0202', label: '廢硫酸' },
-	{ value: '廢氫氟酸', label: '廢氫氟酸' },
-	{ value: '廢磷酸', label: '廢磷酸' }
+	// { value: '廢氫氟酸', label: '廢氫氟酸' },
+	// { value: '廢磷酸', label: '廢磷酸' }
 ]
 const selectedWasteDetail = ref(wasteDetailOptions[0].value)
 

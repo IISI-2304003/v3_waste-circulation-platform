@@ -13,7 +13,7 @@
         </el-col>
         <el-col :xs="24" :md="18">
           <div class="header-title">
-            <h1 class="hero-title">產業廢棄物循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
+            <h1 class="hero-title"  @click="goBackHome">產業廢棄物循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
             <p>路徑推薦</p>
           </div>
         </el-col>
@@ -683,6 +683,7 @@ onBeforeUnmount(() => {
       font-size: clamp(36px, 3.2vw, 68px);
       font-weight: 700;
       color: #2d554a;
+      cursor: pointer;
     }
 
     .hero-title-accent {

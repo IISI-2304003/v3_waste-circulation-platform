@@ -12,7 +12,7 @@
         </el-col>
         <el-col :xs="24" :md="18">
           <div class="header-title">
-            <h1 class="hero-title">產業資源循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
+            <h1 class="hero-title" @click="goBackHome">產業資源循環利用<br><span style="color: #4CAF50;">路徑決策</span><span style="color: #06B6D4;">系統</span></h1>
             <p>條件設定</p>
           </div>
         </el-col>
@@ -186,6 +186,7 @@ onMounted(() => {
 
 .header-title {
   text-align: left;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {

@@ -122,15 +122,16 @@
               清除
             </el-button>
           </div>
-          <!-- 熱門關鍵字 -->
-          <div class="hot-tags-section">
+        
+          <!-- 熱門關鍵字 暫時關閉-->
+          <!-- <div class="hot-tags-section">
             <span class="hot-tags-label">熱門關鍵字：</span>
             <div class="hot-tags-list">
               <button v-for="tag in hotTags" :key="tag" class="hot-tag-item" @click="applyTag(tag)">
                 {{ tag }}
               </button>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <el-divider style="margin: 24px 0" />
