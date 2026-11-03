@@ -88,7 +88,12 @@ const wasteDetailOptions = [
 	// { value: '廢氫氟酸', label: '廢氫氟酸' },
 	// { value: '廢磷酸', label: '廢磷酸' }
 ]
-const selectedWasteDetail = ref(wasteDetailOptions[0].value)
+const selectedWasteDetail = computed({
+	get: () => conditionStore.selectedWasteDetail,
+	set: (value) => {
+		conditionStore.selectedWasteDetail = value
+	}
+})
 
 const emit = defineEmits(['update:modelValue', 'lookup', 'analysis', 'cancel'])
 
@@ -108,7 +113,6 @@ const handleCancel = () => {
 	emit('cancel')
 }
 const choose = (type) => {
-	console.log(props.list)
 	conditionStore.setSelectedWaste(
 		typeof props.list === 'object' ? props.list : null
 	)

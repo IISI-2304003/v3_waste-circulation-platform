@@ -67,6 +67,8 @@ const buildCompanyPayload = () => ({
       conditionStore.businessConditions.cityLabel +
       conditionStore.businessConditions.districtLabel +
       conditionStore.businessConditions.address,
+    capitalAmount: conditionStore.businessConditions.capitalAmount,
+    clearanceFrequency: conditionStore.businessConditions.clearanceFrequency,
     clearanceAmount: conditionStore.businessConditions.clearanceAmount,
     clearanceCost: conditionStore.businessConditions.clearanceCost,
     processingAmount: conditionStore.businessConditions.processingAmount,

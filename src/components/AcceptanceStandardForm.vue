@@ -296,7 +296,8 @@ watch(() => standards.value, (value) => {
 
 // 對父層暴露方法
 defineExpose({
-	setStandards
+	setStandards,
+	resetForm
 })
 </script>
 

@@ -13,7 +13,7 @@
         </el-col>
         <el-col :xs="24" :md="18">
           <div class="header-title">
-            <h1 class="hero-title"  @click="goBackHome">產業廢棄物循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
+            <h1 class="hero-title" @click="goBackHome">產業廢棄物循環利用<br><span class="hero-title-accent">路徑決策</span><span class="hero-title-accent-secondary">系統</span></h1>
             <p>路徑推薦</p>
           </div>
         </el-col>
@@ -256,8 +256,6 @@ const IMPACT_LEVEL_STYLE_MAP = {
   unrated: { color: '#9ca3af', levelLabel: '未評估' },
 }
 
-const toRadarScore = (level) => IMPACT_LEVEL_SCORE_MAP[level] || 0
-
 const formatRadarIndicatorName = (label = '') => {
   const text = String(label)
   if (text.length <= 5) return text
@@ -331,6 +329,47 @@ const getDemandLevel = (demandSelections) => {
     .reduce((best, cur) => (LEVEL_RANK[cur] > LEVEL_RANK[best] ? cur : best), 'low')
 }
 
+const economicAssessment = computed(() => {
+  const business = store.businessConditions
+  const scores = []
+  const addScore = (level) => {
+    if (level) scores.push(IMPACT_LEVEL_SCORE_MAP[level])
+  }
+
+  if (business.capitalAmount === 'hundred-million-up') addScore('high')
+  if (business.capitalAmount === 'hundred-million-down') addScore('medium')
+
+  const frequencyLevels = {
+    monthly: 'high',
+    '每月': 'high',
+    quarterly: 'medium',
+    '每季': 'medium',
+    yearly: 'low',
+    '每年': 'low',
+  }
+  addScore(frequencyLevels[business.clearanceFrequency])
+
+  if (business.clearanceCost !== null && business.clearanceCost !== undefined && business.clearanceCost !== '') {
+    const clearanceCost = Number(business.clearanceCost)
+    if (Number.isFinite(clearanceCost)) {
+      addScore(clearanceCost < 50 ? 'high' : clearanceCost === 50 ? 'medium' : 'low')
+    }
+  }
+
+  const score = scores.length
+    ? Math.round(scores.reduce((total, current) => total + current, 0) / scores.length)
+    : 0
+  const level = scores.length === 0
+    ? 'unrated'
+    : score >= 80
+      ? 'high'
+      : score >= 50
+        ? 'medium'
+        : 'low'
+
+  return { assessedCount: scores.length, totalCount: 3, score, level }
+})
+
 
 // 說明：依目前條件即時計算「condition Summary」內容，提供畫面顯示與決策判斷使用。
 const conditionSummary = computed(() => {
@@ -399,16 +438,43 @@ const conditionSummary = computed(() => {
       value: '已設定',
       icon: Goods,
       ...buildItem(demandLevel)
+    },
+    {
+      id: 'economic',
+      label: '經濟效益',
+      value: `判定 ${economicAssessment.value.assessedCount}/${economicAssessment.value.totalCount} 項`,
+      icon: Money,
+      ...buildItem(economicAssessment.value.level, { score: economicAssessment.value.score })
     }
   ]
 })
+
+const economicSummary = computed(() => {
+  const business = store.businessConditions
+  const capitalAmountLabels = {
+    'hundred-million-up': '1億元以上',
+    'hundred-million-down': '1億元以下',
+  }
+  const formatValue = (value, unit = '') =>
+    value === null || value === undefined || value === '' ? '未設定' : `${value}${unit}`
+
+  return [
+    { label: '資本額（元）', value: capitalAmountLabels[business.capitalAmount] || formatValue(business.capitalAmount) },
+    { label: '清除頻率', value: formatValue(business.clearanceFrequency) },
+    { label: '清除量（公噸）', value: formatValue(business.clearanceAmount, ' 公噸') },
+    { label: '清除費用（元/公噸）', value: formatValue(business.clearanceCost, ' 元/公噸') },
+    { label: '處理量（公噸）', value: formatValue(business.processingAmount, ' 公噸') },
+    { label: '處理費用（元/公噸）', value: formatValue(business.processingCost, ' 元/公噸') },
+  ]
+})
+
 // 說明：計算目前條件中尚未評估的項目數量。
 const unsetCount = computed(() =>
   conditionSummary.value.filter((item) => item.level === 'unrated').length
 )
 
 // 說明：依目前條件即時計算「radar Series Values」內容，提供畫面顯示與決策判斷使用。
-const radarSeriesValues = computed(() => conditionSummary.value.map((item) => toRadarScore(item.level)))
+const radarSeriesValues = computed(() => conditionSummary.value.map((item) => item.score))
 
 // 說明：依目前條件即時計算「radar Responsive Config」內容，提供畫面顯示與決策判斷使用。
 const radarResponsiveConfig = computed(() => {
@@ -501,7 +567,7 @@ const radarOption = computed(() => ({
     ...conditionSummary.value.map((item, index) => {
       // 只在該頂點位置放值，其餘補 null
       // 說明：封裝「value」商業邏輯，供目前流程重複使用。
-      const value = conditionSummary.value.map((_, i) => i === index ? toRadarScore(item.level) : '-')
+      const value = conditionSummary.value.map((_, i) => i === index ? item.score : '-')
       const size = item.level === 'high'
         ? radarResponsiveConfig.value.symbolSize.high
         : item.level === 'medium'
@@ -868,6 +934,46 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     gap: 13px;
+  }
+
+  .economic-summary {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #e4ecea;
+  }
+
+  .economic-summary-title {
+    margin: 0 0 10px;
+    color: #1a2e2b;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .economic-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+  }
+
+  .economic-summary-item {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .economic-summary-label {
+    color: #6b7f7a;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .economic-summary-value {
+    overflow-wrap: anywhere;
+    color: #2f6655;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
   }
 
   .summary-row {

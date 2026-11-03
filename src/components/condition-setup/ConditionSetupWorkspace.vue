@@ -80,8 +80,8 @@
 								<strong class="selected-waste-detail-title">{{ props.selectedWaste?.code }}｜{{ props.selectedWaste.name }}</strong>
 								<div class="selected-waste-detail-row">
 									<span class="selected-waste-detail-label">分析廢液：</span>
-									<strong v-if="!isWasteDetailEditing">{{ selectedWasteDetail }}</strong>
-									<el-select v-else v-model="selectedWasteDetail" class="selected-waste-detail-select">
+									<strong v-if="!isWasteDetailEditing">{{ selectedWasteDetailLabel }}</strong>
+									<el-select v-else v-model="store.selectedWasteDetail" class="selected-waste-detail-select">
 										<el-option v-for="item in wasteDetailOptions" :key="item.value" :label="item.label" :value="item.value" />
 									</el-select>
 									<button type="button" class="selected-waste-detail-change" @click="isWasteDetailEditing = !isWasteDetailEditing">
@@ -330,12 +330,15 @@ const props = defineProps({
 
 
 const wasteDetailOptions = [
-	{ value: '廢硫酸', label: '廢硫酸' },
+	{ value: 'C-0202', label: '廢硫酸' },
 	// { value: '廢氫氟酸', label: '廢氫氟酸' },
 	// { value: '廢磷酸', label: '廢磷酸' }
 ]
 
-const selectedWasteDetail = ref(props.wasteDetail || wasteDetailOptions[0].value)
+const selectedWasteDetailLabel = computed(() =>
+	wasteDetailOptions.find((item) => item.value === store.selectedWasteDetail)?.label || ''
+)
+
 const isWasteDetailEditing = ref(false)
 
 const emits = defineEmits(['next'])
@@ -613,10 +616,11 @@ const handleSectionSelect = async (sectionId) => {
 // 說明：由「重設條件」按鈕觸發；清空 store 條件並重置表單驗證狀態。
 const resetAll = () => {
 	store.resetAll()
+	acceptanceRef.value?.resetForm()
 	hasValidationAttempted.value = false
+
 }
 
-// 說明：彙整目前尚未填寫的必填欄位，提供下一步卡控與提示訊息使用。
 const getMissingRequiredFields = () => {
 	const missingFields = []
 

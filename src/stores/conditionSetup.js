@@ -25,6 +25,7 @@ const defaultBusiness = () => ({
     district: '',
     districtLabel: '',
     address: '',
+    capitalAmount: '',
     clearanceFrequency: '',
     clearanceAmount: null,
     clearanceCost: null,
@@ -55,6 +56,7 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
         recommendedPaths: [],
         selectedRecommendedPath: defaultSelectedPath(),
         selectedWaste: null,
+        selectedWasteDetail: 'C-0202',
         isSimple: false,
     }),
     actions: {
@@ -103,7 +105,8 @@ export const useConditionSetupStore = defineStore('conditionSetup', {
             this.demandSelections = [];
             this.recommendedPaths = [];
             this.selectedRecommendedPath = defaultSelectedPath();
-            this.selectedWaste = null;
+            // this.selectedWaste = selectedWaste;
+            // this.selectedWasteDetail = selectedWasteDetail;
             this.isSimple = false;
         },
     },
