@@ -157,9 +157,10 @@ const applyMappedUnit = (standard) => {
 const loadParameterOptions = async (wastecode) => {
 	try {
 		const properties = await getParameterOptions(wastecode)
-		parameterOptions.value = [...properties.map((p) => p.test_item), '外觀']
-		parameterUnitMap.value = Object.fromEntries(properties.map((p) => [p.test_item, p.unit || '']))
-		const apiUnits = [...new Set(properties.map((p) => p.unit).filter(Boolean)), '']
+		parameterOptions.value = [...properties.map((p) => p.test_item)]
+		parameterUnitMap.value = Object.fromEntries(properties.map((p) => [p.test_item, p.unit]))
+		const apiUnits = [...new Set(properties.map((p) => p.unit))]
+		console.log('properties', new Set(properties.map((p) => p.unit)))
 		if (apiUnits.length > 1) unitOptions.value = apiUnits
 		standards.value.forEach(applyMappedUnit)
 	} catch {
@@ -215,6 +216,7 @@ const normalizeStandards = (items) => items
 			parameter: standard.parameter,
 			operator: standard.operator,
 		}
+
 		if (standard.operator === '範圍') {
 			if (standard.valueMin != null && standard.valueMin !== '') result.valueMin = standard.valueMin
 			if (standard.valueMax != null && standard.valueMax !== '') result.valueMax = standard.valueMax

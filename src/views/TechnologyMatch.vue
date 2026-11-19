@@ -115,7 +115,7 @@
 								<Opportunity />
 							</el-icon>
 						</div>
-						<h2>{{ isInternalMode ? '廠內自行執行' : '執行方式與技術廠商' }}</h2>
+						<h2 >{{ isInternalMode ? '廠內自行執行' : isQuickMode ? '技術廠商' : '執行方式與技術廠商' }}</h2>
 					</div>
 					<div v-if="!isInternalMode" class="sort-controls">
 						<el-select v-model="sortType" class="sort-select" placeholder="排序條件">
@@ -259,68 +259,6 @@
 					<el-pagination v-model:current-page="currentPage" :page-size="pageSize" :total="sortedVendors.length" layout="prev, pager, next" />
 				</div>
 			</section>
-
-			<!-- <section v-if="!isQuickMode" class="panel-card suppliers-panel">
-				<div class="suppliers-header">
-					<div class="section-header suppliers-title">
-						<div class="ai-icon">
-							<el-icon>
-								<Opportunity />
-							</el-icon>
-						</div>
-						<h2>其他替代方案</h2>
-					</div>
-					<div v-if="alternativeTotalPages > 1" class="alt-nav-actions">
-						<el-button circle :disabled="alternativePage === 0" @click="goPrevAlternative">
-							<el-icon>
-								<ArrowLeft />
-							</el-icon>
-						</el-button>
-						<span class="alt-nav-page">{{ alternativePage + 1 }} / {{ alternativeTotalPages }}</span>
-						<el-button circle :disabled="alternativePage >= alternativeTotalPages - 1" @click="goNextAlternative">
-							<el-icon>
-								<ArrowRight />
-							</el-icon>
-						</el-button>
-					</div>
-				</div>
-				<div v-if="visibleAlternativePaths.length" class="alternative-grid">
-					<article v-for="path in visibleAlternativePaths" :key="path.modeName" class="alternative-card">
-						<div class="alternative-top">
-							<span class="alternative-badge" :style="{ background: path.gradient }">{{ path.modeName }}</span>
-							<h3>{{ path.title }}</h3>
-						</div>
-						<p class="alternative-summary">{{ path.summary }}</p>
-
-						<div class="flow-diagram alt-flow-diagram">
-							<template v-for="(step, index) in path.steps" :key="`${path.modeName}-${step.label}`">
-								<div class="flow-step">
-									<div class="flow-icon" :style="{ borderColor: path.accentColor + '60', color: path.accentColor }">
-										<el-icon :size="20">
-											<component :is="step.icon" />
-										</el-icon>
-									</div>
-									<span class="flow-label">{{ step.label }}</span>
-								</div>
-								<div v-if="index < path.steps.length - 1" class="flow-arrow" :style="{ color: path.accentColor }">
-									<el-icon>
-										<ArrowRight />
-									</el-icon>
-								</div>
-							</template>
-						</div>
-						<div class="alternative-meta-row">
-							<el-button type="primary" class="detail-btn" @click="switchToAlternativePath(path)">
-								查看此方案
-								<el-icon class="el-icon--right">
-									<ArrowRight />
-								</el-icon>
-							</el-button>
-						</div>
-					</article>
-				</div>
-				<div v-else class="alternative-empty">目前無其他替代方案。</div>
-			</section> -->
 
 			<el-dialog v-model="detailDialogVisible" class="vendor-detail-dialog " width="min(1120px, 94vw)" align-center destroy-on-close :modal="true" :close-on-click-modal="true" :close-on-press-escape="true" append-to-body @closed="closeVendorDetail">
 				<template #header>

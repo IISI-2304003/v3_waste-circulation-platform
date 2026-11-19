@@ -469,9 +469,9 @@ const configuredSections = computed(() => {
 })
 
 const technologyOptions = [
-	{ value: 'mature', label: '現有成熟技術（常態化循環）' },
-	{ value: 'imported', label: '導入既有循環技術（跨產業／新場域應用）' },
-	{ value: 'innovative', label: '描述或創新技術（取代原生料）' }
+	{ value: 'mature', label: '現有成熟技術（委託清理、再利用）' },
+	{ value: 'imported', label: '導入既有循環技術（自行處理、再利用）' },
+	{ value: 'innovative', label: '精進或創新技術（非屬廢棄物）' }
 ]
 
 const demandOptions = [
